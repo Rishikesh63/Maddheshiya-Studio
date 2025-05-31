@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: maddheshiyaStudio
+    env: python
+    rootDir: backend 
+    buildCommand: "poetry install"
+    startCommand: "poetry run waitress-serve --port=$PORT maddheshiyaStudio.wsgi:application"
+    envVars:
+      - key: SECRET_KEY
+        value: django-insecure-k9^sp+piyo779q$#+xy4!fsqf_a-gos^ytjrunwauhsi=c_n72
+      - key: DEBUG
+        value: "False"
+      - key: DATABASE_URL
+        fromDatabase:
+          name: maddheshiya_studio
+          property: connectionString

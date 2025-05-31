@@ -1,0 +1,2 @@
+web: poetry run waitress-serve --port=$PORT maddheshiyaStudio.wsgi:application
+

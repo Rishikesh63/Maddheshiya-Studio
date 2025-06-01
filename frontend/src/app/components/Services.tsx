@@ -1,5 +1,5 @@
 import React from 'react';
-import { Camera, Video, Palette, Plane, Users, Sparkles, Shirt, IdCard, BookOpen, PictureInPicture } from 'lucide-react';
+import { Camera, Video, Palette, Plane,Sparkles, Shirt, IdCard, BookOpen, PictureInPicture } from 'lucide-react';
 import { Button } from '@/app/components/ui/button';
 
 const ServiceCard = ({

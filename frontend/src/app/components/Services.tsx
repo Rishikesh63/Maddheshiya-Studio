@@ -1,6 +1,5 @@
-
 import React from 'react';
-import { Camera, Video, Palette, Plane, Users, Sparkles, Shirt } from 'lucide-react';
+import { Camera, Video, Palette, Plane, Users, Sparkles, Shirt, IdCard, BookOpen, PictureInPicture } from 'lucide-react';
 import { Button } from '@/app/components/ui/button';
 
 const ServiceCard = ({
@@ -20,7 +19,6 @@ const ServiceCard = ({
       <h3 className="text-xl font-bold text-forge-dark mb-2 text-black">{title}</h3>
       <p className="text-gray-600 mb-4">{description}</p>
       <div className="flex">
-
         <Button
           variant="outline"
           className="text-forge-purple border-forge-purple hover:bg-forge-purple/10 px-4 py-2 text-sm"
@@ -31,7 +29,6 @@ const ServiceCard = ({
     </div>
   );
 };
-
 
 const Services = () => {
   const services = [
@@ -61,14 +58,24 @@ const Services = () => {
       description: "Breathtaking aerial perspectives for unique views of your events and properties."
     },
     {
-      icon: <Users className="w-6 h-6 text-forge-purple" />,
-      title: "Virtual Reality Tours",
-      description: "Immersive VR experiences for weddings, real estate, and special events."
-    },
-    {
       icon: <Sparkles className="w-6 h-6 text-forge-purple" />,
       title: "E-commerce Photography",
       description: "Specialized product photography to boost your online store's conversion rates."
+    },
+    {
+      icon: <IdCard className="w-6 h-6 text-forge-purple" />,
+      title: "ID Card Making",
+      description: "Personalized ID cards for schools, offices, and events with secure design and fast turnaround."
+    },
+    {
+      icon: <BookOpen className="w-6 h-6 text-forge-purple" />,
+      title: "Album Designing",
+      description: "Professionally crafted photo albums that preserve your memories with elegance and creativity."
+    },
+    {
+      icon: <PictureInPicture className="w-6 h-6 text-forge-purple" />,
+      title: "Photo Framing",
+      description: "Custom photo framing solutions to beautifully showcase your special moments."
     }
   ];
 

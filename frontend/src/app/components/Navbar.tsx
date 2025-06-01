@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import { Menu, X, Camera } from "lucide-react";
+import { Menu, X} from "lucide-react";
 
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -26,7 +26,7 @@ const Navbar = () => {
       <div className="container px-4 md:px-6 flex items-center">
         {/* Logo */}
         <a href="#" className="flex items-center gap-2">
-          <Camera className="text-forge-purple h-8 w-8" />
+           <img src="images/logo.png" alt="Logo" className="h-12 w-25 object-contain" />
           <span className="text-xl font-bold text-forge-dark">
             Maddheshiya<span className="text-forge-purple">Studio</span>
           </span>

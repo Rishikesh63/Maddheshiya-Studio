@@ -46,11 +46,8 @@ const Footer = () => {
           <div>
             <h3 className="text-lg font-bold mb-4">Rentals</h3>
             <ul className="space-y-2">
-              <li><a href="#" className="text-gray-300 hover:text-forge-purple transition-colors">Studio Spaces</a></li>
               <li><a href="#" className="text-gray-300 hover:text-forge-purple transition-colors">Camera Equipment</a></li>
               <li><a href="#" className="text-gray-300 hover:text-forge-purple transition-colors">Lighting Gear</a></li>
-              <li><a href="#" className="text-gray-300 hover:text-forge-purple transition-colors">Audio Equipment</a></li>
-              <li><a href="#" className="text-gray-300 hover:text-forge-purple transition-colors">List Your Gear</a></li>
             </ul>
           </div>
 

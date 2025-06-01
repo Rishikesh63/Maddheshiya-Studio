@@ -47,9 +47,9 @@ const Contact = () => {
                     <SelectContent className="max-h-60 bg-blue-500">
                       <SelectItem value="photography">Photography Service</SelectItem>
                       <SelectItem value="videography">Videography Service</SelectItem>
-                      <SelectItem value="studio">Studio Rental</SelectItem>
                       <SelectItem value="gear">Gear Rental</SelectItem>
-                      <SelectItem value="listing">List My Equipment</SelectItem>
+                      <SelectItem value="id card">ID Card</SelectItem>
+                      <SelectItem value='t-shirt printing'>T-Shirt Printing</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>

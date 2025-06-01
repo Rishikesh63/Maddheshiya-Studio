@@ -14,8 +14,9 @@ const IDCardMaking = () => {
       Array.from(files).forEach(file => {
         const reader = new FileReader();
         reader.onload = (e) => {
-          if (e.target?.result) {
-            setUploadedCards(prev => [...prev, e.target.result as string]);
+          const readerTarget = e.target as FileReader | null;
+          if (readerTarget?.result) {
+            setUploadedCards(prev => [...prev, readerTarget.result as string]);
           }
         };
         reader.readAsDataURL(file);

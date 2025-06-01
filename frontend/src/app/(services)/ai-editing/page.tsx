@@ -14,8 +14,9 @@ const AIEditing = () => {
       Array.from(files).forEach(file => {
         const reader = new FileReader();
         reader.onload = (e) => {
-          if (e.target?.result) {
-            setUploadedWork(prev => [...prev, e.target.result as string]);
+          const readerTarget = e.target as FileReader | null;
+          if (readerTarget?.result) {
+            setUploadedWork(prev => [...prev, readerTarget.result as string]);
           }
         };
         reader.readAsDataURL(file);

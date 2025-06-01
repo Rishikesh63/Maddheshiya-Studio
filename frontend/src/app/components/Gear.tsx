@@ -55,18 +55,6 @@ const Gear = () => {
       category: "Lighting",
       price: "₹1,200/day"
     },
-    {
-      image: "https://images.unsplash.com/photo-1551813748-05c9a0d0e765?q=80&w=2069",
-      name: "Blackmagic Pocket 6K",
-      category: "Camera",
-      price: "₹3,000/day"
-    },
-    {
-      image: "https://images.unsplash.com/photo-1598646506899-ac6be1060f4c?q=80&w=1974",
-      name: "Zhiyun Crane 3S Gimbal",
-      category: "Stabilizer",
-      price: "₹1,500/day"
-    }
   ];
 
   return (

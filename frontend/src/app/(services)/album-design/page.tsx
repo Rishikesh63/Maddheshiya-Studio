@@ -7,6 +7,11 @@ import { Input } from '@/app/components/ui/input';
 
 const AlbumDesign = () => {
   const [uploadedAlbums, setUploadedAlbums] = useState<string[]>([]);
+  const [sheetCount, setSheetCount] = useState<number>(10);
+
+  const basePrice = 2500;
+  const pricePerSheet = 100;
+  const totalPrice = basePrice + Math.max(0, sheetCount - 10) * pricePerSheet;
 
   const handleAlbumUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
@@ -15,7 +20,6 @@ const AlbumDesign = () => {
         const reader = new FileReader();
         reader.onload = (e) => {
           const readerTarget = e.target as FileReader | null;
-
           if (readerTarget?.result) {
             setUploadedAlbums(prev => [...prev, readerTarget.result as string]);
           }
@@ -49,10 +53,27 @@ const AlbumDesign = () => {
               <div className="grid md:grid-cols-2 gap-8">
                 <div>
                   <h3 className="text-xl font-bold text-forge-dark mb-4">Service Details</h3>
-                  <p className="text-gray-600 mb-6">Transform your digital memories into beautiful physical albums. We create custom-designed photo books that tell your story with elegance and style.</p>
-                  
+                  <p className="text-gray-600 mb-6">
+                    Transform your digital memories into beautiful physical albums. We create custom-designed photo books that tell your story with elegance and style.
+                  </p>
+
+                  <div className="mb-4">
+                    <label htmlFor="sheet-count" className="block text-sm font-medium text-gray-700 mb-1">Number of Sheets</label>
+                    <Input
+                      id="sheet-count"
+                      type="number"
+                      min={1}
+                      value={sheetCount}
+                      onChange={(e) => setSheetCount(parseInt(e.target.value) || 0)}
+                      className="w-32"
+                    />
+                  </div>
+
                   <div className="mb-6">
-                    <p className="text-lg font-semibold text-forge-purple">Starting from ₹2,500</p>
+                    <p className="text-lg font-semibold text-forge-purple">
+                      Total Price: ₹{totalPrice.toLocaleString()}
+                    </p>
+                    <p className="text-sm text-gray-500">Base price includes 10 sheets. ₹{pricePerSheet}/sheet beyond that.</p>
                   </div>
 
                   <Button className="bg-forge-purple hover:bg-forge-darkpurple text-white">
@@ -63,26 +84,18 @@ const AlbumDesign = () => {
                 <div>
                   <h3 className="text-xl font-bold text-forge-dark mb-4">What&apos;s Included</h3>
                   <ul className="space-y-3">
-                    <li className="flex items-center gap-3">
-                      <div className="w-2 h-2 bg-forge-purple rounded-full"></div>
-                      <span className="text-gray-700">Custom Layout Design</span>
-                    </li>
-                    <li className="flex items-center gap-3">
-                      <div className="w-2 h-2 bg-forge-purple rounded-full"></div>
-                      <span className="text-gray-700">Premium Paper Quality</span>
-                    </li>
-                    <li className="flex items-center gap-3">
-                      <div className="w-2 h-2 bg-forge-purple rounded-full"></div>
-                      <span className="text-gray-700">Wedding Albums</span>
-                    </li>
-                    <li className="flex items-center gap-3">
-                      <div className="w-2 h-2 bg-forge-purple rounded-full"></div>
-                      <span className="text-gray-700">Family Photo Books</span>
-                    </li>
-                    <li className="flex items-center gap-3">
-                      <div className="w-2 h-2 bg-forge-purple rounded-full"></div>
-                      <span className="text-gray-700">Corporate Catalogs</span>
-                    </li>
+                    {[
+                      "Custom Layout Design",
+                      "Premium Paper Quality",
+                      "Wedding Albums",
+                      "Family Photo Books",
+                      "Corporate Catalogs"
+                    ].map((item, idx) => (
+                      <li key={idx} className="flex items-center gap-3">
+                        <div className="w-2 h-2 bg-forge-purple rounded-full"></div>
+                        <span className="text-gray-700">{item}</span>
+                      </li>
+                    ))}
                   </ul>
                 </div>
               </div>

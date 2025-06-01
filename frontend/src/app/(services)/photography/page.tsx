@@ -5,6 +5,20 @@ import { Button } from '@/app/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/app/components/ui/card';
 import { Input } from '@/app/components/ui/input';
 
+const eventPricing = [
+  { title: 'Wedding Photography', price: '₹25,000' },
+  { title: 'Engagement Ceremony', price: '₹15,000' },
+  { title: 'Tilak Function', price: '₹18,000' },
+  { title: 'Reception', price: '₹20,000' },
+];
+
+const cameraPricing = [
+  { title: 'DSLR (Basic)', price: 'Included' },
+  { title: 'Mirrorless', price: '+ ₹5,000' },
+  { title: 'Drone Footage', price: '+ ₹10,000' },
+  { title: 'Crane Camera', price: '+ ₹15,000' },
+];
+
 const PhotographyPage = () => {
   const [uploadedImages, setUploadedImages] = useState<string[]>([]);
 
@@ -32,6 +46,7 @@ const PhotographyPage = () => {
     <div className="min-h-screen bg-forge-light/30 py-20">
       <div className="container mx-auto px-4">
         <div className="max-w-4xl mx-auto">
+          {/* Main Photography Info */}
           <Card className="mb-8">
             <CardHeader>
               <div className="flex items-center gap-4 mb-4">
@@ -62,33 +77,57 @@ const PhotographyPage = () => {
                 <div>
                   <h3 className="text-xl font-bold text-forge-dark mb-4">What&apos;s Included</h3>
                   <ul className="space-y-3">
-                    <li className="flex items-center gap-3">
-                      <div className="w-2 h-2 bg-forge-purple rounded-full"></div>
-                      <span className="text-gray-700">Wedding Photography</span>
-                    </li>
-                    <li className="flex items-center gap-3">
-                      <div className="w-2 h-2 bg-forge-purple rounded-full"></div>
-                      <span className="text-gray-700">Event Coverage</span>
-                    </li>
-                    <li className="flex items-center gap-3">
-                      <div className="w-2 h-2 bg-forge-purple rounded-full"></div>
-                      <span className="text-gray-700">Product Photography</span>
-                    </li>
-                    <li className="flex items-center gap-3">
-                      <div className="w-2 h-2 bg-forge-purple rounded-full"></div>
-                      <span className="text-gray-700">Portrait Sessions</span>
-                    </li>
-                    <li className="flex items-center gap-3">
-                      <div className="w-2 h-2 bg-forge-purple rounded-full"></div>
-                      <span className="text-gray-700">Corporate Headshots</span>
-                    </li>
+                    {['Wedding Photography', 'Event Coverage', 'Product Photography', 'Portrait Sessions', 'Corporate Headshots'].map(item => (
+                      <li key={item} className="flex items-center gap-3">
+                        <div className="w-2 h-2 bg-forge-purple rounded-full"></div>
+                        <span className="text-gray-700">{item}</span>
+                      </li>
+                    ))}
                   </ul>
                 </div>
               </div>
             </CardContent>
           </Card>
 
-          {/* Portfolio Section */}
+          {/* Pricing by Event */}
+          <Card className="mb-8">
+            <CardHeader>
+              <CardTitle className="text-2xl text-forge-dark">Event-Based Pricing</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {eventPricing.map((event, idx) => (
+                  <Card key={idx} className="bg-white shadow-sm border">
+                    <CardContent className="p-4">
+                      <h4 className="text-lg font-semibold text-forge-purple">{event.title}</h4>
+                      <p className="text-gray-700 mt-1">{event.price}</p>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Pricing by Camera */}
+          <Card className="mb-8">
+            <CardHeader>
+              <CardTitle className="text-2xl text-forge-dark">Camera Options & Pricing</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {cameraPricing.map((camera, idx) => (
+                  <Card key={idx} className="bg-white shadow-sm border">
+                    <CardContent className="p-4">
+                      <h4 className="text-lg font-semibold text-forge-purple">{camera.title}</h4>
+                      <p className="text-gray-700 mt-1">{camera.price}</p>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Portfolio Upload Section */}
           <Card>
             <CardHeader>
               <CardTitle className="text-2xl text-forge-dark">Portfolio & Client Work</CardTitle>

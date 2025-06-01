@@ -7,6 +7,11 @@ import { Input } from '@/app/components/ui/input';
 
 const PhotoFraming = () => {
   const [uploadedFrames, setUploadedFrames] = useState<string[]>([]);
+  const [length, setLength] = useState<number>(0);
+  const [width, setWidth] = useState<number>(0);
+  const [calculatedPrice, setCalculatedPrice] = useState<number>(0);
+
+  const ratePerSquareInch = 2; // ₹2 per sq.inch
 
   const handleFrameUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
@@ -26,6 +31,15 @@ const PhotoFraming = () => {
 
   const removeFrame = (index: number) => {
     setUploadedFrames(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const handleCalculatePrice = () => {
+    if (length > 0 && width > 0) {
+      const price = length * width * ratePerSquareInch;
+      setCalculatedPrice(price);
+    } else {
+      setCalculatedPrice(0);
+    }
   };
 
   return (
@@ -49,9 +63,38 @@ const PhotoFraming = () => {
                 <div>
                   <h3 className="text-xl font-bold text-forge-dark mb-4">Service Details</h3>
                   <p className="text-gray-600 mb-6">Professional photo framing services using premium materials and expert craftsmanship. We help you display your precious memories beautifully.</p>
-                  
+
+                  <div className="mb-4">
+                    <label className="block mb-1 text-gray-700 font-medium">Enter Frame Size (in inches)</label>
+                    <div className="flex gap-2 items-center">
+                      <Input
+                        type="number"
+                        placeholder="Length"
+                        value={length}
+                        onChange={(e) => setLength(Number(e.target.value))}
+                        className="w-1/2"
+                      />
+                      <span className="text-gray-500">×</span>
+                      <Input
+                        type="number"
+                        placeholder="Width"
+                        value={width}
+                        onChange={(e) => setWidth(Number(e.target.value))}
+                        className="w-1/2"
+                      />
+                    </div>
+                    <Button
+                      onClick={handleCalculatePrice}
+                      className="mt-3 bg-forge-purple hover:bg-forge-darkpurple text-white"
+                    >
+                      Calculate Price
+                    </Button>
+                  </div>
+
                   <div className="mb-6">
-                    <p className="text-lg font-semibold text-forge-purple">Starting from ₹800</p>
+                    <p className="text-lg font-semibold text-forge-purple">
+                      {calculatedPrice > 0 ? `Estimated Price: ₹${calculatedPrice}` : 'Starting from ₹800'}
+                    </p>
                   </div>
 
                   <Button className="bg-forge-purple hover:bg-forge-darkpurple text-white">

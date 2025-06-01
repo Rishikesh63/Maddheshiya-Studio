@@ -39,7 +39,7 @@ const EcommercePhotography = () => {
                 </div>
                 <div>
                   <CardTitle className="text-3xl text-forge-dark">E-commerce Photography</CardTitle>
-                  <p className="text-lg text-gray-600 mt-2">Specialized product photography to boost your online store's conversion rates.</p>
+                  <p className="text-lg text-gray-600 mt-2">Specialized product photography to boost your online store&apos;s conversion rates.</p>
                 </div>
               </div>
             </CardHeader>

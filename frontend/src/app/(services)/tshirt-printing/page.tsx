@@ -47,7 +47,7 @@ const TshirtPrinting = () => {
               <div className="grid md:grid-cols-2 gap-8">
                 <div>
                   <h3 className="text-xl font-bold text-forge-dark mb-4">Service Details</h3>
-                  <p className="text-gray-600 mb-6">Express yourself with our custom t-shirt printing services. Whether it's for events, businesses, or personal use, we deliver high-quality prints that last.</p>
+                  <p className="text-gray-600 mb-6">Express yourself with our custom t-shirt printing services. Whether it&apos;s for events, businesses, or personal use, we deliver high-quality prints that last.</p>
                   
                   <div className="mb-6">
                     <p className="text-lg font-semibold text-forge-purple">Starting from ₹300 per piece</p>

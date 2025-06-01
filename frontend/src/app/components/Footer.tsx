@@ -1,5 +1,6 @@
 import React from 'react';
-import { Camera, Instagram, Facebook, Twitter, Linkedin, Mail } from 'lucide-react';
+import { Camera, Instagram, Facebook, Linkedin, Mail } from 'lucide-react';
+import { FaWhatsapp } from 'react-icons/fa';
 
 const Footer = () => {
   return (
@@ -17,16 +18,16 @@ const Footer = () => {
               A tech-driven platform for photography, videography, and gear rentals.
             </p>
             <div className="flex space-x-4">
-              <a href="#" className="hover:text-forge-purple transition-colors">
+              <a href="https://www.instagram.com/mithlesh_mds/" className="hover:text-forge-purple transition-colors">
                 <Instagram className="h-5 w-5" />
               </a>
-              <a href="#" className="hover:text-forge-purple transition-colors">
+              <a href="https://www.facebook.com/mithlesh.maddheshiya.3" className="hover:text-forge-purple transition-colors">
                 <Facebook className="h-5 w-5" />
               </a>
-              <a href="#" className="hover:text-forge-purple transition-colors">
-                <Twitter className="h-5 w-5" />
+              <a href="https://whatsapp.com/channel/0029VagkphGEVccOiwnVkg47" className="hover:text-forge-purple transition-colors">
+                <FaWhatsapp className="h-5 w-5" />
               </a>
-              <a href="#" className="hover:text-forge-purple transition-colors">
+              <a href="https://www.linkedin.com/groups/14707064/" className="hover:text-forge-purple transition-colors">
                 <Linkedin className="h-5 w-5" />
               </a>
             </div>
@@ -48,6 +49,8 @@ const Footer = () => {
             <ul className="space-y-2">
               <li><a href="#" className="text-gray-300 hover:text-forge-purple transition-colors">Camera Equipment</a></li>
               <li><a href="#" className="text-gray-300 hover:text-forge-purple transition-colors">Lighting Gear</a></li>
+              <li><a href="#" className="text-gray-300 hover:text-forge-purple transition-colors">Tripod</a></li>
+
             </ul>
           </div>
 

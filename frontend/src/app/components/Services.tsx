@@ -1,5 +1,5 @@
 import React from 'react';
-import { Camera, Video, Palette, Plane,Sparkles, Shirt, IdCard, BookOpen, PictureInPicture } from 'lucide-react';
+import { Camera, Video, Palette, Plane,Sparkles, Shirt, IdCard, BookOpen, PictureInPicture,Bot } from 'lucide-react';
 import { Button } from '@/app/components/ui/button';
 
 const ServiceCard = ({
@@ -76,7 +76,13 @@ const Services = () => {
       icon: <PictureInPicture className="w-6 h-6 text-forge-purple" />,
       title: "Photo Framing",
       description: "Custom photo framing solutions to beautifully showcase your special moments."
-    }
+    },
+    {
+  icon: <Bot className="w-6 h-6 text-forge-purple" />,
+  title: "AI Assistant Development",
+  description: "Custom AI chatbot and assistant solutions for websites, businesses, and automation workflows."
+}
+
   ];
 
   return (

@@ -47,7 +47,7 @@ const PhotographyPage = () => {
               <div className="grid md:grid-cols-2 gap-8">
                 <div>
                   <h3 className="text-xl font-bold text-forge-dark mb-4">Service Details</h3>
-                  <p className="text-gray-600 mb-6">Our professional photography services capture life's most precious moments with artistic excellence. We specialize in wedding photography, event documentation, product photography for businesses, and portrait sessions.</p>
+                  <p className="text-gray-600 mb-6">Our professional photography services capture life&apos;s most precious moments with artistic excellence. We specialize in wedding photography, event documentation, product photography for businesses, and portrait sessions.</p>
                   
                   <div className="mb-6">
                     <p className="text-lg font-semibold text-forge-purple">Starting from ₹15,000</p>

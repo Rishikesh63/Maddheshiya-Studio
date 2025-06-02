@@ -7,7 +7,7 @@ SERVICE_CATEGORIES = [
     ('profesional_photography', 'Photography'),
     ('videography', 'Videography'),
     ('ai_powered_editing','AI Powered Editing'),
-    ('custom_tshirt_printing','Cutome T-Shirt Printing'),
+    ('custom_tshirt_printing','Custom T-Shirt Printing'),
     ('drone_footage', 'Drone Footage'),
     ('e_commerce_photography','E-Commerce Photography'),
     ('id_card_making', 'ID Card Making'),
@@ -22,13 +22,24 @@ class Service(models.Model):
     category = models.CharField(max_length=50, choices=SERVICE_CATEGORIES)
     description = models.TextField()
     price = models.DecimalField(max_digits=10, decimal_places=2)
-    whats_included = models.JSONField(default=list)  # list of features
+    whats_included = models.JSONField(default=list)
 
     def __str__(self):
         return f"{self.name} - {self.category}"
 
+MEDIA_TYPE_CHOICES = [
+    ('image', 'Image'),
+    ('video', 'Video'),
+    ('url', 'External URL'),
+]
+
 class UploadedMedia(models.Model):
     service = models.ForeignKey(Service, on_delete=models.CASCADE, related_name="media")
     uploaded_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
-    image = models.ImageField(upload_to="service_uploads/")
+    media_type = models.CharField(max_length=10, choices=MEDIA_TYPE_CHOICES)
+    file = models.FileField(upload_to="service_uploads/", blank=True, null=True)
+    external_url = models.URLField(blank=True, null=True)
     uploaded_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.media_type} - {self.file or self.external_url}"

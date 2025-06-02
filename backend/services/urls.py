@@ -1,7 +1,9 @@
 from django.urls import path
-from .views import ServiceListCreateView, BookingListCreateView
+from . import views
 
 urlpatterns = [
-    path('services/', ServiceListCreateView.as_view(), name='service-list-create'),
-    path('bookings/', BookingListCreateView.as_view(), name='booking-list-create'),
+    path('services/', views.ServiceListView.as_view(), name='service-list'),
+    path('services/<int:id>/', views.ServiceDetailView.as_view(), name='service-detail'),
+    path('services/<int:service_id>/upload/', views.UploadMediaView.as_view(), name='upload-media'),
 ]
+

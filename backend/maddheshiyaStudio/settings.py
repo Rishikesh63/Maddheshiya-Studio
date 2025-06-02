@@ -31,8 +31,8 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-k9^sp+piyo779q$#+xy4!fsqf_a-gos^ytjrunwauhsi=c_n72'
-# SECRET_KEY = env('SECRET_KEY')
+# SECRET_KEY = 'django-insecure-k9^sp+piyo779q$#+xy4!fsqf_a-gos^ytjrunwauhsi=c_n72'
+SECRET_KEY = env('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG =  env.bool('DEBUG', default=False)
@@ -55,7 +55,18 @@ INSTALLED_APPS = [
     'store.apps.StoreConfig',
     'users.apps.UsersConfig',
     'rest_framework_simplejwt',
+    'django.contrib.sites',
+    'allauth',
+    'rest_framework.authtoken',
+    'allauth.account',
+    'allauth.socialaccount',
+    'allauth.socialaccount.providers.google',
+     'dj_rest_auth',
+    'dj_rest_auth.registration',    
+
 ]
+
+SITE_ID = 1
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -63,6 +74,7 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+     'allauth.account.middleware.AccountMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'corsheaders.middleware.CorsMiddleware',
@@ -156,6 +168,22 @@ REST_FRAMEWORK = {
 }
 
 AUTH_USER_MODEL = 'users.CustomUser'
+ # For dev: prints emails to console
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+
+# Allauth config for email verification
+ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_EMAIL_VERIFICATION = "mandatory"
+ACCOUNT_AUTHENTICATION_METHOD = "username_email"
+ACCOUNT_USERNAME_REQUIRED = True
+ACCOUNT_USER_MODEL_USERNAME_FIELD = "username"
+ACCOUNT_UNIQUE_EMAIL = True
+
+# Redirect URLs after login/logout - can customize
+LOGIN_REDIRECT_URL = "/"
+LOGOUT_REDIRECT_URL = "/"
+
 
 
 CORS_ALLOWED_ORIGINS = [

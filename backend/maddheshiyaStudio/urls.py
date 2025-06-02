@@ -35,6 +35,10 @@ urlpatterns = [
       # JWT auth routes
     path('api/auth/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/auth/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    
+    # dj-rest-auth URLs:
+    path('auth/', include('dj_rest_auth.urls')),            # Login, logout, password reset etc.
+    path('auth/registration/', include('dj_rest_auth.registration.urls')),  # Registration + email verification
 ]
 
 # Media files handling (e.g. profile images, uploads)

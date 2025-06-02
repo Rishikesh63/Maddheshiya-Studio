@@ -1,18 +1,17 @@
-from django.shortcuts import render
-from rest_framework import generics
-from rest_framework.views import APIView
+from rest_framework import generics, permissions
 from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.views import APIView
+from .serializers import RegisterSerializer, UserSerializer
 from .models import CustomUser
-from .serializers import UserSerializer
 
-class UserListCreateView(generics.ListCreateAPIView):
+class RegisterView(generics.CreateAPIView):
     queryset = CustomUser.objects.all()
-    serializer_class = UserSerializer
-    pass
+    permission_classes = [permissions.AllowAny]
+    serializer_class = RegisterSerializer
 
-class ProtectedView(APIView):
-    permission_classes = [IsAuthenticated]
+class UserDetailView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
 
     def get(self, request):
-        return Response({'message': 'Hello, Authenticated User!'})
+        serializer = UserSerializer(request.user)
+        return Response(serializer.data)

@@ -22,7 +22,10 @@ class Service(models.Model):
     category = models.CharField(max_length=50, choices=SERVICE_CATEGORIES)
     description = models.TextField()
     price = models.DecimalField(max_digits=10, decimal_places=2)
-    whats_included = models.JSONField(default=list)
+    whats_included = models.TextField(help_text="Enter one item per line")
+    
+    def get_whats_included_list(self):
+        return [item.strip() for item in self.whats_included.strip().splitlines() if item.strip()]
 
     def __str__(self):
         return f"{self.name} - {self.category}"

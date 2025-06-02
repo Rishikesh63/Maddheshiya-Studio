@@ -31,13 +31,13 @@ const Hero = () => {
           {/* Textual Content */}
           <header className="space-y-8 animate-fade-in">
             <div className="inline-block bg-forge-purple/10 px-4 py-2 rounded-full">
-              <p className="text-forge-darkpurple font-medium flex items-center gap-1">
+              <p className="text-gray-800 font-medium flex items-center gap-1">
                 <span className="w-2 h-2 bg-forge-purple rounded-full" />
                 Tech-Driven Photography & Videography
               </p>
             </div>
 
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight text-forge-dark">
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight text-gray-700">
               Capture <span className="text-forge-purple">moments</span> that matter, rent <span className="text-forge-purple">gear</span> you need
             </h1>
 

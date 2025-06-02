@@ -45,11 +45,16 @@ const Contact = () => {
                       <SelectValue placeholder="Select a service" />
                     </SelectTrigger>
                     <SelectContent className="max-h-60 bg-blue-500">
-                      <SelectItem value="photography">Photography Service</SelectItem>
-                      <SelectItem value="videography">Videography Service</SelectItem>
-                      <SelectItem value="gear">Gear Rental</SelectItem>
-                      <SelectItem value="id card">ID Card</SelectItem>
+                      <SelectItem value="photography">Professional Photography</SelectItem>
+                      <SelectItem value="videography">Videography </SelectItem>
+                      <SelectItem value="gear">AI Powered Editing</SelectItem>
+                      <SelectItem value="id card">ID Card making</SelectItem>
                       <SelectItem value='t-shirt printing'>T-Shirt Printing</SelectItem>
+                      <SelectItem value='drone footage'>Drone Footage</SelectItem>
+                      <SelectItem value="e-commerce photography">E-Commerce Photography</SelectItem>
+                      <SelectItem value='albumb designing'>Albumb Designing</SelectItem>
+                      <SelectItem value='photo framing'>Photo Framing</SelectItem>
+                      <SelectItem value='ai assistant development'>AI Assistant Development</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>

@@ -1,2 +1,11 @@
 /venv
 .env
+
+
+*.mp4
+*.mov
+*.avi
+*.zip
+*.tar
+*.exe
+*.bin

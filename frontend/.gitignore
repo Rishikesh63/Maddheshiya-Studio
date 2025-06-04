@@ -40,3 +40,12 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+
+*.mp4
+*.mov
+*.avi
+*.zip
+*.tar
+*.exe
+*.bin

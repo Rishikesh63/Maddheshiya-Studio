@@ -1,5 +1,5 @@
 import React from 'react';
-import Image from 'next/image'; // If you're using Next.js
+import Image from 'next/image'; 
 import { Button } from '@/app/components/ui/button';
 import { ArrowRight, Camera, Video, Film } from 'lucide-react';
 import { LucideIcon } from "lucide-react";

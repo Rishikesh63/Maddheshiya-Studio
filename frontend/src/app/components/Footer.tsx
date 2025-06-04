@@ -36,11 +36,17 @@ const Footer = () => {
           <div>
             <h3 className="text-lg font-bold mb-4">Our Services</h3>
             <ul className="space-y-2">
-              <li><a href="#" className="text-gray-300 hover:text-forge-purple transition-colors">Wedding Photography</a></li>
+              <li><a href="#" className="text-gray-300 hover:text-forge-purple transition-colors">Professional Photography</a></li>
               <li><a href="#" className="text-gray-300 hover:text-forge-purple transition-colors">Event Videography</a></li>
               <li><a href="#" className="text-gray-300 hover:text-forge-purple transition-colors">Product Photography</a></li>
               <li><a href="#" className="text-gray-300 hover:text-forge-purple transition-colors">Drone Services</a></li>
-              <li><a href="#" className="text-gray-300 hover:text-forge-purple transition-colors">VR Experiences</a></li>
+              <li><a href="#" className="text-gray-300 hover:text-forge-purple transition-colors">E-Commerce PhotoGraphy</a></li>
+              <li><a href="#" className="text-gray-300 hover:text-forge-purple transition-colors">ID Card Making</a></li>
+              <li><a href="#" className="text-gray-300 hover:text-forge-purple transition-colors">AI Editing</a></li>
+              <li><a href="#" className="text-gray-300 hover:text-forge-purple transition-colors">AI Assistants</a></li>
+              <li><a href="#" className="text-gray-300 hover:text-forge-purple transition-colors">Album Designing</a></li>
+              <li><a href="#" className="text-gray-300 hover:text-forge-purple transition-colors">Photo Framing</a></li>
+
             </ul>
           </div>
 

@@ -69,7 +69,7 @@ const Gear = () => {
 
         <div className="flex overflow-x-auto pb-8 space-x-6 snap-x snap-mandatory no-scrollbar">
           {gearItems.map((item, index) => (
-            <div key={index} className="min-w-[250px] sm:min-w-[280px] snap-center">
+            <div key={index} className="min-w-[250px] sm:min-w-[280px] snap-center text-black">
               <GearCard 
                 image={item.image}
                 name={item.name}
@@ -89,7 +89,7 @@ const Gear = () => {
         <div className="mt-16 bg-white rounded-2xl shadow-lg p-8">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
             <div>
-              <h3 className="text-2xl font-bold text-forge-dark mb-4">Have gear? List it and earn</h3>
+              <h3 className="text-2xl font-bold text-gray-950 mb-4">Have gear? List it and earn</h3>
               <p className="text-gray-600 mb-6">
                 Own photography or videography equipment that sits idle? List it on our platform and earn passive income when others rent your gear.
               </p>

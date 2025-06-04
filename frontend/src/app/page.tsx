@@ -7,7 +7,6 @@ import Footer from '@/app/components/Footer';
 import Gear from "@/app/components/Gear";
 import Contact from "@/app/components/Contact";
 import PhotoGallery from '@/app/components/PhotoGallery';
-import {CldVideoPlayer } from "next-cloudinary";
 import VideoGallery from "@/app/components/VideoGallery";
 
 export default function Home() {

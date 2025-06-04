@@ -9,6 +9,10 @@ const videoMedia = [
     type: "video",
     publicId: "Ring_Ceremony_c7e9xh",
   },
+  {
+    type:"video",
+    publicId: "Wedding_fyh6ak",
+  }
   // Add more videos as needed
 ];
 

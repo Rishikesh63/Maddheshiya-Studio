@@ -1,27 +1,121 @@
-'use client'
-import React, { useState } from 'react';
-import { Plane, Upload, X } from 'lucide-react';
-import { Button } from '@/app/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/app/components/ui/card';
-import { Input } from '@/app/components/ui/input';
+"use client";
 
-const DroneFotage = () => {
-  const [uploadedFootage, setUploadedFootage] = useState<string[]>([]);
+import React, { useState, useCallback } from 'react';
+import { Plane, Upload, X, CheckCircle, Film, Map, Building } from 'lucide-react';
 
-  const handleFootageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const files = event.target.files;
+// --- Mock UI Components for Demonstration ---
+const Button = ({ children, className, ...props }: { children: React.ReactNode; className?: string; [key:string]: any }) => (
+    <button className={`inline-flex items-center justify-center rounded-lg text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none ring-offset-background ${className}`} {...props}>{children}</button>
+);
+const Card = ({ children, className, ...props }: { children: React.ReactNode; className?: string; [key:string]: any }) => (
+    <div className={`rounded-xl border bg-white text-card-foreground shadow-sm ${className}`} {...props}>{children}</div>
+);
+const CardContent = ({ children, className, ...props }: { children: React.ReactNode; className?: string; [key:string]: any }) => (
+    <div className={`p-6 ${className}`} {...props}>{children}</div>
+);
+const CardHeader = ({ children, className, ...props }: { children: React.ReactNode; className?: string; [key:string]: any }) => (
+    <div className={`flex flex-col space-y-1.5 p-6 ${className}`} {...props}>{children}</div>
+);
+const CardTitle = ({ children, className, ...props }: { children: React.ReactNode; className?: string; [key:string]: any }) => (
+    <h3 className={`text-lg font-semibold leading-none tracking-tight ${className}`} {...props}>{children}</h3>
+);
+const Input = ({ className, ...props }: { className?: string; [key:string]: any }) => (
+    <input className={`flex h-10 w-full rounded-md border border-slate-300 bg-transparent px-3 py-2 text-sm ${className}`} {...props} />
+);
+
+// --- Type Definitions ---
+interface FeatureItem {
+  icon: React.ReactElement;
+  title: string;
+  description: string;
+}
+interface UploadedFile {
+  name: string;
+  url: string;
+  type: string;
+}
+
+// --- Data Layer ---
+const includedFeatures = [
+  "Aerial Photography & Videography", "4K High-Resolution Recording", "Real Estate Virtual Tours", 
+  "Event & Wedding Coverage", "Construction Site Monitoring"
+];
+
+const featureHighlights: FeatureItem[] = [
+    { icon: <Film size={24} className="text-indigo-500" />, title: 'Cinematic Quality', description: 'Capture breathtaking, movie-like aerial shots.' },
+    { icon: <Map size={24} className="text-indigo-500" />, title: 'Unique Perspectives', description: 'Showcase properties and events from stunning new angles.' },
+    { icon: <Building size={24} className="text-indigo-500" />, title: 'Versatile Applications', description: 'Perfect for real estate, construction, events, and more.' },
+];
+
+// --- Reusable Sub-components ---
+const FeatureListItem = ({ children }: { children: React.ReactNode }) => (
+  <li className="flex items-center gap-3">
+    <CheckCircle className="w-5 h-5 text-green-500" />
+    <span className="text-slate-700">{children}</span>
+  </li>
+);
+
+const FeatureHighlightCard = ({ icon, title, description }: FeatureItem) => (
+  <div className="text-center p-4">
+    <div className="flex justify-center items-center mb-4">
+        <div className="bg-indigo-100 p-4 rounded-full">{icon}</div>
+    </div>
+    <h4 className="text-lg font-semibold text-slate-800 mb-1">{title}</h4>
+    <p className="text-slate-600 text-sm">{description}</p>
+  </div>
+);
+
+const MediaPreview = ({ file, onRemove }: { file: UploadedFile; onRemove: () => void; }) => (
+    <div className="relative group bg-slate-100 rounded-lg overflow-hidden">
+        {file.type.startsWith('image/') ? (
+            <img src={file.url} alt={file.name} className="w-full h-40 object-cover" />
+        ) : (
+            <video src={file.url} controls className="w-full h-40 object-cover" />
+        )}
+        <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+            <button
+                onClick={onRemove}
+                className="bg-red-500 text-white rounded-full p-2"
+                aria-label="Remove media"
+            >
+                <X className="w-5 h-5" />
+            </button>
+        </div>
+    </div>
+);
+
+// --- Main Drone Footage Page Component ---
+const DroneFootagePage = () => {
+  const [uploadedFootage, setUploadedFootage] = useState<UploadedFile[]>([]);
+  const [isDragging, setIsDragging] = useState(false);
+
+  const handleFileChange = useCallback((files: FileList | null) => {
     if (files) {
       Array.from(files).forEach(file => {
-        const reader = new FileReader();
-        reader.onload = (e) => {
-          const readerTarget = e.target as FileReader | null;
-          if (readerTarget?.result) {
-            setUploadedFootage(prev => [...prev, readerTarget.result as string]);
-          }
-        };
-        reader.readAsDataURL(file);
+        if (file.type.startsWith('image/') || file.type.startsWith('video/')) {
+          const reader = new FileReader();
+          reader.onload = (e: ProgressEvent<FileReader>) => {
+            const readerTarget = e.target;
+            if (readerTarget?.result) {
+              setUploadedFootage(prev => [...prev, {
+                name: file.name,
+                url: readerTarget.result as string,
+                type: file.type
+              }]);
+            }
+          };
+          reader.readAsDataURL(file);
+        }
       });
     }
+  }, []);
+
+  const handleDragEvents = (e: React.DragEvent<HTMLDivElement>, action: 'enter' | 'leave' | 'over' | 'drop') => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (action === 'enter' || action === 'over') setIsDragging(true);
+    if (action === 'leave' || action === 'drop') setIsDragging(false);
+    if (action === 'drop') handleFileChange(e.dataTransfer.files);
   };
 
   const removeFootage = (index: number) => {
@@ -29,108 +123,80 @@ const DroneFotage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-forge-light/30 py-20">
+    <div className="min-h-screen bg-slate-50 py-20">
       <div className="container mx-auto px-4">
-        <div className="max-w-4xl mx-auto">
-          <Card className="mb-8">
+        <div className="max-w-5xl mx-auto space-y-12">
+          
+          <Card>
             <CardHeader>
-              <div className="flex items-center gap-4 mb-4">
-                <div className="w-16 h-16 rounded-xl bg-forge-purple/10 flex items-center justify-center">
-                  <Plane className="w-8 h-8 text-forge-purple" />
+              <div className="flex items-center gap-4">
+                <div className="w-16 h-16 rounded-xl bg-indigo-100 flex items-center justify-center">
+                  <Plane className="w-8 h-8 text-indigo-600" />
                 </div>
                 <div>
-                  <CardTitle className="text-3xl text-forge-dark">Drone Footage</CardTitle>
-                  <p className="text-lg text-gray-600 mt-2">Breathtaking aerial perspectives for unique views of your events and properties.</p>
+                  <h1 className="text-3xl font-bold text-slate-900">Drone Footage</h1>
+                  <p className="text-lg text-slate-600 mt-1">Breathtaking aerial views for your events and properties.</p>
                 </div>
               </div>
             </CardHeader>
             <CardContent>
               <div className="grid md:grid-cols-2 gap-8">
                 <div>
-                  <h3 className="text-xl font-bold text-forge-dark mb-4">Service Details</h3>
-                  <p className="text-gray-600 mb-6">Capture stunning aerial footage with our professional drone services. Perfect for real estate, events, construction monitoring, and cinematic productions.</p>
-                  
-                  <div className="mb-6">
-                    <p className="text-lg font-semibold text-forge-purple">Starting from ₹8,000</p>
-                  </div>
-
-                  <Button className="bg-forge-purple hover:bg-forge-darkpurple text-white">
-                    Book This Service
-                  </Button>
+                  <h3 className="text-xl font-bold text-slate-800 mb-4">Service Details</h3>
+                  <p className="text-slate-600 mb-6">Capture stunning aerial footage with our professional drone services. Perfect for real estate, events, construction monitoring, and cinematic productions.</p>
+                  <p className="text-lg font-semibold text-indigo-600 mb-6">Starting from ₹8,000</p>
+                  <Button className="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2">Book This Service</Button>
                 </div>
-
                 <div>
-                  <h3 className="text-xl font-bold text-forge-dark mb-4">What&apos;s Included</h3>
+                  <h3 className="text-xl font-bold text-slate-800 mb-4">What's Included</h3>
                   <ul className="space-y-3">
-                    <li className="flex items-center gap-3">
-                      <div className="w-2 h-2 bg-forge-purple rounded-full"></div>
-                      <span className="text-gray-700">Aerial Photography</span>
-                    </li>
-                    <li className="flex items-center gap-3">
-                      <div className="w-2 h-2 bg-forge-purple rounded-full"></div>
-                      <span className="text-gray-700">4K Video Recording</span>
-                    </li>
-                    <li className="flex items-center gap-3">
-                      <div className="w-2 h-2 bg-forge-purple rounded-full"></div>
-                      <span className="text-gray-700">Real Estate Tours</span>
-                    </li>
-                    <li className="flex items-center gap-3">
-                      <div className="w-2 h-2 bg-forge-purple rounded-full"></div>
-                      <span className="text-gray-700">Event Coverage</span>
-                    </li>
-                    <li className="flex items-center gap-3">
-                      <div className="w-2 h-2 bg-forge-purple rounded-full"></div>
-                      <span className="text-gray-700">Construction Monitoring</span>
-                    </li>
+                    {includedFeatures.map(feature => <FeatureListItem key={feature}>{feature}</FeatureListItem>)}
                   </ul>
                 </div>
               </div>
             </CardContent>
           </Card>
 
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {featureHighlights.map((item) => <FeatureHighlightCard key={item.title} {...item} />)}
+          </div>
+
           <Card>
             <CardHeader>
-              <CardTitle className="text-2xl text-forge-dark">Aerial Portfolio</CardTitle>
-              <p className="text-gray-600">Upload and showcase your drone footage to clients</p>
+              <CardTitle className="text-2xl text-slate-900">Your Aerial Portfolio</CardTitle>
+              <p className="text-slate-600">Upload and showcase your drone footage to clients.</p>
             </CardHeader>
             <CardContent>
-              <div className="mb-6">
-                <label htmlFor="footage-upload" className="block text-sm font-medium text-gray-700 mb-2">
-                  Upload Your Footage
-                </label>
-                <div className="flex items-center gap-4">
+              <div 
+                onDragEnter={(e) => handleDragEvents(e, 'enter')}
+                onDragLeave={(e) => handleDragEvents(e, 'leave')}
+                onDragOver={(e) => handleDragEvents(e, 'over')}
+                onDrop={(e) => handleDragEvents(e, 'drop')}
+                className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors duration-300 ${isDragging ? 'border-indigo-500 bg-indigo-50' : 'border-slate-300 bg-slate-100'}`}
+              >
+                <Upload className="w-12 h-12 mx-auto text-slate-400 mb-4" />
+                <label htmlFor="footage-upload" className="font-semibold text-indigo-600 cursor-pointer">
+                  Choose files
                   <Input
                     id="footage-upload"
                     type="file"
                     accept="video/*,image/*"
                     multiple
-                    onChange={handleFootageUpload}
-                    className="flex-1"
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleFileChange(e.target.files)}
+                    className="hidden"
                   />
-                  <Button variant="outline" size="sm">
-                    <Upload className="w-4 h-4 mr-2" />
-                    Upload
-                  </Button>
-                </div>
+                </label>
+                <p className="text-slate-500 text-sm mt-1">or drag and drop</p>
               </div>
 
               {uploadedFootage.length > 0 && (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {uploadedFootage.map((footage, index) => (
-                    <div key={index} className="relative group">
-                      <video
-                        src={footage}
-                        controls
-                        className="w-full h-48 object-cover rounded-lg"
-                      />
-                      <button
-                        onClick={() => removeFootage(index)}
-                        className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
-                      >
-                        <X className="w-4 h-4" />
-                      </button>
+                <div className="mt-8">
+                    <h3 className="font-semibold mb-4 text-slate-800">Your Uploaded Footage</h3>
+                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                        {uploadedFootage.map((file, index) => (
+                            <MediaPreview key={index} file={file} onRemove={() => removeFootage(index)} />
+                        ))}
                     </div>
-                  ))}
                 </div>
               )}
             </CardContent>
@@ -141,4 +207,4 @@ const DroneFotage = () => {
   );
 };
 
-export default DroneFotage;
+export default DroneFootagePage;

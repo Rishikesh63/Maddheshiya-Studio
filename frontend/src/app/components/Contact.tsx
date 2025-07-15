@@ -1,125 +1,215 @@
+"use client";
 
-import React from 'react';
-import { Button } from '@/app/components/ui/button';
-import { Input } from '@/app/components/ui/input';
-import { Textarea } from '@/app/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/app/components/ui/select';
-import { Card, CardContent } from '@/app/components/ui/card';
-import { CalendarDays, MessageSquare, MapPin, Send } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { CalendarDays, MessageSquare, MapPin, Send, Star, LucideIcon, ChevronDown } from 'lucide-react';
 
+// --- Mock UI Components for Demonstration ---
+const Button = ({ children, className, ...props }: { children: React.ReactNode; className?: string; [key:string]: any }) => (
+    <button className={`inline-flex items-center justify-center rounded-lg text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none ring-offset-background ${className}`} {...props}>
+      {children}
+    </button>
+);
+
+const Input = ({ className, ...props }: { className?: string; [key:string]: any }) => (
+    <input className={`flex h-10 w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-shadow ${className}`} {...props} />
+);
+
+const Textarea = ({ className, ...props }: { className?: string; [key:string]: any }) => (
+    <textarea className={`flex min-h-[80px] w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-shadow ${className}`} {...props} />
+);
+
+const Card = ({ children, className, ...props }: { children: React.ReactNode; className?: string; [key:string]: any }) => (
+    <div className={`rounded-xl border bg-card text-card-foreground ${className}`} {...props}>
+        {children}
+    </div>
+);
+
+const CardContent = ({ children, className, ...props }: { children: React.ReactNode; className?: string; [key:string]: any }) => (
+    <div className={`p-6 ${className}`} {...props}>
+        {children}
+    </div>
+);
+
+// --- Improved Custom Select Component ---
+const CustomSelect = ({ items, placeholder }: { items: string[]; placeholder: string }) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const [selectedValue, setSelectedValue] = useState("");
+  const selectRef = useRef<HTMLDivElement>(null);
+
+  const handleItemClick = (value: string) => {
+    setSelectedValue(value);
+    setIsOpen(false);
+  };
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (selectRef.current && !selectRef.current.contains(event.target as Node)) {
+        setIsOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  return (
+    <div className="relative" ref={selectRef}>
+      <button
+        type="button"
+        onClick={() => setIsOpen(!isOpen)}
+        className="flex h-10 w-full items-center justify-between rounded-md border border-slate-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-shadow"
+      >
+        <span className={selectedValue ? "text-slate-900" : "text-slate-500"}>
+          {selectedValue || placeholder}
+        </span>
+        <ChevronDown
+          size={16}
+          className={`text-slate-500 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}
+        />
+      </button>
+      {isOpen && (
+        <div className="absolute z-10 mt-1 w-full rounded-md border border-slate-200 bg-white shadow-lg max-h-60 overflow-y-auto animate-fade-in-sm">
+          <div className="p-1">
+            {items.map((item) => (
+              <div
+                key={item}
+                onClick={() => handleItemClick(item)}
+                className="p-2 text-sm text-slate-700 hover:bg-slate-100 rounded-md cursor-pointer"
+              >
+                {item}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+// --- Data Layer ---
+const services = [
+  "Professional Photography", "Videography", "AI Powered Editing", 
+  "ID Card making", "T-Shirt Printing", "Drone Footage", 
+  "E-Commerce Photography", "Album Designing", "Photo Framing", 
+  "AI Assistant Development"
+];
+
+const contactInfo = [
+    {
+        icon: MapPin,
+        title: "Visit Our Studios",
+        lines: ["Maharajganj Chauraha,", "Gorakhpur, Uttar Pradesh 273165"]
+    },
+    {
+        icon: MessageSquare,
+        title: "Email & Phone",
+        lines: ["info@maddheshiyastudio.com", "+91 98765 43210"]
+    },
+    {
+        icon: CalendarDays,
+        title: "Operating Hours",
+        lines: ["Mon - Sat: 9:00 AM - 8:00 PM", "Sunday: 10:00 AM - 4:00 PM"]
+    }
+];
+
+// --- Reusable Components ---
+const InfoCard = ({ icon: Icon, title, lines }: { icon: LucideIcon; title: string; lines: string[] }) => (
+    <div className="flex items-start gap-4">
+        <div className="w-12 h-12 rounded-full bg-indigo-100 flex items-center justify-center shrink-0">
+            <Icon className="h-6 w-6 text-indigo-600" />
+        </div>
+        <div>
+            <h4 className="font-semibold text-slate-800">{title}</h4>
+            <div className="text-slate-600 mt-1">
+                {lines.map((line, index) => <p key={index}>{line}</p>)}
+            </div>
+        </div>
+    </div>
+);
+
+const FormField = ({ id, label, children }: { id: string; label: string; children: React.ReactNode }) => (
+    <div className="space-y-2">
+        <label htmlFor={id} className="text-sm font-medium text-slate-700">{label}</label>
+        {children}
+    </div>
+);
+
+// --- Main Contact Section ---
 const Contact = () => {
   return (
-    <section id="contact" className="py-20 bg-forge-light/50">
-      <div className="container mx-auto px-4">
-        <div className="text-center max-w-3xl mx-auto mb-16">
-          <h2 className="text-3xl md:text-4xl font-bold text-forge-dark mb-4">Get In Touch</h2>
-          <p className="text-lg text-gray-600">
-            Book a service, rent equipment, or inquire about listing your gear. We&apos;re here to help!
-          </p>
-        </div>
+    <>
+      <style>{`
+        @keyframes fade-in-sm {
+          from { opacity: 0; transform: scale(0.98) translateY(-5px); }
+          to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        .animate-fade-in-sm { animation: fade-in-sm 0.2s ease-out forwards; }
+      `}</style>
+      <section id="contact" className="py-20 sm:py-24 bg-slate-50">
+        <div className="container mx-auto px-4">
+          <div className="text-center max-w-3xl mx-auto mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">Get In Touch</h2>
+            <p className="text-lg text-slate-600">
+              Book a service, rent equipment, or inquire about listing your gear. We're here to help!
+            </p>
+          </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
-          <Card className="shadow-lg border-0">
-            <CardContent className="pt-6">
-              <form className="space-y-6">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <label htmlFor="name" className="text-sm font-medium">Full Name</label>
-                    <Input id="name" placeholder="Your name" />
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
+            <Card className="shadow-lg border-slate-200 bg-white">
+              <CardContent className="p-6 md:p-8">
+                <form className="space-y-6">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                    <FormField id="name" label="Full Name">
+                      <Input id="name" placeholder="Your name" />
+                    </FormField>
+                    <FormField id="email" label="Email Address">
+                      <Input id="email" type="email" placeholder="you@example.com" />
+                    </FormField>
                   </div>
-                  <div className="space-y-2">
-                    <label htmlFor="email" className="text-sm font-medium">Email Address</label>
-                    <Input id="email" type="email" placeholder="you@example.com" />
-                  </div>
-                </div>
 
-                <div className="space-y-2">
-                  <label htmlFor="phone" className="text-sm font-medium">Phone Number</label>
-                  <Input id="phone" placeholder="Your phone number" />
-                </div>
+                  <FormField id="phone" label="Phone Number">
+                    <Input id="phone" placeholder="Your phone number" />
+                  </FormField>
 
-                <div className="space-y-2">
-                  <label htmlFor="service" className="text-sm font-medium">What are you interested in?</label>
-                  <Select>
-                    <SelectTrigger id="service">
-                      <SelectValue placeholder="Select a service" />
-                    </SelectTrigger>
-                    <SelectContent className="max-h-60 bg-blue-500">
-                      <SelectItem value="photography">Professional Photography</SelectItem>
-                      <SelectItem value="videography">Videography </SelectItem>
-                      <SelectItem value="gear">AI Powered Editing</SelectItem>
-                      <SelectItem value="id card">ID Card making</SelectItem>
-                      <SelectItem value='t-shirt printing'>T-Shirt Printing</SelectItem>
-                      <SelectItem value='drone footage'>Drone Footage</SelectItem>
-                      <SelectItem value="e-commerce photography">E-Commerce Photography</SelectItem>
-                      <SelectItem value='albumb designing'>Albumb Designing</SelectItem>
-                      <SelectItem value='photo framing'>Photo Framing</SelectItem>
-                      <SelectItem value='ai assistant development'>AI Assistant Development</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
+                  <FormField id="service" label="What are you interested in?">
+                    <CustomSelect items={services} placeholder="Select a service" />
+                  </FormField>
 
-                <div className="space-y-2">
-                  <label htmlFor="message" className="text-sm font-medium">Your Message</label>
-                  <Textarea id="message" placeholder="Let us know how we can help you..." rows={4} />
-                </div>
+                  <FormField id="message" label="Your Message">
+                    <Textarea id="message" placeholder="Let us know how we can help you..." rows={4} />
+                  </FormField>
 
-                <Button type="submit" className="w-full bg-forge-purple hover:bg-forge-darkpurple text-white">
-                  Send Message <Send className="ml-2 h-4 w-4" />
-                </Button>
-              </form>
-            </CardContent>
-          </Card>
+                  <Button type="submit" className="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-3 text-base">
+                    Send Message <Send className="ml-2 h-4 w-4" />
+                  </Button>
+                </form>
+              </CardContent>
+            </Card>
 
-          <div className="space-y-8">
-            <div>
-              <h3 className="text-2xl font-bold text-forge-dark mb-6">Connect With Us</h3>
-              <div className="space-y-4">
-                <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 rounded-full bg-forge-purple/10 flex items-center justify-center shrink-0">
-                    <MapPin className="h-5 w-5 text-forge-purple" />
-                  </div>
-                  <div>
-                    <h4 className="font-medium text-forge-dark">Visit Our Studios</h4>
-                    <p className="text-gray-600 mt-1">Maharajganj Chauraha,<br />Gorakhpur, Uttar Pradesh 273165</p>
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 rounded-full bg-forge-purple/10 flex items-center justify-center shrink-0">
-                    <MessageSquare className="h-5 w-5 text-forge-purple" />
-                  </div>
-                  <div>
-                    <h4 className="font-medium text-forge-dark">Email & Phone</h4>
-                    <p className="text-gray-600 mt-1">info@Maddheshiya Studio.studio<br />+91 98765 43210</p>
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 rounded-full bg-forge-purple/10 flex items-center justify-center shrink-0">
-                    <CalendarDays className="h-5 w-5 text-forge-purple" />
-                  </div>
-                  <div>
-                    <h4 className="font-medium text-forge-dark">Operating Hours</h4>
-                    <p className="text-gray-600 mt-1">Monday - Saturday: 9:00 AM - 8:00 PM<br />Sunday: 10:00 AM - 4:00 PM</p>
-                  </div>
+            <div className="space-y-8">
+              <div>
+                <h3 className="text-2xl font-bold text-slate-900 mb-6">Connect With Us</h3>
+                <div className="space-y-6">
+                  {contactInfo.map(info => <InfoCard key={info.title} {...info} />)}
                 </div>
               </div>
-            </div>
 
-            <div className="bg-blue-500 p-6 rounded-2xl shadow-lg">
-              <h3 className="font-bold text-forge-dark mb-4">Special Offer!</h3>
-              <p className="text-gray-600 mb-4">
-                Get 15% off on your first booking or rental. Use code <span className="font-bold text-forge-purple">FIRSTFRAME15</span> at checkout.
-              </p>
-              <Button variant="outline" className="w-full border-forge-purple text-forge-purple hover:bg-forge-purple/10">
-                Book Now
-              </Button>
+              <div className="bg-gradient-to-br from-indigo-500 to-purple-600 text-white p-8 rounded-2xl shadow-lg">
+                  <div className="flex items-center gap-2 mb-3">
+                      {[...Array(5)].map((_, i) => <Star key={i} size={20} className="fill-current text-yellow-400" />)}
+                  </div>
+                <h3 className="font-bold text-xl mb-3">Special Offer!</h3>
+                <p className="opacity-90 mb-4">
+                  Get <strong>15% off</strong> on your first booking or rental. Use code <span className="font-semibold bg-white/20 px-2 py-1 rounded-md">FIRSTFRAME15</span> at checkout.
+                </p>
+                <Button variant="outline" className="w-full bg-white/20 border-white/30 hover:bg-white/30 text-white">
+                  Book Now
+                </Button>
+              </div>
             </div>
           </div>
         </div>
-      </div>
-    </section>
+      </section>
+    </>
   );
 };
 

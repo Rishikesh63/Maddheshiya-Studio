@@ -1,8 +1,8 @@
 "use client";
 
 import React from 'react';
-import { ArrowRight, Camera, Airplay, Zap, Aperture } from 'lucide-react';
-import NextImage from 'next/image';
+
+import { ArrowRight, Camera, Airplay, Zap, Aperture, Package } from 'lucide-react';
 
 // --- UI Components ---
 const Button = ({
@@ -19,33 +19,31 @@ const Button = ({
   </button>
 );
 
+// FIX: Replaced the Next.js Image component with a standard HTML <img> tag to resolve the build error.
 const Image = ({
   src,
   alt,
   className,
   ...props
-}: React.ComponentProps<typeof NextImage>) => (
-  <NextImage
+}: React.ComponentProps<'img'>) => (
+  <img
     src={src}
     alt={alt}
     className={className}
-    width={600}
-    height={400}
     {...props}
   />
 );
 
 // --- Type Definitions ---
+// Simplified the interface as the publicId logic was causing issues.
 interface GearItem {
   id: string;
-  image: string;
+  image: string; // The full URL to the image
   name: string;
   category: string;
   categoryIcon: React.ReactElement;
   price: string;
 }
-
-// --- Data Layer ---
 const gearItems: GearItem[] = [
   {
     id: "sony-a7iii",
@@ -80,13 +78,14 @@ const gearItems: GearItem[] = [
     price: "₹1,200/day",
   },
   {
-    id: "rode-videomic-pro",
-    image: "https://images.unsplash.com/photo-1621886292933-282f7e449258?q=80&w=2070",
-    name: "Rode VideoMic Pro+",
-    category: "Audio",
-    categoryIcon: <Zap size={14} />,
-    price: "₹800/day",
-  },
+    id: "manfrotto-tripod-kit",
+    // Using the full Cloudinary URL directly as provided.
+    image: "https://res.cloudinary.com/dxwgmuoht/image/upload/v1752685060/dollar-gill-wZjIT-0T68I-unsplash_1_xtzxcf.jpg",
+    name: "Tripod",
+    category: "Accessories",
+    categoryIcon: <Package size={14} />,
+    price: "₹300/day",
+  }
 ];
 
 // --- Reusable Gear Card Component ---
@@ -97,6 +96,7 @@ const GearCard = ({
   price,
   categoryIcon,
 }: GearItem) => {
+
   return (
     <div className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 group border border-slate-200 hover:border-indigo-300">
       <div className="h-48 overflow-hidden relative">

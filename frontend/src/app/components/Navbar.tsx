@@ -19,7 +19,6 @@ interface NavLink {
 // Centralized navigation links for easy updates and consistency.
 const navLinks: NavLink[] = [
   { href: "#services", label: "Services" },
-  { href: "#studios", label: "Studios" },
   { href: "#gear", label: "Gear Rental" },
   { href: "#testimonials", label: "Testimonials" },
   { href: "#contact", label: "Contact" },

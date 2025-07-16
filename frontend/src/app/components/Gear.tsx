@@ -1,7 +1,7 @@
 "use client";
 
 import React from 'react';
-import { ArrowRight, Camera, Video, Airplay, Zap, Aperture } from 'lucide-react';
+import { ArrowRight, Camera, Airplay, Zap, Aperture } from 'lucide-react';
 import NextImage from 'next/image';
 
 // --- UI Components ---

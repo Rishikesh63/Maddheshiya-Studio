@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useCallback } from 'react';
-import { Video, Upload, X, CheckCircle, Film, Camera, Airplay, Zap, Package } from 'lucide-react';
+import { Video, Upload, X, CheckCircle, Camera, Airplay, Zap, Package } from 'lucide-react';
 
 // --- Mock UI Components for Demonstration (with improved types) ---
 const Button = ({ children, className, ...props }: React.ComponentProps<'button'>) => (

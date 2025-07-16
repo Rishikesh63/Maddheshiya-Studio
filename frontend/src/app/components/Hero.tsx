@@ -3,21 +3,27 @@
 import React from 'react';
 import { ArrowRight, Camera, Video, Film, LucideIcon } from 'lucide-react';
 
-// --- Mock UI Components for Demonstration (with improved types) ---
-const Link = ({ href, children, ...props }: React.ComponentProps<'a'>) => (
-  <a href={href} {...props}>{children}</a>
-);
-
-const Button = ({ children, className, size, variant, ...props }: React.ComponentProps<'button'> & { size?: string; variant?: string; }) => (
-  <button className={`inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none ring-offset-background ${className}`} {...props}>
+// --- Mock UI Components (cleaned up) ---
+const Button = ({ children, className, ...props }: React.ComponentProps<'button'>) => (
+  <button
+    className={`inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none ring-offset-background ${className}`}
+    {...props}
+  >
     {children}
   </button>
 );
 
 const Image = ({ src, alt, className, ...props }: React.ComponentProps<'img'>) => (
-  <img src={src} alt={alt} className={className} {...props} onError={(e) => { (e.target as HTMLImageElement).src = 'https://placehold.co/500x500/e2e8f0/4a5568?text=Image+Error'; }} />
+  <img
+    src={src}
+    alt={alt}
+    className={className}
+    {...props}
+    onError={(e) => {
+      (e.target as HTMLImageElement).src = 'https://placehold.co/500x500/e2e8f0/4a5568?text=Image+Error';
+    }}
+  />
 );
-
 
 // --- Type Definitions ---
 interface Feature {
@@ -32,7 +38,7 @@ const features: Feature[] = [
   { icon: Film, text: "Rentals" },
 ];
 
-// --- Reusable Feature Icon Component (Corrected) ---
+// --- Reusable Feature Icon Component ---
 const FeatureIcon = ({ icon: Icon, text }: Feature) => (
   <div className="text-center">
     <div className="bg-white shadow-md rounded-xl p-3 inline-block mb-3 transition-transform duration-300 group-hover:scale-110">
@@ -58,6 +64,7 @@ const Hero = () => {
         .animate-fade-in { animation: fade-in 0.8s ease-out forwards; }
         .animate-slide-up { animation: slide-up 0.8s ease-out forwards; }
       `}</style>
+
       <section className="relative min-h-screen flex items-center pt-20 pb-10 overflow-hidden bg-slate-50">
         {/* Blurred Background Shapes */}
         <div className="absolute -top-20 -right-20 w-72 h-72 bg-indigo-200/50 rounded-full blur-3xl" />
@@ -85,10 +92,10 @@ const Hero = () => {
               </p>
 
               <div className="flex flex-col sm:flex-row gap-4">
-                <Button size="lg" className="bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-3 h-auto text-base">
+                <Button className="bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-3 h-auto text-base">
                   Book a Shoot <ArrowRight className="ml-2 h-5 w-5" />
                 </Button>
-                <Button size="lg" variant="outline" className="border-slate-300 text-slate-700 hover:bg-slate-100 px-8 py-3 h-auto text-base">
+                <Button className="border border-slate-300 text-slate-700 hover:bg-slate-100 px-8 py-3 h-auto text-base">
                   Explore Studios
                 </Button>
               </div>
@@ -100,7 +107,7 @@ const Hero = () => {
               </div>
             </header>
 
-            {/* Hero Images with updated, relevant sources */}
+            {/* Hero Images */}
             <div className="hidden lg:block relative animate-slide-up" style={{ animationDelay: '0.4s' }}>
               <div className="aspect-square rounded-3xl overflow-hidden shadow-2xl transform rotate-3 transition-transform duration-500 hover:rotate-0 hover:scale-105">
                 <Image 

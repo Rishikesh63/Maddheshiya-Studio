@@ -4,7 +4,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { CalendarDays, MessageSquare, MapPin, Send, Star, LucideIcon, ChevronDown } from 'lucide-react';
 
 // --- Mock UI Components for Demonstration (with improved types) ---
-const Button = ({ children, className, variant, ...props }: React.ComponentProps<'button'> & { variant?: string }) => (
+const Button = ({ children, className, ...props }: React.ComponentProps<'button'>) => (
     <button className={`inline-flex items-center justify-center rounded-lg text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none ring-offset-background ${className}`} {...props}>
       {children}
     </button>
@@ -197,7 +197,7 @@ const Contact = () => {
                 <p className="opacity-90 mb-4">
                   Get <strong>15% off</strong> on your first booking or rental. Use code <span className="font-semibold bg-white/20 px-2 py-1 rounded-md">FIRSTFRAME15</span> at checkout.
                 </p>
-                <Button variant="outline" className="w-full bg-white/20 border-white/30 hover:bg-white/30 text-white">
+                <Button className="w-full bg-white/20 border-white/30 hover:bg-white/30 text-white">
                   Book Now
                 </Button>
               </div>

@@ -3,23 +3,23 @@
 import React, { useState, useCallback } from 'react';
 import { Camera, Upload, X, CheckCircle, Package, Airplay, Zap } from 'lucide-react';
 
-// --- Mock UI Components for Demonstration ---
-const Button = ({ children, className, ...props }: { children: React.ReactNode; className?: string; [key:string]: any }) => (
+// --- Mock UI Components for Demonstration (with improved types) ---
+const Button = ({ children, className, ...props }: React.ComponentProps<'button'>) => (
     <button className={`inline-flex items-center justify-center rounded-lg text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none ring-offset-background ${className}`} {...props}>{children}</button>
 );
-const Card = ({ children, className, ...props }: { children: React.ReactNode; className?: string; [key:string]: any }) => (
+const Card = ({ children, className, ...props }: React.ComponentProps<'div'>) => (
     <div className={`rounded-xl border bg-white text-card-foreground shadow-sm ${className}`} {...props}>{children}</div>
 );
-const CardContent = ({ children, className, ...props }: { children: React.ReactNode; className?: string; [key:string]: any }) => (
+const CardContent = ({ children, className, ...props }: React.ComponentProps<'div'>) => (
     <div className={`p-6 ${className}`} {...props}>{children}</div>
 );
-const CardHeader = ({ children, className, ...props }: { children: React.ReactNode; className?: string; [key:string]: any }) => (
+const CardHeader = ({ children, className, ...props }: React.ComponentProps<'div'>) => (
     <div className={`flex flex-col space-y-1.5 p-6 ${className}`} {...props}>{children}</div>
 );
-const CardTitle = ({ children, className, ...props }: { children: React.ReactNode; className?: string; [key:string]: any }) => (
+const CardTitle = ({ children, className, ...props }: React.ComponentProps<'h3'>) => (
     <h3 className={`text-lg font-semibold leading-none tracking-tight ${className}`} {...props}>{children}</h3>
 );
-const Input = ({ className, ...props }: { className?: string; [key:string]: any }) => (
+const Input = ({ className, ...props }: React.ComponentProps<'input'>) => (
     <input className={`flex h-10 w-full rounded-md border border-slate-300 bg-transparent px-3 py-2 text-sm ${className}`} {...props} />
 );
 
@@ -151,12 +151,12 @@ const PhotographyPage = () => {
               <div className="grid md:grid-cols-2 gap-8">
                 <div>
                   <h3 className="text-xl font-bold text-slate-800 mb-4">Service Details</h3>
-                  <p className="text-slate-600 mb-6">Our professional photography services capture life's most precious moments with artistic excellence. We specialize in weddings, events, products, and portraits.</p>
+                  <p className="text-slate-600 mb-6">Our professional photography services capture life&apos;s most precious moments with artistic excellence. We specialize in weddings, events, products, and portraits.</p>
                   <p className="text-lg font-semibold text-indigo-600 mb-6">Starting from ₹15,000</p>
                   <Button className="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2">Book This Service</Button>
                 </div>
                 <div>
-                  <h3 className="text-xl font-bold text-slate-800 mb-4">What's Included</h3>
+                  <h3 className="text-xl font-bold text-slate-800 mb-4">What&apos;s Included</h3>
                   <ul className="space-y-3">
                     {includedFeatures.map(feature => <FeatureListItem key={feature}>{feature}</FeatureListItem>)}
                   </ul>

@@ -1,9 +1,35 @@
 "use client";
 
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useRef, useState, useEffect, useCallback } from 'react';
 import { Star, Quote, ChevronLeft, ChevronRight } from 'lucide-react';
 
-const testimonialsData = [
+// --- Mock UI Components for Demonstration (with improved types) ---
+const Image = ({ src, alt, className, ...props }: React.ComponentProps<'img'>) => (
+  <img 
+    src={src} 
+    alt={alt} 
+    className={className} 
+    {...props} 
+    onError={(e) => { 
+      // Prevents infinite loop if placeholder also fails
+      if ((e.target as HTMLImageElement).src !== 'https://placehold.co/48x48/e2e8f0/4a5568?text=??') {
+        (e.target as HTMLImageElement).src = 'https://placehold.co/48x48/e2e8f0/4a5568?text=??';
+      }
+    }} 
+  />
+);
+
+// --- Type Definitions ---
+interface Testimonial {
+    id: string;
+    content: string;
+    name: string;
+    role: string;
+    image: string;
+}
+
+// --- Data Layer ---
+const testimonialsData: Testimonial[] = [
   {
     id: 'testimonial-1',
     content: "Maddheshiya Studio captured our wedding beautifully. The team was professional, and the drone footage gave us perspectives we never imagined possible!",
@@ -34,8 +60,8 @@ const testimonialsData = [
   }
 ];
 
-
-const TestimonialCard = ({ content, name, role, image }: { content: string, name:string, role:string, image:string }) => {
+// --- Reusable Testimonial Card Component ---
+const TestimonialCard = ({ content, name, role, image }: Testimonial) => {
   return (
     <div className="bg-white p-6 md:p-8 rounded-2xl shadow-lg h-full flex flex-col">
       <div className="flex justify-between mb-4">
@@ -48,7 +74,7 @@ const TestimonialCard = ({ content, name, role, image }: { content: string, name
       </div>
       <p className="text-gray-600 mb-6 flex-grow">{content}</p>
       <div className="flex items-center gap-4">
-        <img src={image} alt={name} className="w-12 h-12 rounded-full object-cover" />
+        <Image src={image} alt={name} className="w-12 h-12 rounded-full object-cover" />
         <div>
           <h4 className="font-bold text-gray-800">{name}</h4>
           <p className="text-sm text-gray-500">{role}</p>
@@ -58,20 +84,20 @@ const TestimonialCard = ({ content, name, role, image }: { content: string, name
   );
 };
 
-
+// --- Main Testimonials Section ---
 const Testimonials = () => {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [isScrollable, setIsScrollable] = useState(false);
   const [showLeftArrow, setShowLeftArrow] = useState(false);
   const [showRightArrow, setShowRightArrow] = useState(true);
 
-  const handleScroll = () => {
+  const handleScroll = useCallback(() => {
     if (scrollContainerRef.current) {
       const { scrollLeft, scrollWidth, clientWidth } = scrollContainerRef.current;
-      setShowLeftArrow(scrollLeft > 5);
-      setShowRightArrow(scrollLeft < scrollWidth - clientWidth - 5);
+      setShowLeftArrow(scrollLeft > 10);
+      setShowRightArrow(scrollLeft < scrollWidth - clientWidth - 10);
     }
-  };
+  }, []);
 
   const scroll = (direction: 'left' | 'right') => {
     if (scrollContainerRef.current) {
@@ -91,20 +117,26 @@ const Testimonials = () => {
         setIsScrollable(hasOverflow);
         if(hasOverflow) {
             handleScroll();
+        } else {
+            setShowLeftArrow(false);
+            setShowRightArrow(false);
         }
       };
-      checkScrollable();
-      container.addEventListener('scroll', handleScroll);
-      window.addEventListener('resize', checkScrollable);
+      
+      const resizeObserver = new ResizeObserver(checkScrollable);
+      resizeObserver.observe(container);
+      
+      container.addEventListener('scroll', handleScroll, { passive: true });
+      
       return () => {
+        resizeObserver.disconnect();
         container.removeEventListener('scroll', handleScroll);
-        window.removeEventListener('resize', checkScrollable);
       };
     }
-  }, []);
+  }, [handleScroll]);
 
   return (
-    <section id="testimonials" className="py-20 bg-gray-50">
+    <section id="testimonials" className="py-20 bg-slate-50">
       <div className="container mx-auto px-4">
         <div className="text-center max-w-3xl mx-auto mb-16">
           <h2 className="text-3xl md:text-4xl font-bold text-gray-800 mb-4">What Our Clients Say</h2>
@@ -114,21 +146,28 @@ const Testimonials = () => {
         </div>
 
         <div className="relative">
-          {/* Left Scroll Button */}
-          {isScrollable && showLeftArrow && (
-            <button
-              onClick={() => scroll('left')}
-              className="absolute top-1/2 -left-4 -translate-y-1/2 z-10 bg-white rounded-full p-2 shadow-lg hover:bg-gray-100 transition hidden lg:flex items-center justify-center"
-              aria-label="Scroll left"
-            >
-              <ChevronLeft className="w-6 h-6 text-gray-700" />
-            </button>
+          {isScrollable && (
+            <>
+              <button
+                onClick={() => scroll('left')}
+                className={`absolute top-1/2 -left-4 -translate-y-1/2 z-10 bg-white rounded-full p-2 shadow-lg hover:bg-gray-100 transition-all hidden lg:flex items-center justify-center ${showLeftArrow ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
+                aria-label="Scroll left"
+              >
+                <ChevronLeft className="w-6 h-6 text-gray-700" />
+              </button>
+              <button
+                onClick={() => scroll('right')}
+                className={`absolute top-1/2 -right-4 -translate-y-1/2 z-10 bg-white rounded-full p-2 shadow-lg hover:bg-gray-100 transition-all hidden lg:flex items-center justify-center ${showRightArrow ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
+                aria-label="Scroll right"
+              >
+                <ChevronRight className="w-6 h-6 text-gray-700" />
+              </button>
+            </>
           )}
 
-          {/* Horizontally Scrolling Container */}
           <div
             ref={scrollContainerRef}
-            className="flex gap-8 overflow-x-auto snap-x snap-mandatory no-scrollbar pb-4"
+            className="flex gap-8 overflow-x-auto snap-x snap-mandatory no-scrollbar pb-4 -mx-4 px-4"
           >
             {testimonialsData.map((testimonial) => (
               <div key={testimonial.id} className="snap-center w-[85vw] md:w-[400px] lg:w-1/3 flex-shrink-0">
@@ -136,19 +175,9 @@ const Testimonials = () => {
               </div>
             ))}
           </div>
-
-          {/* Right Scroll Button */}
-          {isScrollable && showRightArrow && (
-            <button
-              onClick={() => scroll('right')}
-              className="absolute top-1/2 -right-4 -translate-y-1/2 z-10 bg-white rounded-full p-2 shadow-lg hover:bg-gray-100 transition hidden lg:flex items-center justify-center"
-              aria-label="Scroll right"
-            >
-              <ChevronRight className="w-6 h-6 text-gray-700" />
-            </button>
-          )}
         </div>
       </div>
+      <style>{`.no-scrollbar::-webkit-scrollbar { display: none; } .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }`}</style>
     </section>
   );
 };

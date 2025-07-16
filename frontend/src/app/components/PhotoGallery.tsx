@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect } from "react";
 import { ArrowRight, ArrowLeft, X, Camera } from "lucide-react";
 
 // --- Type Definitions ---
@@ -14,11 +14,10 @@ interface Photo {
 }
 
 // --- Data Layer ---
-// The data now includes both `publicId` for Cloudinary and `url` for fallbacks.
 const photoMedia: Photo[] = [
   {
     id: "wedding_cermony_jvbjur",
-    publicId: "wedding_cermony_jvbjur", // Cloudinary publicId
+    publicId: "wedding_cermony_jvbjur",
     url: "https://res.cloudinary.com/dxwgmuoht/image/upload/v1752604990/wedding_cermony_jvbjur.jpg",
     title: "Candid Wedding Moment",
     altText: "A candid, joyful moment at an Indian wedding.",
@@ -26,7 +25,7 @@ const photoMedia: Photo[] = [
   },
   {
     id: "pexels-artosuraj-30706029_dotbjq",
-    publicId: "pexels-artosuraj-30706029_dotbjq", // Cloudinary publicId
+    publicId: "pexels-artosuraj-30706029_dotbjq",
     url: "https://res.cloudinary.com/dxwgmuoht/image/upload/v1752604991/pexels-artosuraj-30706029_dotbjq.jpg",
     title: "Haldi Ceremony",
     altText: "A happy couple during their Haldi ceremony.",
@@ -34,7 +33,7 @@ const photoMedia: Photo[] = [
   },
   {
     id: "ethinic_photography_pr3lfn",
-    publicId: "ethinic_photography_pr3lfn", // Cloudinary publicId
+    publicId: "ethinic_photography_pr3lfn",
     url: "https://res.cloudinary.com/dxwgmuoht/image/upload/v1752606238/ethinic_photography_pr3lfn.jpg",
     title: "Ethnic Fashion",
     altText: "A model in a traditional Indian saree.",
@@ -42,7 +41,6 @@ const photoMedia: Photo[] = [
   },
   {
     id: "architecture-taj-mahal",
-    // This entry has no publicId, so it will use the URL as a fallback
     url: "https://images.pexels.com/photos/1603650/pexels-photo-1603650.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
     title: "The Taj Mahal",
     altText: "A beautiful architectural shot of the Taj Mahal.",
@@ -50,7 +48,7 @@ const photoMedia: Photo[] = [
   },
   {
     id: "Product-photography_dzobxp",
-    publicId: "Product-photography_dzobxp", // Cloudinary publicId
+    publicId: "Product-photography_dzobxp",
     url: "https://res.cloudinary.com/dxwgmuoht/image/upload/v1752606005/Product-photography_dzobxp.jpg",
     title: "Product Photography",
     altText: "A professional shot of a vintage camera.",
@@ -58,7 +56,6 @@ const photoMedia: Photo[] = [
   },
   {
     id: "indian-food-photography",
-    // This entry also uses the URL fallback
     url: "https://images.pexels.com/photos/12737921/pexels-photo-12737921.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
     title: "Indian Thali",
     altText: "A top-down shot of a delicious Indian food thali.",
@@ -68,11 +65,8 @@ const photoMedia: Photo[] = [
 
 
 // --- Universal Image Component (Corrected) ---
-// This component now correctly uses the provided URL directly.
-const UniversalImage = ({ photo, className, ...props }: { photo: Photo; className: string; [key: string]: any; }) => {
+const UniversalImage = ({ photo, className, ...props }: { photo: Photo; className?: string } & React.ComponentProps<'img'>) => {
   const placeholderImg = 'https://placehold.co/600x800/e2e8f0/4a5568?text=Image+Not+Found';
-
-  // Use the `url` property as the primary source, as it contains the full Cloudinary link.
   const imageUrl = photo.url || placeholderImg;
 
   return (
@@ -82,7 +76,7 @@ const UniversalImage = ({ photo, className, ...props }: { photo: Photo; classNam
       className={className}
       onError={(e: React.SyntheticEvent<HTMLImageElement, Event>) => {
         const target = e.target as HTMLImageElement;
-        target.onerror = null; // prevents looping
+        target.onerror = null; 
         target.src = placeholderImg;
       }}
       {...props}
@@ -146,19 +140,19 @@ const PhotoCard = ({ photo, onClick }: { photo: Photo; onClick: () => void; }) =
 const App = () => {
   const [selectedImageIndex, setSelectedImageIndex] = useState<number | null>(null);
 
-  const handleNext = useCallback(() => {
+  const handleNext = () => {
     setSelectedImageIndex((prevIndex) => {
       if (prevIndex === null) return 0;
       return (prevIndex + 1) % photoMedia.length;
     });
-  }, []);
+  };
 
-  const handlePrev = useCallback(() => {
+  const handlePrev = () => {
     setSelectedImageIndex((prevIndex) => {
       if (prevIndex === null) return 0;
       return (prevIndex - 1 + photoMedia.length) % photoMedia.length;
     });
-  }, []);
+  };
 
   const handleOpen = (index: number) => setSelectedImageIndex(index);
   const handleClose = () => setSelectedImageIndex(null);

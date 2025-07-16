@@ -3,18 +3,18 @@
 import React from 'react';
 import { ArrowRight, Camera, Video, Film, LucideIcon } from 'lucide-react';
 
-// --- Mock Next.js & UI Components for Demonstration ---
-const Link = ({ href, children, ...props }: { href: string; children: React.ReactNode; [key:string]: any }) => (
+// --- Mock UI Components for Demonstration (with improved types) ---
+const Link = ({ href, children, ...props }: React.ComponentProps<'a'>) => (
   <a href={href} {...props}>{children}</a>
 );
 
-const Button = ({ children, className, ...props }: { children: React.ReactNode; className?: string; [key:string]: any }) => (
+const Button = ({ children, className, size, variant, ...props }: React.ComponentProps<'button'> & { size?: string; variant?: string; }) => (
   <button className={`inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none ring-offset-background ${className}`} {...props}>
     {children}
   </button>
 );
 
-const Image = ({ src, alt, className, ...props }: { src: string; alt: string; className?: string; [key:string]: any }) => (
+const Image = ({ src, alt, className, ...props }: React.ComponentProps<'img'>) => (
   <img src={src} alt={alt} className={className} {...props} onError={(e) => { (e.target as HTMLImageElement).src = 'https://placehold.co/500x500/e2e8f0/4a5568?text=Image+Error'; }} />
 );
 
@@ -33,7 +33,6 @@ const features: Feature[] = [
 ];
 
 // --- Reusable Feature Icon Component (Corrected) ---
-// The `icon` prop is correctly destructured and aliased to `Icon` for use as a component.
 const FeatureIcon = ({ icon: Icon, text }: Feature) => (
   <div className="text-center">
     <div className="bg-white shadow-md rounded-xl p-3 inline-block mb-3 transition-transform duration-300 group-hover:scale-110">
@@ -96,7 +95,6 @@ const Hero = () => {
 
               <div className="grid grid-cols-3 gap-4 pt-8 max-w-md group">
                 {features.map((item) => (
-                  // The component is now called with the correct prop name `icon`
                   <FeatureIcon key={item.text} icon={item.icon} text={item.text} />
                 ))}
               </div>

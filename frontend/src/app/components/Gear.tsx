@@ -3,14 +3,14 @@
 import React from 'react';
 import { ArrowRight, Camera, Video, Airplay, Zap } from 'lucide-react';
 
-// --- Mock UI Components for Demonstration ---
-const Button = ({ children, className, ...props }: { children: React.ReactNode; className?: string; [key:string]: any }) => (
+// --- Mock UI Components for Demonstration (with improved types) ---
+const Button = ({ children, className, size, ...props }: React.ComponentProps<'button'> & { size?: string }) => (
   <button className={`inline-flex items-center justify-center rounded-lg text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none ring-offset-background ${className}`} {...props}>
     {children}
   </button>
 );
 
-const Image = ({ src, alt, className, ...props }: { src: string; alt: string; className?: string; [key:string]: any }) => (
+const Image = ({ src, alt, className, ...props }: React.ComponentProps<'img'>) => (
   <img src={src} alt={alt} className={className} {...props} onError={(e) => { (e.target as HTMLImageElement).src = 'https://placehold.co/600x400/e2e8f0/4a5568?text=Image+Error'; }} />
 );
 

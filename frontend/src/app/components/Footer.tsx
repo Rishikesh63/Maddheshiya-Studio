@@ -3,8 +3,8 @@
 import React from 'react';
 import { Camera, Instagram, Facebook, Linkedin, Mail, ArrowRight } from 'lucide-react';
 
-// --- Mock UI Components for Demonstration ---
-const Link = ({ href, children, ...props }: { href: string; children: React.ReactNode; [key:string]: any }) => (
+// --- Mock UI Components for Demonstration (with improved types) ---
+const Link = ({ href, children, ...props }: React.ComponentProps<'a'>) => (
   <a href={href} {...props}>{children}</a>
 );
 
@@ -66,8 +66,8 @@ const FooterColumn = ({ title, children }: { title: string; children: React.Reac
 
 const FooterLink = ({ href, label }: FooterLinkItem) => (
   <li>
-    <Link href={href} className="text-slate-300 hover:text-indigo-400 transition-colors duration-300 flex items-center gap-2">
-      <ArrowRight size={14} className="opacity-0 group-hover:opacity-100 transition-opacity -translate-x-2 group-hover:translate-x-0" />
+    <Link href={href} className="text-slate-300 hover:text-indigo-400 transition-colors duration-300 flex items-center gap-2 group">
+      <ArrowRight size={14} className="opacity-0 group-hover:opacity-100 transition-all duration-300 -translate-x-2 group-hover:translate-x-0" />
       {label}
     </Link>
   </li>
@@ -103,16 +103,12 @@ const Footer = () => {
 
           {/* Services Column */}
           <FooterColumn title="Our Services">
-            <div className="group">
-                {serviceLinks.map(link => <FooterLink key={link.label} {...link} />)}
-            </div>
+            {serviceLinks.map(link => <FooterLink key={link.label} {...link} />)}
           </FooterColumn>
 
           {/* Rentals Column */}
           <FooterColumn title="Rentals">
-             <div className="group">
-                {rentalLinks.map(link => <FooterLink key={link.label} {...link} />)}
-            </div>
+            {rentalLinks.map(link => <FooterLink key={link.label} {...link} />)}
           </FooterColumn>
 
           {/* Subscribe Column */}

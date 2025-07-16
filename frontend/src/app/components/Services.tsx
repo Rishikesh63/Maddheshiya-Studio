@@ -15,13 +15,8 @@ import {
   ArrowRight
 } from 'lucide-react';
 
-// --- Mock Next.js Components for Demonstration ---
-// In a real Next.js app, you would import these from 'next/navigation' and 'next/link'.
-const useRouter = () => ({
-  push: (path: string) => console.log(`Navigating to: ${path}`),
-});
-
-const Link = ({ href, children, ...props }: { href: string; children: React.ReactNode; [key: string]: any; }) => (
+// --- Mock Next.js Components for Demonstration (with improved types) ---
+const Link = ({ href, children, ...props }: React.ComponentProps<'a'>) => (
     <a href={href} {...props}>{children}</a>
 );
 
@@ -33,8 +28,7 @@ interface Service {
   slug: string;
 }
 
-// --- Data Layer (Moved outside the component) ---
-// This prevents the array from being redeclared on every render.
+// --- Data Layer ---
 const servicesData: Service[] = [
   {
     icon: <Camera className="w-6 h-6 text-indigo-600" />,
@@ -130,7 +124,7 @@ const Services = () => {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
           {servicesData.map((service) => (
             <ServiceCard
-              key={service.slug} // Using a unique slug for the key is better practice
+              key={service.slug}
               icon={service.icon}
               title={service.title}
               description={service.description}

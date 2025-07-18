@@ -197,14 +197,18 @@ LOGOUT_REDIRECT_URL = "/"
 ALLOWED_HOSTS = ["maddheshiya-studio.onrender.com", "localhost", "127.0.0.1"]
 
 CSRF_TRUSTED_ORIGINS = [
-    "https://maddheshiya-studio.onrender.com"
+    "https://maddheshiya-studio.onrender.com",
+    "https://maddheshiya-studio.vercel.app/"
+
 ]
 
 CORS_ALLOWED_ORIGINS = [
     "https://maddheshiya-studio.onrender.com",
+    "https://maddheshiya-studio.vercel.app",
     "http://localhost:3000",
     "http://127.0.0.1:3000"
 ]
+CORS_ALLOW_CREDENTIALS = True
 
 CSRF_COOKIE_SECURE = True
 SESSION_COOKIE_SECURE = True

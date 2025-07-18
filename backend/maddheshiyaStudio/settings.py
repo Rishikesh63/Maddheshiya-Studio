@@ -12,11 +12,13 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 import environ
 import os
 from pathlib import Path
+import dj_database_url
 
 # Initialize environment variables
 env = environ.Env()
-
-
+DATABASES = {
+    'default': dj_database_url.config(default=env('DATABASE_URL'))
+}
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -116,16 +118,16 @@ WSGI_APPLICATION = 'maddheshiyaStudio.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': env('POSTGRES_DB'),
-        'USER': env('POSTGRES_USER'),
-        'PASSWORD': env('POSTGRES_PASSWORD'),
-        'HOST': env('DB_HOST'),
-        'PORT': '5433',
-    }
-}
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': env('POSTGRES_DB'),
+#         'USER': env('POSTGRES_USER'),
+#         'PASSWORD': env('POSTGRES_PASSWORD'),
+#         'HOST': env('DB_HOST'),
+#         'PORT': '5433',
+#     }
+# }
 
 
 # Password validation
@@ -198,7 +200,7 @@ ALLOWED_HOSTS = ["maddheshiya-studio.onrender.com", "localhost", "127.0.0.1"]
 
 CSRF_TRUSTED_ORIGINS = [
     "https://maddheshiya-studio.onrender.com",
-    "https://maddheshiya-studio.vercel.app/"
+    "https://maddheshiya-studio.vercel.app"
 
 ]
 

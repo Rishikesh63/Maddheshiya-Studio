@@ -451,6 +451,16 @@ python-jose = ["python-jose (==3.3.0)"]
 test = ["cryptography", "freezegun", "pytest", "pytest-cov", "pytest-django", "pytest-xdist", "tox"]
 
 [[package]]
+name = "environ"
+version = "1.0"
+description = "Stack Based Globals Management"
+optional = false
+python-versions = "*"
+files = [
+    {file = "environ-1.0.tar.gz", hash = "sha256:4df7f1dfeb7d1c988d2e19a8bd5d547a526e0400aeb35adf732032472f35dcb0"},
+]
+
+[[package]]
 name = "idna"
 version = "3.10"
 description = "Internationalized Domain Names in Applications (IDNA)"
@@ -1002,4 +1012,4 @@ brotli = ["brotli"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "96441245ae5247defabc37cb5adf98784d1ce2b9cec03de80de3f95824b53bb9"
+content-hash = "26b448036c272fff6de329af8fc76f8a1761e4d58eb93000a9e5de1ee9c345a1"

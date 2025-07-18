@@ -16,9 +16,16 @@ import dj_database_url
 
 # Initialize environment variables
 env = environ.Env()
-# DATABASES = {
-#     'default': dj_database_url.config(default=env('DATABASE_URL'))
-# }
+environ.Env.read_env() 
+
+DATABASES = {
+    'default': dj_database_url.config(
+        default=os.environ.get('DATABASE_URL'),
+        conn_max_age=600,
+        ssl_require=True
+    )
+}
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -42,7 +49,7 @@ SECRET_KEY = env('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG =  env.bool('DEBUG', default=False)
 
-ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', default=[])
+# ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', default=[])
 
 
 # Application definition
@@ -114,21 +121,21 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'maddheshiyaStudio.wsgi.application'
 
-if DEBUG:
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.postgresql',
-            'NAME': 'mylocaldb',
-            'USER': 'postgres',
-            'PASSWORD': 'password',
-            'HOST': 'localhost',
-            'PORT': '5432',
-        }
-    }
-else:
-    DATABASES = {
-        'default': dj_database_url.config(default=env('DATABASE_URL'))
-    }
+# if DEBUG:
+#     DATABASES = {
+#         'default': {
+#             'ENGINE': 'django.db.backends.postgresql',
+#             'NAME': 'mylocaldb',
+#             'USER': 'postgres',
+#             'PASSWORD': 'password',
+#             'HOST': 'localhost',
+#             'PORT': '5432',
+#         }
+#     }
+# else:
+#     DATABASES = {
+#         'default': dj_database_url.config(default=env('DATABASE_URL'))
+#     }
 
 
 # Database
@@ -201,11 +208,11 @@ EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 # Allauth config for email verification
 # ✅ Updated Allauth Configuration (no deprecation warnings)
 ACCOUNT_SIGNUP_FIELDS = ['username*', 'email*', 'password1*', 'password2*']
-ACCOUNT_LOGIN_METHODS = {'username', 'email'}
+ACCOUNT_LOGIN_METHOD = 'username_email'
 ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
-ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_UNIQUE_EMAIL = True
 ACCOUNT_USER_MODEL_USERNAME_FIELD = 'username'
+
 
 
 # Redirect URLs after login/logout - can customize

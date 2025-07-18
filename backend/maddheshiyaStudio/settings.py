@@ -16,9 +16,9 @@ import dj_database_url
 
 # Initialize environment variables
 env = environ.Env()
-DATABASES = {
-    'default': dj_database_url.config(default=env('DATABASE_URL'))
-}
+# DATABASES = {
+#     'default': dj_database_url.config(default=env('DATABASE_URL'))
+# }
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -113,6 +113,22 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'maddheshiyaStudio.wsgi.application'
+
+if DEBUG:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': 'mylocaldb',
+            'USER': 'postgres',
+            'PASSWORD': 'password',
+            'HOST': 'localhost',
+            'PORT': '5432',
+        }
+    }
+else:
+    DATABASES = {
+        'default': dj_database_url.config(default=env('DATABASE_URL'))
+    }
 
 
 # Database

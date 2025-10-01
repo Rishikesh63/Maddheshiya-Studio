@@ -26,8 +26,8 @@ export default function ForgotPasswordPage() {
       }
 
       setMessage('Password reset email sent. Please check your inbox.');
-    } catch (err: any) {
-      setError(err.message || 'Something went wrong');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Something went wrong');
     } finally {
       setLoading(false);
     }

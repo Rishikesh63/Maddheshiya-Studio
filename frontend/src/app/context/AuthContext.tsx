@@ -61,7 +61,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         const decoded: User = jwtDecode(parsedTokens.access);
         setTokens(parsedTokens);
         setUser(decoded);
-      } catch (err) {
+      } catch (_err) {
         console.error('Invalid token, clearing session');
         clearStoredTokens();
       }

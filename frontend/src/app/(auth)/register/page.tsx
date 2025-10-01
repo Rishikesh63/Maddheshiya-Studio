@@ -57,7 +57,7 @@ const RegisterPage = () => {
       } else {
         setError(data?.detail || 'Registration failed');
       }
-    } catch (err) {
+    } catch (_err) {
       setError('An unexpected error occurred.');
     } finally {
       setLoading(false);

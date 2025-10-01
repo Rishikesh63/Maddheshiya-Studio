@@ -18,24 +18,83 @@
   The component gracefully falls back to an image if a 3D model is not provided.
 */
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Camera, X } from "lucide-react";
-import dynamic from 'next/dynamic';
 
-// Create a wrapper component for model-viewer
-const ModelViewer = ({ children, ...props }: any) => {
-  const [isClient, setIsClient] = useState(false);
+// Define custom element type
+interface ModelViewerElement extends HTMLElement {
+  src: string;
+  alt: string;
+  setAttribute(name: string, value: string): void;
+}
+
+// Define types for the model viewer
+interface ModelViewerProps {
+  src: string;
+  alt: string;
+  ar?: boolean;
+  autoplay?: boolean;
+  'disable-zoom'?: boolean;
+  'camera-controls'?: boolean;
+  style?: React.CSSProperties;
+  children?: React.ReactNode;
+  autoRotate?: boolean;
+}
+
+// Create a wrapper component that loads the model-viewer element
+const ModelViewer: React.FC<ModelViewerProps> = ({ 
+  children, 
+  src, 
+  alt, 
+  style, 
+  autoRotate,
+  ar,
+  autoplay,
+  'disable-zoom': disableZoom,
+  'camera-controls': cameraControls 
+}) => {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [isLoaded, setIsLoaded] = useState(false);
 
   useEffect(() => {
-    import('@google/model-viewer');
-    setIsClient(true);
+    // Load model-viewer script
+    const script = document.createElement('script');
+    script.type = 'module';
+    script.src = 'https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js';
+    script.onload = () => setIsLoaded(true);
+    document.head.appendChild(script);
+
+    return () => {
+      document.head.removeChild(script);
+    };
   }, []);
 
-  if (!isClient) {
-    return null;
-  }
+  useEffect(() => {
+    if (isLoaded && containerRef.current) {
+      // Create and configure model-viewer element
+      const viewer = document.createElement('model-viewer') as ModelViewerElement;
+      viewer.src = src;
+      viewer.alt = alt;
+      if (cameraControls) viewer.setAttribute('camera-controls', '');
+      if (ar) viewer.setAttribute('ar', '');
+      if (autoRotate) viewer.setAttribute('auto-rotate', '');
+      if (autoplay) viewer.setAttribute('autoplay', '');
+      if (disableZoom) viewer.setAttribute('disable-zoom', '');
+      
+      // Apply styles
+      Object.assign(viewer.style, style);
+      
+      // Replace existing content
+      containerRef.current.innerHTML = '';
+      containerRef.current.appendChild(viewer);
+    }
+  }, [isLoaded, src, alt, style, autoRotate, ar, cameraControls, autoplay, disableZoom]);
 
-  return <model-viewer {...props}>{children}</model-viewer>;
+  return (
+    <div ref={containerRef} style={style}>
+      {!isLoaded && children}
+    </div>
+  );
 };
 
 interface ServiceItem {
@@ -122,11 +181,11 @@ const CreativeServices: React.FC = () => {
                     <ModelViewer
                       src={s.modelUrl}
                       alt={s.title}
-                      ar
-                      camera-controls
-                      autoplay
-                      disable-zoom
-                      auto-rotate={autoRotate}
+                      ar={true}
+                      camera-controls={true}
+                      autoplay={true}
+                      disable-zoom={true}
+                      autoRotate={autoRotate}
                       style={{ width: "100%", height: "260px" }}
                     >
                       {/* Fallback slot content used when model-viewer is not available */}
@@ -190,9 +249,9 @@ const CreativeServices: React.FC = () => {
                     <ModelViewer
                       src={active.modelUrl}
                       alt={active.title}
-                      ar
-                      camera-controls
-                      auto-rotate={autoRotate}
+                      ar={true}
+                      camera-controls={true}
+                      autoRotate={autoRotate}
                       style={{ width: "100%", height: "100%" }}
                     >
                       <FallbackImage src={active.thumbnail} alt={active.title} />

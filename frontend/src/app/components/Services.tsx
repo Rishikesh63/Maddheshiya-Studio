@@ -84,12 +84,7 @@ const servicesData: Service[] = [
     description: "Custom photo framing solutions to beautifully showcase your special moments.",
     slug: '/photo-framing',
   },
-  {
-    icon: <Bot className="w-6 h-6 text-indigo-600" />,
-    title: "AI Assistant Development",
-    description: "Custom AI chatbot and assistant solutions for websites, businesses, and automation workflows.",
-    slug: '/ai-assistants',
-  }
+  
 ];
 
 // --- Reusable Service Card Component ---

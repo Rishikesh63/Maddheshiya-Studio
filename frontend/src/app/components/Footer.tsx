@@ -29,11 +29,11 @@ const serviceLinks: FooterLinkItem[] = [
   { href: "#", label: "Album Designing" },
 ];
 
-const rentalLinks: FooterLinkItem[] = [
-  { href: "#", label: "Camera Equipment" },
-  { href: "#", label: "Lighting Gear" },
-  { href: "#", label: "Lenses & Filters" },
-  { href: "#", label: "Tripods & Gimbals" },
+const companyLinks: FooterLinkItem[] = [
+  { href: "#", label: "About Us" },
+  { href: "#", label: "Contact" },
+  { href: "#", label: "Our Team" },
+  { href: "#", label: "Testimonials" },
 ];
 
 const legalLinks: FooterLinkItem[] = [
@@ -94,7 +94,7 @@ const Footer = () => {
               </span>
             </div>
             <p className="text-slate-400 mb-6 pr-4">
-              A tech-driven platform for photography, videography, and gear rentals.
+              A tech-driven platform for photography, videography, and creative services.
             </p>
             <div className="flex space-x-4">
               {socialLinks.map(link => <SocialLink key={link.label} {...link} />)}
@@ -106,9 +106,9 @@ const Footer = () => {
             {serviceLinks.map(link => <FooterLink key={link.label} {...link} />)}
           </FooterColumn>
 
-          {/* Rentals Column */}
-          <FooterColumn title="Rentals">
-            {rentalLinks.map(link => <FooterLink key={link.label} {...link} />)}
+          {/* Company Column */}
+          <FooterColumn title="Company">
+            {companyLinks.map(link => <FooterLink key={link.label} {...link} />)}
           </FooterColumn>
 
           {/* Subscribe Column */}

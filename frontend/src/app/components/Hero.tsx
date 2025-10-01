@@ -35,7 +35,6 @@ interface Feature {
 const features: Feature[] = [
   { icon: Camera, text: "Photography" },
   { icon: Video, text: "Videography" },
-  { icon: Film, text: "Rentals" },
 ];
 
 // --- Reusable Feature Icon Component ---
@@ -83,12 +82,12 @@ const Hero = () => {
               </div>
 
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold leading-tight text-slate-900">
-                Capture <span className="text-indigo-600">moments</span> that matter, rent <span className="text-indigo-600">gear</span> you need
+                Capture <span className="text-indigo-600">moments</span> that matter, create <span className="text-indigo-600">memories</span> that last 
               </h1>
 
               <p className="text-lg text-slate-600 max-w-xl">
-                Maddheshiya Studio combines photography, videography, and gear rentals all in one platform. 
-                Book shoots, rent studios, or list your gear - all in one place.
+                Maddheshiya Studio offers professional photography and videography services. 
+                Book shoots and bring your creative vision to life with us.
               </p>
 
               <div className="flex flex-col sm:flex-row gap-4">

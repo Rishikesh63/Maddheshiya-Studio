@@ -2,12 +2,11 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import { Menu, X, ShoppingBag, UserCircle } from "lucide-react";
+import { Menu, X, ShoppingBag, UserCircle, ShoppingCart } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 
 const navLinks = [
   { href: "#services", label: "Services" },
-  { href: "#gear", label: "Gear Rental" },
   { href: "#testimonials", label: "Testimonials" },
   { href: "#contact", label: "Contact" },
 ];
@@ -69,6 +68,13 @@ const Navbar = () => {
 
           {/* Auth - Desktop */}
           <div className="flex items-center gap-4">
+            <Link
+              href="/cart"
+              className="flex items-center gap-2 text-slate-600 hover:text-indigo-600"
+            >
+              <ShoppingCart size={22} />
+              <span className="sr-only">Cart</span>
+            </Link>
             {user ? (
               <>
                 <Link
@@ -133,6 +139,14 @@ const Navbar = () => {
 
           {/* Auth - Mobile */}
           <div className="flex flex-col space-y-4">
+            <Link
+              href="/cart"
+              onClick={closeMobileMenu}
+              className="text-slate-700 hover:text-indigo-600 hover:bg-indigo-50 rounded-md py-3 px-4 text-lg transition-colors text-center flex items-center justify-center gap-2"
+            >
+              <ShoppingCart size={20} />
+              Cart
+            </Link>
             {user ? (
               <>
                 <Link

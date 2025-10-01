@@ -18,9 +18,25 @@
   The component gracefully falls back to an image if a 3D model is not provided.
 */
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Camera, X } from "lucide-react";
-import '@google/model-viewer';
+import dynamic from 'next/dynamic';
+
+// Create a wrapper component for model-viewer
+const ModelViewer = ({ children, ...props }: any) => {
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    import('@google/model-viewer');
+    setIsClient(true);
+  }, []);
+
+  if (!isClient) {
+    return null;
+  }
+
+  return <model-viewer {...props}>{children}</model-viewer>;
+};
 
 interface ServiceItem {
   id: string;
@@ -103,7 +119,7 @@ const CreativeServices: React.FC = () => {
                       model-viewer supports attributes: camera-controls, auto-rotate, ar, exposure, poster
                       Keep it accessible using title/aria-label.
                     */}
-                    <model-viewer
+                    <ModelViewer
                       src={s.modelUrl}
                       alt={s.title}
                       ar
@@ -115,7 +131,7 @@ const CreativeServices: React.FC = () => {
                     >
                       {/* Fallback slot content used when model-viewer is not available */}
                       <FallbackImage src={s.thumbnail} alt={s.title} />
-                    </model-viewer>
+                    </ModelViewer>
                   </div>
                 ) : (
                   <FallbackImage src={s.thumbnail} alt={s.title} />
@@ -171,7 +187,7 @@ const CreativeServices: React.FC = () => {
               <div className="p-6 grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <div className="w-full h-96 bg-gray-50 rounded-lg flex items-center justify-center overflow-hidden">
                   {active.modelUrl ? (
-                    <model-viewer
+                    <ModelViewer
                       src={active.modelUrl}
                       alt={active.title}
                       ar
@@ -180,7 +196,7 @@ const CreativeServices: React.FC = () => {
                       style={{ width: "100%", height: "100%" }}
                     >
                       <FallbackImage src={active.thumbnail} alt={active.title} />
-                    </model-viewer>
+                    </ModelViewer>
                   ) : (
                     <FallbackImage src={active.thumbnail} alt={active.title} />
                   )}

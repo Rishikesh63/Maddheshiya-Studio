@@ -1,7 +1,7 @@
 "use client";
 
 import React from 'react';
-import { ArrowRight, Camera, Video, Film, LucideIcon } from 'lucide-react';
+import { ArrowRight, Camera, Video,LucideIcon } from 'lucide-react';
 
 // --- Mock UI Components (cleaned up) ---
 const Button = ({ children, className, ...props }: React.ComponentProps<'button'>) => (

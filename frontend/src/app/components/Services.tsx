@@ -11,7 +11,6 @@ import {
   IdCard,
   BookOpen,
   PictureInPicture,
-  Bot,
   ArrowRight
 } from 'lucide-react';
 

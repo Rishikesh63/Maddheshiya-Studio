@@ -2,6 +2,7 @@
 import './globals.css';
 import { Geist } from 'next/font/google';
 import { Metadata } from 'next';
+import Script from 'next/script';
 import ClientWrapper from './ClientWrapper';
 
 const geistSans = Geist({
@@ -44,7 +45,11 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
-        <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
+        <Script
+          type="module"
+          src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"
+          strategy="afterInteractive"
+        />
       </head>
       <body className={geistSans.variable}>
         <ClientWrapper>

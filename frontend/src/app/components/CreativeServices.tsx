@@ -18,8 +18,9 @@
   The component gracefully falls back to an image if a 3D model is not provided.
 */
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Camera, X } from "lucide-react";
+import '@google/model-viewer';
 
 interface ServiceItem {
   id: string;

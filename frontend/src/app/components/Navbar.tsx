@@ -1,96 +1,61 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Menu, X, ShoppingBag } from "lucide-react";
+import Link from "next/link";
+import { Menu, X, ShoppingBag, UserCircle } from "lucide-react";
+import { useAuth } from "../context/AuthContext";
 
-// --- Mock Next.js Link for Demonstration (with improved types) ---
-// In a real Next.js app, you would import this from 'next/link'.
-const Link = ({ href, children, ...props }: React.ComponentProps<'a'>) => (
-  <a href={href} {...props}>{children}</a>
-);
-
-// --- Type Definitions ---
-interface NavLink {
-  href: string;
-  label: string;
-}
-
-// --- Navigation Data ---
-// Centralized navigation links for easy updates and consistency.
-const navLinks: NavLink[] = [
+const navLinks = [
   { href: "#services", label: "Services" },
   { href: "#gear", label: "Gear Rental" },
   { href: "#testimonials", label: "Testimonials" },
   { href: "#contact", label: "Contact" },
 ];
 
-// --- Main Navbar Component ---
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const { user, logout } = useAuth();
 
-  // Effect to handle scroll detection
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 10);
     };
+
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // Effect to prevent scrolling when the mobile menu is open
   useEffect(() => {
-    if (isMobileMenuOpen) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = 'auto';
-    }
-    // Cleanup function to restore scrolling when component unmounts
-    return () => {
-        document.body.style.overflow = 'auto';
-    };
+    document.body.style.overflow = isMobileMenuOpen ? "hidden" : "auto";
   }, [isMobileMenuOpen]);
 
-  const toggleMobileMenu = () => {
-    setIsMobileMenuOpen(!isMobileMenuOpen);
-  };
-  
-  const closeMobileMenu = () => {
-    setIsMobileMenuOpen(false);
+  const toggleMobileMenu = () => setIsMobileMenuOpen((prev) => !prev);
+  const closeMobileMenu = () => setIsMobileMenuOpen(false);
+
+  const handleLogout = () => {
+    logout();
+    closeMobileMenu();
   };
 
   return (
-    <>
-      <style>{`
-        .menu-open {
-          transform: translateY(0);
-          opacity: 1;
-          visibility: visible;
-        }
-        .menu-closed {
-          transform: translateY(-10%);
-          opacity: 0;
-          visibility: hidden;
-        }
-      `}</style>
-      <nav
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ease-in-out ${
-          isScrolled || isMobileMenuOpen
-            ? "bg-white/95 backdrop-blur-sm shadow-md py-3"
-            : "bg-transparent py-5"
-        }`}
-      >
-        <div className="container mx-auto px-4 flex items-center justify-between">
-          {/* Logo */}
-          <Link href="/" className="flex items-center gap-2 text-slate-800">
-            <ShoppingBag className="h-8 w-8 text-indigo-600" />
-            <span className="text-xl font-bold">
-              Maddheshiya<span className="text-indigo-600">Studio</span>
-            </span>
-          </Link>
+    <nav
+      className={`fixed top-0 w-full z-50 transition-all duration-300 ${
+        isScrolled ? "bg-white shadow" : "bg-transparent"
+      }`}
+    >
+      <div className="container mx-auto px-4 py-4 flex items-center justify-between">
+        {/* Logo */}
+        <Link href="/" className="flex items-center gap-2 text-slate-800">
+          <ShoppingBag className="h-8 w-8 text-indigo-600" />
+          <span className="text-xl font-bold">
+            Maddheshiya<span className="text-indigo-600">Studio</span>
+          </span>
+        </Link>
 
-          {/* Desktop Menu */}
-          <div className="hidden md:flex items-center space-x-8">
+        {/* Desktop Menu */}
+        <div className="hidden md:flex items-center gap-8">
+          <div className="flex items-center space-x-8">
             {navLinks.map((link) => (
               <Link
                 key={link.href}
@@ -102,40 +67,101 @@ const Navbar = () => {
             ))}
           </div>
 
-          {/* Mobile Menu Button */}
-          <button
-            className="md:hidden text-slate-800 z-10"
-            onClick={toggleMobileMenu}
-            aria-label="Toggle mobile menu"
-            aria-expanded={isMobileMenuOpen}
-            aria-controls="mobile-menu"
-          >
-            {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
-          </button>
+          {/* Auth - Desktop */}
+          <div className="flex items-center gap-4">
+            {user ? (
+              <>
+                <Link
+                  href="/dashboard"
+                  className="flex items-center gap-2 text-slate-600 hover:text-indigo-600"
+                >
+                  <UserCircle size={22} />
+                  Dashboard
+                </Link>
+                <button
+                  onClick={handleLogout}
+                  className="text-slate-600 hover:text-indigo-600 font-medium transition-colors cursor-pointer"
+                >
+                  Logout
+                </button>
+              </>
+            ) : (
+              <Link
+                href="/login"
+                className="bg-indigo-600 text-white px-4 py-2 rounded-md font-semibold hover:bg-indigo-700 transition-colors shadow-sm"
+              >
+                Login
+              </Link>
+            )}
+          </div>
         </div>
 
-        {/* Mobile Menu */}
-        <div
-          id="mobile-menu"
-          className={`md:hidden absolute top-0 left-0 w-full h-screen bg-white transition-all duration-300 ease-in-out ${
-            isMobileMenuOpen ? 'menu-open' : 'menu-closed'
-          }`}
+        {/* Mobile Menu Button */}
+        <button
+          className="md:hidden text-slate-800 z-50"
+          onClick={toggleMobileMenu}
+          aria-label="Toggle navigation menu"
+          aria-expanded={isMobileMenuOpen}
         >
-          <div className="container mx-auto px-4 pt-24 pb-8 flex flex-col space-y-4">
+          {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+        </button>
+      </div>
+
+      {/* Mobile Menu */}
+      <div
+        id="mobile-menu"
+        className={`fixed inset-0 bg-white z-40 transition-transform duration-300 transform ${
+          isMobileMenuOpen ? "translate-x-0" : "-translate-x-full"
+        }`}
+      >
+        <div className="container mx-auto px-4 pt-24 pb-8 flex flex-col h-full">
+          {/* Navigation Links */}
+          <div className="flex flex-col space-y-4">
             {navLinks.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
-                className="text-slate-700 hover:text-indigo-600 hover:bg-indigo-50 rounded-md py-3 px-4 text-lg transition-colors text-center"
                 onClick={closeMobileMenu}
+                className="text-slate-700 hover:text-indigo-600 hover:bg-indigo-50 rounded-md py-3 px-4 text-lg transition-colors text-center"
               >
                 {link.label}
               </Link>
             ))}
           </div>
+
+          <hr className="my-6 border-slate-200" />
+
+          {/* Auth - Mobile */}
+          <div className="flex flex-col space-y-4">
+            {user ? (
+              <>
+                <Link
+                  href="/dashboard"
+                  onClick={closeMobileMenu}
+                  className="text-slate-700 hover:text-indigo-600 hover:bg-indigo-50 rounded-md py-3 px-4 text-lg transition-colors text-center"
+                >
+                  Dashboard
+                </Link>
+                <button
+                  onClick={handleLogout}
+                  className="text-slate-700 hover:text-indigo-600 hover:bg-indigo-50 rounded-md py-3 px-4 text-lg transition-colors text-center"
+                >
+                  Logout
+                </button>
+              </>
+            ) : (
+              <Link
+                href="/auth/login"
+                onClick={closeMobileMenu}
+                className="bg-indigo-600 text-white rounded-md py-3 px-4 text-lg transition-colors text-center font-semibold"
+              >
+                Login
+              </Link>
+            )}
+          </div>
         </div>
-      </nav>
-    </>
+      </div>
+    </nav>
   );
 };
 

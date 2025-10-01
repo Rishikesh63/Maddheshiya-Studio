@@ -8,7 +8,11 @@ class RegisterSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CustomUser
-        fields = ['username', 'email', 'password', 'password2', 'is_creator', 'is_client', 'phone', 'bio', 'profile_image']
+        ref_name = "CustomUserRegisterSerializer"  # ✅ This resolves swagger conflict
+        fields = [
+            'username', 'email', 'password', 'password2',
+            'is_creator', 'is_client', 'phone', 'bio', 'profile_image'
+        ]
 
     def validate(self, attrs):
         if attrs['password'] != attrs['password2']:
@@ -32,4 +36,8 @@ class RegisterSerializer(serializers.ModelSerializer):
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
-        fields = ['id', 'username', 'email', 'phone', 'profile_image', 'bio', 'is_creator', 'is_client']
+        fields = [
+            'id', 'username', 'email',
+            'phone', 'profile_image', 'bio',
+            'is_creator', 'is_client'
+        ]

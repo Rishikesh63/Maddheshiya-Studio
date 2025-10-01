@@ -15,3 +15,12 @@ class UserDetailView(APIView):
     def get(self, request):
         serializer = UserSerializer(request.user)
         return Response(serializer.data)
+
+class UsersRootView(APIView):
+    permission_classes = [permissions.AllowAny]
+
+    def get(self, request):
+        return Response({
+            "register": "/api/users/register/",
+            "me": "/api/users/me/"
+        })

@@ -189,7 +189,7 @@ const VideoGallery = () => {
             className="flex gap-6 overflow-x-auto snap-x snap-mandatory no-scrollbar"
           >
             {videoMedia.map((media) => (
-              <VideoCard key={media.publicId} media={media} />
+              <VideoCard key={media.s3Key} media={media} />
             ))}
           </div>
 

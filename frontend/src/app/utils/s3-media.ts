@@ -16,13 +16,7 @@ const AWS_REGION = process.env.NEXT_PUBLIC_AWS_REGION || 'us-east-1';
  * @param options - Optional transformations
  */
 export const getImageUrl = (
-  key: string,
-  options?: {
-    width?: number;
-    height?: number;
-    quality?: number;
-    format?: 'webp' | 'jpg' | 'png' | 'avif';
-  }
+  key: string
 ): string => {
   // If CloudFront URL is configured, use it (recommended for production)
   if (CLOUDFRONT_URL) {

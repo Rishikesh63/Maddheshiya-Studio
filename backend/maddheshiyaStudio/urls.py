@@ -68,5 +68,5 @@ urlpatterns = [
          name='schema-redoc'),
 ]
 
-# Serve media files in development
-urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+if settings.DEBUG and not getattr(settings, 'USE_S3_MEDIA', False):
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -3,10 +3,10 @@ name = "maddheshiya-studio"
 version = "0.1.0"
 description = ""
 authors = ["Rishikesh Maddhesiya <rishi89324@gmail.com>"]
-readme = "README.md"
+package-mode = false
 
 [tool.poetry.dependencies]
-python = "^3.11"
+python = ">=3.11,<3.14"
 django = "^5.2.1"
 django-cors-headers = "^4.7.0"
 asgiref = "^3.8.1"
@@ -27,6 +27,8 @@ django-rest-framework-social-oauth2 = "^1.2.0"
 whitenoise = "^6.9.0"
 environ = "^1.0"
 drf-yasg = "^1.21.10"
+django-storages = "^1.14.6"
+boto3 = "^1.38.0"
 
 
 [build-system]

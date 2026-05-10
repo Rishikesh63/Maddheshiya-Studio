@@ -2,42 +2,40 @@
 
 import React, { useRef, useState, useEffect } from "react";
 import { ArrowRight, ChevronLeft, ChevronRight, PlayCircle } from "lucide-react";
+import { getVideoUrl, getVideoThumbnail, isS3Configured } from "@/app/utils/s3-media";
 
-
+// Update these with your S3 object keys after uploading to S3
 const videoMedia = [
   {
     type: "video",
-    publicId: "Ring_Ceremony_c7e9xh",
+    s3Key: "videos/ring-ceremony.mp4", // Your S3 path
     title: "Ring Ceremony",
   },
   {
     type: "video",
-    publicId: "Wedding_fyh6ak",
+    s3Key: "videos/wedding-highlights.mp4",
     title: "Wedding Highlights",
   },
   {
     type: "video",
-    publicId: "Preewedding_u7h0yv",
+    s3Key: "videos/prewedding-shoot.mp4",
     title: "Prewedding Shoot",
   },
   {
     type:"video",
-    publicId:"Indian_Wedding_Video_Link_Provided_jfpvjz",
+    s3Key:"videos/drone-footage.mp4",
     title:"Drone Footage",
   }
  
 ];
 
 
-const VideoCard = ({ media }: { media: { publicId: string, title: string } }) => {
+const VideoCard = ({ media }: { media: { s3Key: string, title: string } }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
 
-
-  const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
- 
-  const videoUrl = cloudName ? `https://res.cloudinary.com/${cloudName}/video/upload/f_auto,q_auto/${media.publicId}` : "";
-  const posterUrl = cloudName ? `https://res.cloudinary.com/${cloudName}/video/upload/so_0/f_auto,q_auto/${media.publicId}.jpg` : "";
+  const videoUrl = getVideoUrl(media.s3Key);
+  const posterUrl = getVideoThumbnail(media.s3Key);
 
   const handlePlay = () => {
     if (videoRef.current) {
@@ -63,17 +61,17 @@ const VideoCard = ({ media }: { media: { publicId: string, title: string } }) =>
   }, []);
 
 
-  if (!cloudName) {
+  if (!isS3Configured()) {
     return (
         <div className="snap-center bg-white shadow-lg rounded-2xl overflow-hidden w-[90vw] md:w-[450px] flex-shrink-0 flex items-center justify-center p-4" style={{ aspectRatio: '16 / 9' }}>
-            <p className="text-red-500 text-center">Cloudinary cloud name is not configured.</p>
+            <p className="text-red-500 text-center">AWS S3 is not configured. Please set environment variables.</p>
         </div>
     );
   }
 
   return (
     <div
-      key={media.publicId}
+      key={media.s3Key}
       className="snap-center bg-white shadow-lg rounded-2xl overflow-hidden w-[90vw] md:w-[450px] flex-shrink-0"
     >
       <div className="bg-black relative">

@@ -2,39 +2,38 @@
 
 import React, { useState, useEffect } from "react";
 import { ArrowRight, ArrowLeft, X, Camera } from "lucide-react";
+import { getImageUrl } from "@/app/utils/s3-media";
 
 // --- Type Definitions ---
 interface Photo {
   id: string;
-  publicId?: string;
-  url: string;
+  s3Key?: string; // S3 object key (path in bucket)
+  url?: string; // Fallback URL for external images
   title: string;
   altText: string;
   category: string;
 }
 
 // --- Data Layer ---
+// Update these with your S3 object keys after uploading to S3
 const photoMedia: Photo[] = [
   {
-    id: "wedding_cermony_jvbjur",
-    publicId: "wedding_cermony_jvbjur",
-    url: "https://res.cloudinary.com/dxwgmuoht/image/upload/v1752604990/wedding_cermony_jvbjur.jpg",
+    id: "wedding_ceremony",
+    s3Key: "photos/wedding_ceremony.jpg", // Your S3 path
     title: "Candid Wedding Moment",
     altText: "A candid, joyful moment at an Indian wedding.",
     category: "Candid Wedding",
   },
   {
-    id: "pexels-artosuraj-30706029_dotbjq",
-    publicId: "pexels-artosuraj-30706029_dotbjq",
-    url: "https://res.cloudinary.com/dxwgmuoht/image/upload/v1752604991/pexels-artosuraj-30706029_dotbjq.jpg",
+    id: "haldi_ceremony",
+    s3Key: "photos/haldi_ceremony.jpg",
     title: "Haldi Ceremony",
     altText: "A happy couple during their Haldi ceremony.",
     category: "Ceremony",
   },
   {
-    id: "ethinic_photography_pr3lfn",
-    publicId: "ethinic_photography_pr3lfn",
-    url: "https://res.cloudinary.com/dxwgmuoht/image/upload/v1752606238/ethinic_photography_pr3lfn.jpg",
+    id: "ethnic_photography",
+    s3Key: "photos/ethnic_photography.jpg",
     title: "Ethnic Fashion",
     altText: "A model in a traditional Indian saree.",
     category: "Fashion",
@@ -47,9 +46,8 @@ const photoMedia: Photo[] = [
     category: "Architecture",
   },
   {
-    id: "Product-photography_dzobxp",
-    publicId: "Product-photography_dzobxp",
-    url: "https://res.cloudinary.com/dxwgmuoht/image/upload/v1752606005/Product-photography_dzobxp.jpg",
+    id: "product_photography",
+    s3Key: "photos/product_photography.jpg",
     title: "Product Photography",
     altText: "A professional shot of a vintage camera.",
     category: "E-commerce",
@@ -67,7 +65,9 @@ const photoMedia: Photo[] = [
 // --- Universal Image Component (Corrected) ---
 const UniversalImage = ({ photo, className, ...props }: { photo: Photo; className?: string } & React.ComponentProps<'img'>) => {
   const placeholderImg = 'https://placehold.co/600x800/e2e8f0/4a5568?text=Image+Not+Found';
-  const imageUrl = photo.url || placeholderImg;
+  
+  // Use S3 URL if s3Key exists, otherwise use direct URL
+  const imageUrl = photo.s3Key ? getImageUrl(photo.s3Key) : (photo.url || placeholderImg);
 
   return (
     <img

@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from .models import CustomUser
 from django.contrib.auth.password_validation import validate_password
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
 class RegisterSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True, required=True, validators=[validate_password])
@@ -41,3 +42,17 @@ class UserSerializer(serializers.ModelSerializer):
             'phone', 'profile_image', 'bio',
             'is_creator', 'is_client'
         ]
+
+
+class EmailOrUsernameTokenObtainPairSerializer(TokenObtainPairSerializer):
+    username_field = 'username'
+
+    def validate(self, attrs):
+        login = attrs.get('username') or attrs.get('email')
+
+        if login and '@' in login:
+            user = CustomUser.objects.filter(email__iexact=login).first()
+            if user:
+                attrs['username'] = user.get_username()
+
+        return super().validate(attrs)

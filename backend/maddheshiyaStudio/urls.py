@@ -18,10 +18,7 @@ from django.contrib import admin
 from django.urls import path, include, re_path
 from django.conf import settings
 from django.conf.urls.static import static
-from rest_framework_simplejwt.views import (
-    TokenObtainPairView,
-    TokenRefreshView,
-)
+from rest_framework_simplejwt.views import TokenRefreshView
 
 # Swagger imports
 from drf_yasg.views import get_schema_view
@@ -30,6 +27,7 @@ from rest_framework import permissions
 
 # Public Home view
 from services.views import home
+from users.views import EmailOrUsernameTokenObtainPairView
 
 schema_view = get_schema_view(
     openapi.Info(
@@ -54,7 +52,7 @@ urlpatterns = [
     path('api/store/', include('store.urls')),
 
     # Auth & JWT
-    path('api/auth/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('api/auth/token/', EmailOrUsernameTokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/auth/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('api/auth/', include('dj_rest_auth.urls')),
     path('api/auth/registration/', include('dj_rest_auth.registration.urls')),

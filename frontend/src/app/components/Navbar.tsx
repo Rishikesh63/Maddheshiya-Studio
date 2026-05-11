@@ -165,7 +165,7 @@ const Navbar = () => {
               </>
             ) : (
               <Link
-                href="/auth/login"
+                href="/login"
                 onClick={closeMobileMenu}
                 className="bg-indigo-600 text-white rounded-md py-3 px-4 text-lg transition-colors text-center font-semibold"
               >

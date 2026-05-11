@@ -3,52 +3,33 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { useMutation } from '@tanstack/react-query';
+import { useAuth } from '@/app/context/AuthContext';
 
 type LoginPayload = {
   email: string;
   password: string;
 };
 
-type LoginResponse = {
-  access: string;
-  refresh: string;
-};
-
 export default function LoginPage() {
   const [formData, setFormData] = useState<LoginPayload>({ email: '', password: '' });
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const router = useRouter();
+  const { login } = useAuth();
 
-  const { mutate, status } = useMutation<LoginResponse, Error, LoginPayload>({
-    mutationFn: async (payload: LoginPayload) => {
-      const res = await fetch('https://maddheshiya-studio.onrender.com/api/token/', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-      });
-
-      if (!res.ok) {
-        const errData = await res.json();
-        throw new Error(errData.detail || 'Invalid credentials');
-      }
-
-      return res.json();
-    },
-    onSuccess: (data) => {
-      sessionStorage.setItem('access_token', data.access);
-      sessionStorage.setItem('refresh_token', data.refresh);
-      router.push('/dashboard');
-    },
-    onError: (err) => {
-      setError(err.message);
-    },
-  });
-
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
-    mutate(formData);
+    setLoading(true);
+
+    try {
+      await login(formData.email, formData.password);
+      router.push('/');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Invalid credentials');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -85,11 +66,11 @@ export default function LoginPage() {
         <button
           type="submit"
           className={`w-full text-white py-2 rounded ${
-            status === 'pending' ? 'bg-blue-400' : 'bg-blue-600 hover:bg-blue-700'
+            loading ? 'bg-blue-400' : 'bg-blue-600 hover:bg-blue-700'
           }`}
-          disabled={status === 'pending'}
+          disabled={loading}
         >
-          {status === 'pending' ? 'Logging in...' : 'Login'}
+          {loading ? 'Logging in...' : 'Login'}
         </button>
       </form>
 
@@ -99,14 +80,6 @@ export default function LoginPage() {
           Sign Up
         </Link>
       </p>
-
-      {/* Placeholder for social logins */}
-      <div className="mt-6 text-center">
-        <p className="text-sm text-gray-500 mb-2">Or login with</p>
-        <div className="flex justify-center gap-4">
-          <button className="bg-black text-white px-4 py-2 rounded">Google</button>
-        </div>
-      </div>
     </div>
   );
 }

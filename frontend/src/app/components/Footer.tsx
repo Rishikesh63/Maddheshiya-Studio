@@ -33,7 +33,6 @@ const companyLinks: FooterLinkItem[] = [
   { href: "#", label: "About Us" },
   { href: "#", label: "Contact" },
   { href: "#", label: "Our Team" },
-  { href: "#", label: "Testimonials" },
 ];
 
 const legalLinks: FooterLinkItem[] = [

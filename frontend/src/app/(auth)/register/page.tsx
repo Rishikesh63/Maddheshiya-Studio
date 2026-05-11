@@ -3,7 +3,6 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { signIn } from 'next-auth/react'; // <-- Add this
 import { apiUrl } from '@/app/lib/api';
 
 const RegisterPage = () => {
@@ -45,7 +44,7 @@ const RegisterPage = () => {
       const res = await fetch(apiUrl('/api/users/register/'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username, email, password }),
+        body: JSON.stringify({ username, email, password, password2: confirmPassword }),
       });
 
       const data = await res.json();
@@ -54,17 +53,16 @@ const RegisterPage = () => {
         setSuccess(true);
         setTimeout(() => router.push('/login'), 2000);
       } else {
-        setError(data?.detail || 'Registration failed');
+        const firstError = data && typeof data === 'object'
+          ? Object.values(data).flat().join(' ')
+          : '';
+        setError(firstError || 'Registration failed');
       }
     } catch {
       setError('An unexpected error occurred.');
     } finally {
       setLoading(false);
     }
-  };
-
-  const handleGoogleSignup = () => {
-    signIn('google'); // triggers Google login via NextAuth
   };
 
   return (
@@ -132,20 +130,9 @@ const RegisterPage = () => {
           {loading ? 'Registering...' : 'Register'}
         </button>
 
-        <div className="my-4 text-center text-gray-500">OR</div>
-
-        <button
-          type="button"
-          onClick={handleGoogleSignup}
-          className="w-full flex items-center justify-center gap-2 bg-white border border-gray-300 py-2 rounded hover:bg-gray-100 transition"
-        >
-          <img src="/google-icon.svg" alt="Google" className="w-5 h-5" />
-          <span className="text-sm text-gray-700">Sign up with Google</span>
-        </button>
-
         <p className="mt-4 text-sm text-center">
           Already have an account?{' '}
-          <Link href="/auth/login" className="text-blue-600 hover:underline">
+          <Link href="/login" className="text-blue-600 hover:underline">
             Login
           </Link>
         </p>

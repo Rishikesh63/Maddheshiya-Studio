@@ -1,0 +1,200 @@
+{
+  "main": {
+    "id": "425a3b15736dc0a4",
+    "type": "split",
+    "children": [
+      {
+        "id": "102e285e8485fc1c",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "136ca9911f4b0bd2",
+            "type": "leaf",
+            "state": {
+              "type": "graph",
+              "state": {},
+              "icon": "lucide-git-fork",
+              "title": "Graph view"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "vertical"
+  },
+  "left": {
+    "id": "020f5a15073d2c44",
+    "type": "split",
+    "children": [
+      {
+        "id": "248005c9c45c038a",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "c263558d12bd5a6d",
+            "type": "leaf",
+            "state": {
+              "type": "file-explorer",
+              "state": {
+                "sortOrder": "alphabetical",
+                "autoReveal": false
+              },
+              "icon": "lucide-folder-closed",
+              "title": "Files"
+            }
+          },
+          {
+            "id": "27ff1ed185b39dea",
+            "type": "leaf",
+            "state": {
+              "type": "search",
+              "state": {
+                "query": "",
+                "matchingCase": false,
+                "explainSearch": false,
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical"
+              },
+              "icon": "lucide-search",
+              "title": "Search"
+            }
+          },
+          {
+            "id": "820e948d9019c6bd",
+            "type": "leaf",
+            "state": {
+              "type": "bookmarks",
+              "state": {},
+              "icon": "lucide-bookmark",
+              "title": "Bookmarks"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300
+  },
+  "right": {
+    "id": "f64a1e8d040b6d02",
+    "type": "split",
+    "children": [
+      {
+        "id": "d99bbb212b943eb4",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "44f727ab7c164d2e",
+            "type": "leaf",
+            "state": {
+              "type": "backlink",
+              "state": {
+                "file": "backend/static/admin/img/calendar-icons.svg",
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical",
+                "showSearch": false,
+                "searchQuery": "",
+                "backlinkCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-coming-in",
+              "title": "Backlinks for calendar-icons"
+            }
+          },
+          {
+            "id": "e8f2d72dabbf8ae8",
+            "type": "leaf",
+            "state": {
+              "type": "outgoing-link",
+              "state": {
+                "file": "backend/static/admin/img/calendar-icons.svg",
+                "linksCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-going-out",
+              "title": "Outgoing links from calendar-icons"
+            }
+          },
+          {
+            "id": "0203acaf97d171a7",
+            "type": "leaf",
+            "state": {
+              "type": "tag",
+              "state": {
+                "sortOrder": "frequency",
+                "useHierarchy": true,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-tags",
+              "title": "Tags"
+            }
+          },
+          {
+            "id": "bd798431a53a099b",
+            "type": "leaf",
+            "state": {
+              "type": "all-properties",
+              "state": {
+                "sortOrder": "frequency",
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-archive",
+              "title": "All properties"
+            }
+          },
+          {
+            "id": "f55c4250f3db9c60",
+            "type": "leaf",
+            "state": {
+              "type": "outline",
+              "state": {
+                "file": "backend/static/admin/img/calendar-icons.svg",
+                "followCursor": false,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-list",
+              "title": "Outline of calendar-icons"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300,
+    "collapsed": true
+  },
+  "left-ribbon": {
+    "hiddenItems": {
+      "switcher:Open quick switcher": false,
+      "graph:Open graph view": false,
+      "canvas:Create new canvas": false,
+      "daily-notes:Open today's daily note": false,
+      "templates:Insert template": false,
+      "command-palette:Open command palette": false,
+      "bases:Create new base": false
+    }
+  },
+  "active": "136ca9911f4b0bd2",
+  "lastOpenFiles": [
+    "frontend/src/app/api/auth/[...nextauth]/route.ts",
+    "frontend/src/app/api/auth/[...nextauth]",
+    "frontend/src/app/api/auth",
+    "frontend/src/app/api",
+    "frontend/src/app/lib/api.ts",
+    "backend/store/__pycache__/serializers.cpython-312.pyc",
+    "backend/store/__pycache__/views.cpython-312.pyc",
+    "backend/store/__pycache__/urls.cpython-312.pyc",
+    "backend/services/__pycache__/urls.cpython-312.pyc",
+    "backend/users/__pycache__/serializers.cpython-312.pyc",
+    "backend/users/__pycache__/views.cpython-312.pyc",
+    "frontend/node_modules/eslint-plugin-react/README.md",
+    "frontend/node_modules/ms/license.md",
+    "backend/static/admin/img/calendar-icons.svg",
+    "frontend/node_modules/jose/README.md"
+  ]
+}

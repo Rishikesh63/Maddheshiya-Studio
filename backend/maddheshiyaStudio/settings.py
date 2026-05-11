@@ -77,7 +77,10 @@ if not SECRET_KEY:
     else:
         raise ImproperlyConfigured('Set the SECRET_KEY environment variable')
 
-# ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', default=[])
+ALLOWED_HOSTS = env.list(
+    'ALLOWED_HOSTS',
+    default=['maddheshiya-studio.onrender.com', 'localhost', '127.0.0.1'],
+)
 
 
 # Application definition
@@ -201,6 +204,11 @@ else:
 
 SOCIALACCOUNT_PROVIDERS = {
     'google': {
+        'APP': {
+            'client_id': env('GOOGLE_CLIENT_ID', default=''),
+            'secret': env('GOOGLE_CLIENT_SECRET', default=''),
+            'key': '',
+        },
         'SCOPE': [
             'profile',
             'email',
@@ -260,8 +268,23 @@ REST_FRAMEWORK = {
 
 
 AUTH_USER_MODEL = 'users.CustomUser'
- # For dev: prints emails to console
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+POSTMARK_SERVER_TOKEN = env('POSTMARK_SERVER_TOKEN', default='')
+SMTP_FROM = env('SMTP_FROM', default='no-reply@maddheshiyastudio.com')
+SMTP_FROM_NAME = env('SMTP_FROM_NAME', default='Maddheshiya Studio')
+
+if POSTMARK_SERVER_TOKEN:
+    EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+    EMAIL_HOST = 'smtp.postmarkapp.com'
+    EMAIL_PORT = 587
+    EMAIL_HOST_USER = POSTMARK_SERVER_TOKEN
+    EMAIL_HOST_PASSWORD = POSTMARK_SERVER_TOKEN
+    EMAIL_USE_TLS = True
+    DEFAULT_FROM_EMAIL = f'{SMTP_FROM_NAME} <{SMTP_FROM}>'
+else:
+    # For local development: prints emails to the console.
+    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+    DEFAULT_FROM_EMAIL = f'{SMTP_FROM_NAME} <{SMTP_FROM}>'
 
 
 # Allauth config for email verification
@@ -278,22 +301,25 @@ ACCOUNT_USER_MODEL_USERNAME_FIELD = 'username'
 LOGIN_REDIRECT_URL = "/"
 LOGOUT_REDIRECT_URL = "/"
 
-ALLOWED_HOSTS = ["maddheshiya-studio.onrender.com", "localhost", "127.0.0.1"]
+CSRF_TRUSTED_ORIGINS = env.list(
+    'CSRF_TRUSTED_ORIGINS',
+    default=[
+        'https://maddheshiya-studio.onrender.com',
+        'https://maddheshiya-studio.vercel.app',
+    ],
+)
 
-CSRF_TRUSTED_ORIGINS = [
-    "https://maddheshiya-studio.onrender.com",
-    "https://maddheshiya-studio.vercel.app"
-
-]
-
-CORS_ALLOWED_ORIGINS = [
-    "https://maddheshiya-studio.onrender.com",
-    "https://maddheshiya-studio.vercel.app",
-    "http://localhost:3000",
-    "http://127.0.0.1:3000"
-]
+CORS_ALLOWED_ORIGINS = env.list(
+    'CORS_ALLOWED_ORIGINS',
+    default=[
+        'https://maddheshiya-studio.onrender.com',
+        'https://maddheshiya-studio.vercel.app',
+        'http://localhost:3000',
+        'http://127.0.0.1:3000',
+    ],
+)
 CORS_ALLOW_CREDENTIALS = True
 
-CSRF_COOKIE_SECURE = True
-SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = not DEBUG
+SESSION_COOKIE_SECURE = not DEBUG
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")

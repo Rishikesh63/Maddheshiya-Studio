@@ -8,6 +8,7 @@ import React, {
 } from 'react';
 import { jwtDecode } from 'jwt-decode';
 import { useMutation } from '@tanstack/react-query';
+import { apiUrl } from '@/app/lib/api';
 
 // --- Type Definitions ---
 interface AuthToken {
@@ -33,9 +34,6 @@ interface AuthContextType {
 
 // --- Create Context ---
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
-
-// --- API URL ---
-const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 // --- Session Storage Helpers ---
 const storeTokens = (tokens: AuthToken) =>
@@ -71,7 +69,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const loginMutation = useMutation({
     mutationFn: async ({ username, password }: { username: string; password: string }) => {
-      const response = await fetch(`${API_URL}/token/`, {
+      const response = await fetch(apiUrl('/api/auth/token/'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username, password }),
@@ -91,7 +89,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const socialLogin = async (provider: 'google', accessToken: string) => {
-    const res = await fetch(`${API_URL}/auth/${provider}/`, {
+    const res = await fetch(apiUrl(`/api/auth/${provider}/`), {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ access_token: accessToken }),

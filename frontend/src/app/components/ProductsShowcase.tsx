@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion";
 import Link from "next/link";
-import { Film, BookImage, FrameIcon, Wand2, CreditCard, Shirt, ArrowRight } from "lucide-react";
+import { Film, FrameIcon, Wand2, CreditCard, Shirt, Clapperboard, Star, ArrowRight } from "lucide-react";
 
 const products = [
   {
@@ -12,22 +12,28 @@ const products = [
     href: "/products/digital/invitation-video",
   },
   {
-    icon: BookImage,
-    label: "Album Design",
-    desc: "Heirloom-quality wedding album layouts, print-ready",
-    href: "/products/digital/album-design",
+    icon: Clapperboard,
+    label: "Wedding Highlight",
+    desc: "Cinematic 5–10 min wedding highlight reel, color-graded",
+    href: "/products/digital/wedding-highlight",
+  },
+  {
+    icon: Star,
+    label: "Pre-Wedding Highlight",
+    desc: "Romantic cinematic film of your pre-wedding shoot",
+    href: "/products/digital/prewedding-highlight",
+  },
+  {
+    icon: Wand2,
+    label: "Album PSD",
+    desc: "Professional album retouching, composites & color grading",
+    href: "/products/digital/album-psd",
   },
   {
     icon: FrameIcon,
     label: "Photo Framing",
     desc: "Premium wood, acrylic & canvas frames for your memories",
     href: "/products/printing/photo-framing",
-  },
-  {
-    icon: Wand2,
-    label: "PSD Editing",
-    desc: "Advanced retouching, composites & color grading",
-    href: "/products/digital/photo-psd",
   },
   {
     icon: CreditCard,
@@ -81,7 +87,7 @@ export default function ProductsShowcase() {
           initial="hidden"
           whileInView="show"
           viewport={{ once: true }}
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4"
         >
           {products.map((p) => (
             <motion.div key={p.href} variants={item}>

@@ -3,9 +3,9 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import Navbar from "../../../components/Navbar";
 import Footer from "../../../components/Footer";
-import BookingCTA from "../../../components/BookingCTA";
+import AddToCartButton from "../../../components/AddToCartButton";
 import { productData } from "../../../lib/serviceData";
-import { Check, ArrowLeft, Clock, MessageCircle } from "lucide-react";
+import { Check, ArrowLeft, Clock } from "lucide-react";
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -40,24 +40,36 @@ export default async function DigitalProductPage({ params }: Props) {
             <ArrowLeft size={12} />
             Products
           </Link>
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-16 items-start">
+            {/* Left: product info */}
             <div>
               <span className="text-[10px] tracking-[0.4em] uppercase text-[var(--gold)]/60 block mb-4">
                 Digital Product
               </span>
               <h1
-                className="text-4xl md:text-6xl font-light text-white mb-3"
+                className="text-4xl md:text-6xl font-light text-white mb-2"
                 style={{ fontFamily: "var(--font-cormorant)" }}
               >
                 {data.title}
               </h1>
+              <p
+                className="text-lg font-light text-white/50 mb-3"
+                style={{ fontFamily: "var(--font-cormorant)" }}
+              >
+                {data.subtitle}
+              </p>
               <div className="w-12 h-px bg-[var(--gold)]/40 mb-6" />
-              <p className="text-sm text-white/50 leading-relaxed mb-6">{data.description}</p>
+              <p className="text-sm text-white/50 leading-relaxed mb-8">{data.description}</p>
 
-              <div className="flex items-center gap-4 mb-8">
+              {/* Price + Delivery */}
+              <div className="flex items-center gap-6 mb-8 p-5 bg-[var(--black-card)] border border-[var(--gold)]/10">
                 <div>
                   <p className="text-[10px] tracking-widest uppercase text-white/30 mb-1">Starting From</p>
-                  <p className="text-2xl text-[var(--gold)]" style={{ fontFamily: "var(--font-cormorant)" }}>
+                  <p
+                    className="text-3xl text-[var(--gold)]"
+                    style={{ fontFamily: "var(--font-cormorant)" }}
+                  >
                     {data.startingPrice}
                   </p>
                 </div>
@@ -71,31 +83,30 @@ export default async function DigitalProductPage({ params }: Props) {
                 </div>
               </div>
 
-              <div className="flex flex-col gap-3">
-                <Link
-                  href="https://wa.me/919XXXXXXXXX"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-3 px-8 py-4 bg-[var(--gold)] text-black text-xs tracking-widest uppercase font-medium hover:bg-[var(--gold-light)] transition-colors"
-                >
-                  <MessageCircle size={14} />
-                  Order via WhatsApp
-                </Link>
+              {/* CTA buttons */}
+              <div className="flex flex-col sm:flex-row gap-3">
+                <AddToCartButton
+                  id={slug}
+                  title={data.title}
+                  category="Digital Product"
+                  price={data.price}
+                />
                 <Link
                   href="/contact"
-                  className="inline-flex items-center gap-3 px-8 py-4 border border-[var(--gold)]/30 text-[var(--gold)]/70 text-xs tracking-widest uppercase hover:border-[var(--gold)] hover:text-[var(--gold)] transition-all"
+                  className="inline-flex items-center justify-center gap-3 px-8 py-4 border border-[var(--gold)]/30 text-[var(--gold)]/70 text-xs tracking-widest uppercase hover:border-[var(--gold)] hover:text-[var(--gold)] transition-all"
                 >
                   Get Custom Quote
                 </Link>
               </div>
             </div>
 
+            {/* Right: features */}
             <div>
               <h3
                 className="text-2xl font-light text-white mb-6"
                 style={{ fontFamily: "var(--font-cormorant)" }}
               >
-                Features
+                What&apos;s Included
               </h3>
               <ul className="space-y-4">
                 {data.features.map((f) => (
@@ -110,8 +121,8 @@ export default async function DigitalProductPage({ params }: Props) {
         </div>
       </section>
 
-      {/* Gallery placeholder */}
-      <section className="py-12 px-6">
+      {/* Samples placeholder */}
+      <section className="py-12 px-6 pb-24">
         <div className="max-w-5xl mx-auto">
           <h2
             className="text-3xl font-light text-white mb-8"
@@ -123,15 +134,16 @@ export default async function DigitalProductPage({ params }: Props) {
             {Array.from({ length: 4 }).map((_, i) => (
               <div
                 key={i}
-                className="aspect-square bg-[var(--black-card)] border border-[var(--gold)]/5"
-              />
+                className="aspect-video bg-[var(--black-card)] border border-[var(--gold)]/5 flex items-center justify-center"
+              >
+                <span className="text-[10px] tracking-widest uppercase text-white/10">Preview</span>
+              </div>
             ))}
           </div>
-          <p className="text-xs text-white/20 mt-4">Sample images will appear here</p>
+          <p className="text-xs text-white/20 mt-4">Sample videos/images will appear here</p>
         </div>
       </section>
 
-      <BookingCTA />
       <Footer />
     </div>
   );

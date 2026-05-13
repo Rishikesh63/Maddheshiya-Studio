@@ -11,24 +11,14 @@ export const metadata: Metadata = {
 };
 
 const digitalProducts = [
-  {
-    slug: "photo-psd",
-    title: "Photo PSD Editing",
-    desc: "Advanced retouching, composites & color grading",
-    price: "From ₹500",
-  },
-  {
-    slug: "invitation-video",
-    title: "Invitation Videos",
-    desc: "Cinematic digital invitations for WhatsApp & social",
-    price: "From ₹1,500",
-  },
-  {
-    slug: "album-design",
-    title: "Album Design",
-    desc: "Heirloom-quality photo album layouts, print-ready",
-    price: "From ₹2,000",
-  },
+  { slug: "album-psd", title: "Album PSD", desc: "Professional album retouching & composites", price: "From ₹500" },
+  { slug: "invitation-video", title: "Invitation Videos", desc: "Cinematic digital invitations for WhatsApp & social", price: "From ₹1,500" },
+  { slug: "wedding-highlight", title: "Wedding Highlight", desc: "Cinematic wedding highlight reel, color-graded", price: "From ₹3,500" },
+  { slug: "ring-ceremony-highlight", title: "Ring Ceremony Highlights", desc: "Elegant short film of your ring exchange", price: "From ₹2,000" },
+  { slug: "wedding-title", title: "Wedding Title", desc: "Cinematic title card for wedding films", price: "From ₹500" },
+  { slug: "video-logo", title: "Video Logo", desc: "Animated logo intro for your videos", price: "From ₹800" },
+  { slug: "birthday-highlight", title: "Birthday Highlight", desc: "Fun cinematic birthday event film", price: "From ₹2,000" },
+  { slug: "prewedding-highlight", title: "Pre-Wedding Highlight", desc: "Romantic cinematic pre-wedding film", price: "From ₹2,500" },
 ];
 
 const printingProducts = [
@@ -114,7 +104,7 @@ export default function ProductsPage() {
               Digital Products
             </h2>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 relative">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 relative">
             {digitalProducts.map((p) => (
               <ProductCard key={p.slug} product={p} category="digital" />
             ))}

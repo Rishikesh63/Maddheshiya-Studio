@@ -25,8 +25,8 @@ const videographyLinks = [
 
 const productsLinks = [
   { href: "/products/digital/invitation-video", label: "Invitation Videos" },
-  { href: "/products/digital/album-design", label: "Album Design" },
-  { href: "/products/digital/photo-psd", label: "Photo PSD" },
+  { href: "/products/digital/wedding-highlight", label: "Wedding Highlight" },
+  { href: "/products/digital/album-psd", label: "Album PSD" },
   { href: "/products/printing/id-cards", label: "ID Cards" },
   { href: "/products/printing/photo-framing", label: "Photo Framing" },
 ];

@@ -3,8 +3,9 @@
 import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Menu, X, ChevronDown, Camera, Video, Package } from "lucide-react";
+import { Menu, X, ChevronDown, Camera, Video, Package, ShoppingCart } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
+import { useCart } from "../context/CartContext";
 
 const photographyLinks = [
   { href: "/photography/wedding", label: "Wedding" },
@@ -23,9 +24,10 @@ const videographyLinks = [
 
 const productLinks = [
   { group: "Digital", items: [
-    { href: "/products/digital/photo-psd", label: "Photo PSD" },
+    { href: "/products/digital/album-psd", label: "Album PSD" },
     { href: "/products/digital/invitation-video", label: "Invitation Video" },
-    { href: "/products/digital/album-design", label: "Album Design" },
+    { href: "/products/digital/wedding-highlight", label: "Wedding Highlight" },
+    { href: "/products/digital/prewedding-highlight", label: "Pre-Wedding Highlight" },
   ]},
   { group: "Printing", items: [
     { href: "/products/printing/id-cards", label: "ID Cards" },
@@ -102,6 +104,7 @@ export default function Navbar() {
   const [mobileSection, setMobileSection] = useState<string | null>(null);
   const pathname = usePathname();
   const { user, logout } = useAuth();
+  const { count: cartCount } = useCart();
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 40);
@@ -185,7 +188,7 @@ export default function Navbar() {
           ))}
         </div>
 
-        {/* Right: Book Now + Auth */}
+        {/* Right: Cart + Book Now + Auth */}
         <div className="hidden lg:flex items-center gap-4">
           {user && (
             <button
@@ -195,6 +198,18 @@ export default function Navbar() {
               Logout
             </button>
           )}
+          <Link
+            href="/cart"
+            className="relative text-white/50 hover:text-[var(--gold)] transition-colors"
+            aria-label="Cart"
+          >
+            <ShoppingCart size={18} />
+            {cartCount > 0 && (
+              <span className="absolute -top-2 -right-2 w-4 h-4 bg-[var(--gold)] text-black text-[9px] font-bold flex items-center justify-center rounded-full">
+                {cartCount}
+              </span>
+            )}
+          </Link>
           <Link
             href="/booking"
             className="px-6 py-2.5 text-xs tracking-widest uppercase border border-[var(--gold)] text-[var(--gold)] hover:bg-[var(--gold)] hover:text-[var(--black)] transition-all duration-300 font-medium"

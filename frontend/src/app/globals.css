@@ -2,32 +2,108 @@
 @tailwind utilities;
 
 :root {
-  --primary: #007bff;
-  --primary-hover: #0069d9;
-  --secondary: #6c757d;
-  --background: #1619e7;
-  --foreground: #212529;
-  --muted: #f8f9fa;
-  --border: #dee2e6;
-  --radius: 0.375rem;
+  --gold: #C9A84C;
+  --gold-light: #E8D5A3;
+  --gold-muted: #A8872C;
+  --gold-dark: #8B6914;
+  --black: #0A0A0A;
+  --black-soft: #111111;
+  --black-card: #161616;
+  --black-border: #2A2A2A;
+  --white: #FAFAF8;
+  --white-muted: #E8E6E1;
+  --gray-subtle: #3A3A3A;
+  --gray-text: #A0A0A0;
+  --radius: 0.25rem;
+
+  /* Legacy aliases kept for shadcn/ui compatibility */
+  --background: #0A0A0A;
+  --foreground: #FAFAF8;
+  --muted: #161616;
+  --border: #2A2A2A;
+  --primary: #C9A84C;
+  --primary-hover: #A8872C;
+  --secondary: #3A3A3A;
+
+  --font-heading: var(--font-cormorant);
+  --font-sans: var(--font-inter);
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-inter);
+  --font-heading: var(--font-cormorant);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #130c02ea;
-    --foreground: #ededed;
-  }
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--black);
+  color: var(--white);
+  font-family: var(--font-inter), 'Inter', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-cormorant), 'Cormorant Garamond', Georgia, serif;
+  letter-spacing: 0.02em;
+}
+
+/* Gold gradient text utility */
+.text-gold-gradient {
+  background: linear-gradient(135deg, var(--gold-light) 0%, var(--gold) 50%, var(--gold-muted) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Luxury divider */
+.divider-gold {
+  width: 60px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+}
+
+/* Cinematic overlay for image cards */
+.cinematic-overlay {
+  background: linear-gradient(
+    to top,
+    rgba(0, 0, 0, 0.85) 0%,
+    rgba(0, 0, 0, 0.4) 50%,
+    rgba(0, 0, 0, 0.1) 100%
+  );
+}
+
+/* Gold border glow */
+.gold-glow {
+  box-shadow: 0 0 20px rgba(201, 168, 76, 0.15);
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--black);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--gold-dark);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--gold);
+}
+
+/* Selection */
+::selection {
+  background: rgba(201, 168, 76, 0.3);
+  color: var(--white);
 }

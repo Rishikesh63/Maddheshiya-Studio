@@ -1,25 +1,34 @@
-"use client";
+import { Metadata } from "next";
 import Navbar from "./components/Navbar";
-import Hero from '@/app/components/Hero';
-import Services from '@/app/components/Services';
-import Footer from '@/app/components/Footer';
+import HeroSection from "./components/HeroSection";
+import ServiceCategories from "./components/ServiceCategories";
+import FeaturedPortfolio from "./components/FeaturedPortfolio";
+import ProductsShowcase from "./components/ProductsShowcase";
+import WhyChooseUs from "./components/WhyChooseUs";
+import BehindTheScenes from "./components/BehindTheScenes";
+import ReelsShowcase from "./components/ReelsShowcase";
+import BookingCTA from "./components/BookingCTA";
+import Footer from "./components/Footer";
 
-import Contact from "@/app/components/Contact";
-import PhotoGallery from '@/app/components/PhotoGallery';
-import VideoGallery from "@/app/components/VideoGallery";
-import CreativeServices from "@/app/components/CreativeServices";
+export const metadata: Metadata = {
+  title: "Maddheshiya Studio | Premium Wedding Photography & Videography",
+  description:
+    "Maddheshiya Studio — Premium wedding photography, cinematic films, drone coverage, and creative services in Kanpur, Lucknow & across India.",
+};
 
 export default function Home() {
   return (
-    <div>
+    <div className="bg-[var(--black)]">
       <Navbar />
       <main>
-        <Hero />
-        <Services />
-        <CreativeServices />
-        <PhotoGallery/>
-        <VideoGallery/>
-        <Contact />
+        <HeroSection />
+        <ServiceCategories />
+        <FeaturedPortfolio />
+        <ProductsShowcase />
+        <WhyChooseUs />
+        <BehindTheScenes />
+        <ReelsShowcase />
+        <BookingCTA />
       </main>
       <Footer />
     </div>

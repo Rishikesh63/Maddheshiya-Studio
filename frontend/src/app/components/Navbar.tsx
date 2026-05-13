@@ -1,173 +1,334 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
-import { Menu, X, ShoppingBag, UserCircle, ShoppingCart } from "lucide-react";
+import { usePathname } from "next/navigation";
+import { Menu, X, ChevronDown, Camera, Video, Package } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 
-const navLinks = [
-  { href: "#services", label: "Services" },
-  { href: "/store", label: "Products" },
-  { href: "#contact", label: "Contact" },
+const photographyLinks = [
+  { href: "/photography/wedding", label: "Wedding" },
+  { href: "/photography/prewedding", label: "Pre-Wedding" },
+  { href: "/photography/studio", label: "Studio" },
+  { href: "/photography/product", label: "Product" },
+  { href: "/photography/drone", label: "Drone" },
 ];
 
-const Navbar = () => {
-  const [isScrolled, setIsScrolled] = useState(false);
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+const videographyLinks = [
+  { href: "/videography/wedding-films", label: "Wedding Films" },
+  { href: "/videography/reels", label: "Cinematic Reels" },
+  { href: "/videography/drone", label: "Drone Videography" },
+  { href: "/videography/events", label: "Events" },
+];
+
+const productLinks = [
+  { group: "Digital", items: [
+    { href: "/products/digital/photo-psd", label: "Photo PSD" },
+    { href: "/products/digital/invitation-video", label: "Invitation Video" },
+    { href: "/products/digital/album-design", label: "Album Design" },
+  ]},
+  { group: "Printing", items: [
+    { href: "/products/printing/id-cards", label: "ID Cards" },
+    { href: "/products/printing/tshirt-printing", label: "T-Shirt Printing" },
+    { href: "/products/printing/photo-framing", label: "Photo Framing" },
+  ]},
+];
+
+function DropdownMenu({
+  label,
+  icon: Icon,
+  href,
+  children,
+}: {
+  label: string;
+  icon: React.ElementType;
+  href: string;
+  children: React.ReactNode;
+}) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, []);
+
+  return (
+    <div
+      ref={ref}
+      className="relative"
+      onMouseEnter={() => setOpen(true)}
+      onMouseLeave={() => setOpen(false)}
+    >
+      <Link
+        href={href}
+        className="flex items-center gap-1 text-sm tracking-widest uppercase text-white/70 hover:text-[var(--gold)] transition-colors duration-300 py-2"
+        onClick={() => setOpen(false)}
+      >
+        <Icon size={14} className="opacity-60" />
+        {label}
+        <ChevronDown
+          size={12}
+          className={`transition-transform duration-200 ${open ? "rotate-180" : ""}`}
+        />
+      </Link>
+
+      {open && (
+        <div className="absolute top-full left-0 mt-1 bg-[#111111] border border-[var(--gold)]/20 shadow-2xl shadow-black/60 min-w-[200px] z-50 animate-in fade-in slide-in-from-top-2 duration-150">
+          <div className="p-1">{children}</div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function DropdownLink({ href, label }: { href: string; label: string }) {
+  return (
+    <Link
+      href={href}
+      className="block px-4 py-2.5 text-xs tracking-widest uppercase text-white/60 hover:text-[var(--gold)] hover:bg-[var(--gold)]/5 transition-colors duration-200"
+    >
+      {label}
+    </Link>
+  );
+}
+
+export default function Navbar() {
+  const [scrolled, setScrolled] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const [mobileSection, setMobileSection] = useState<string | null>(null);
+  const pathname = usePathname();
   const { user, logout } = useAuth();
 
   useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 10);
-    };
-
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
+    const onScroll = () => setScrolled(window.scrollY > 40);
+    window.addEventListener("scroll", onScroll);
+    return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
   useEffect(() => {
-    document.body.style.overflow = isMobileMenuOpen ? "hidden" : "auto";
-  }, [isMobileMenuOpen]);
+    setMobileOpen(false);
+    setMobileSection(null);
+  }, [pathname]);
 
-  const toggleMobileMenu = () => setIsMobileMenuOpen((prev) => !prev);
-  const closeMobileMenu = () => setIsMobileMenuOpen(false);
-
-  const handleLogout = () => {
-    logout();
-    closeMobileMenu();
-  };
+  useEffect(() => {
+    document.body.style.overflow = mobileOpen ? "hidden" : "";
+    return () => { document.body.style.overflow = ""; };
+  }, [mobileOpen]);
 
   return (
     <nav
-      className={`fixed top-0 w-full z-50 transition-all duration-300 ${
-        isScrolled ? "bg-white shadow" : "bg-transparent"
+      className={`fixed top-0 w-full z-50 transition-all duration-500 ${
+        scrolled
+          ? "bg-[#0A0A0A]/95 backdrop-blur-md border-b border-[var(--gold)]/10 py-3"
+          : "bg-transparent py-5"
       }`}
     >
-      <div className="container mx-auto px-4 py-4 flex items-center justify-between">
+      <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">
+
         {/* Logo */}
-        <Link href="/" className="flex items-center gap-2 text-slate-800">
-          <ShoppingBag className="h-8 w-8 text-indigo-600" />
-          <span className="text-xl font-bold">
-            Maddheshiya<span className="text-indigo-600">Studio</span>
+        <Link href="/" className="flex flex-col leading-none group">
+          <span
+            className="text-xl font-light tracking-[0.25em] uppercase text-[var(--gold)] transition-opacity duration-300 group-hover:opacity-80"
+            style={{ fontFamily: "var(--font-cormorant)" }}
+          >
+            Maddheshiya
+          </span>
+          <span className="text-[9px] tracking-[0.5em] uppercase text-white/40 mt-0.5">
+            Studio
           </span>
         </Link>
 
-        {/* Desktop Menu */}
-        <div className="hidden md:flex items-center gap-8">
-          <div className="flex items-center space-x-8">
-            {navLinks.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                className="text-slate-600 hover:text-indigo-600 font-medium transition-colors relative after:content-[''] after:absolute after:left-0 after:bottom-[-4px] after:h-[2px] after:w-0 after:bg-indigo-600 after:transition-all after:duration-300 hover:after:w-full"
-              >
-                {link.label}
-              </Link>
+        {/* Desktop nav */}
+        <div className="hidden lg:flex items-center gap-8">
+          <DropdownMenu label="Photography" icon={Camera} href="/photography">
+            {photographyLinks.map((l) => (
+              <DropdownLink key={l.href} href={l.href} label={l.label} />
             ))}
-          </div>
+          </DropdownMenu>
 
-          {/* Auth - Desktop */}
-          <div className="flex items-center gap-4">
+          <DropdownMenu label="Videography" icon={Video} href="/videography">
+            {videographyLinks.map((l) => (
+              <DropdownLink key={l.href} href={l.href} label={l.label} />
+            ))}
+          </DropdownMenu>
+
+          <DropdownMenu label="Products" icon={Package} href="/products">
+            {productLinks.map((group) => (
+              <div key={group.group}>
+                <div className="px-4 pt-3 pb-1 text-[9px] tracking-[0.3em] uppercase text-[var(--gold)]/60">
+                  {group.group}
+                </div>
+                {group.items.map((l) => (
+                  <DropdownLink key={l.href} href={l.href} label={l.label} />
+                ))}
+              </div>
+            ))}
+          </DropdownMenu>
+
+          {[
+            { href: "/portfolio", label: "Portfolio" },
+            { href: "/packages", label: "Packages" },
+            { href: "/about", label: "About" },
+            { href: "/contact", label: "Contact" },
+          ].map((l) => (
             <Link
-              href="/cart"
-              className="flex items-center gap-2 text-slate-600 hover:text-indigo-600"
+              key={l.href}
+              href={l.href}
+              className="text-sm tracking-widest uppercase text-white/70 hover:text-[var(--gold)] transition-colors duration-300"
             >
-              <ShoppingCart size={22} />
-              <span className="sr-only">Cart</span>
+              {l.label}
             </Link>
-            {user ? (
-              <>
-                <Link
-                  href="/dashboard"
-                  className="flex items-center gap-2 text-slate-600 hover:text-indigo-600"
-                >
-                  <UserCircle size={22} />
-                  Dashboard
-                </Link>
-                <button
-                  onClick={handleLogout}
-                  className="text-slate-600 hover:text-indigo-600 font-medium transition-colors cursor-pointer"
-                >
-                  Logout
-                </button>
-              </>
-            ) : (
-              <Link
-                href="/login"
-                className="bg-indigo-600 text-white px-4 py-2 rounded-md font-semibold hover:bg-indigo-700 transition-colors shadow-sm"
-              >
-                Login
-              </Link>
-            )}
-          </div>
+          ))}
         </div>
 
-        {/* Mobile Menu Button */}
+        {/* Right: Book Now + Auth */}
+        <div className="hidden lg:flex items-center gap-4">
+          {user && (
+            <button
+              onClick={logout}
+              className="text-xs tracking-widest uppercase text-white/50 hover:text-white/80 transition-colors"
+            >
+              Logout
+            </button>
+          )}
+          <Link
+            href="/booking"
+            className="px-6 py-2.5 text-xs tracking-widest uppercase border border-[var(--gold)] text-[var(--gold)] hover:bg-[var(--gold)] hover:text-[var(--black)] transition-all duration-300 font-medium"
+          >
+            Book Now
+          </Link>
+        </div>
+
+        {/* Mobile hamburger */}
         <button
-          className="md:hidden text-slate-800 z-50"
-          onClick={toggleMobileMenu}
-          aria-label="Toggle navigation menu"
-          aria-expanded={isMobileMenuOpen}
+          className="lg:hidden text-white/80 hover:text-[var(--gold)] transition-colors z-50"
+          onClick={() => setMobileOpen((p) => !p)}
+          aria-label="Toggle menu"
         >
-          {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+          {mobileOpen ? <X size={24} /> : <Menu size={24} />}
         </button>
       </div>
 
-      {/* Mobile Menu */}
+      {/* Mobile drawer */}
       <div
-        id="mobile-menu"
-        className={`fixed inset-0 bg-white z-40 transition-transform duration-300 transform ${
-          isMobileMenuOpen ? "translate-x-0" : "-translate-x-full"
+        className={`lg:hidden fixed inset-0 top-0 bg-[#0A0A0A] z-40 transition-transform duration-400 ${
+          mobileOpen ? "translate-x-0" : "translate-x-full"
         }`}
       >
-        <div className="container mx-auto px-4 pt-24 pb-8 flex flex-col h-full">
-          {/* Navigation Links */}
-          <div className="flex flex-col space-y-4">
-            {navLinks.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                onClick={closeMobileMenu}
-                className="text-slate-700 hover:text-indigo-600 hover:bg-indigo-50 rounded-md py-3 px-4 text-lg transition-colors text-center"
+        <div className="h-full overflow-y-auto pt-24 pb-12 px-8 flex flex-col gap-2">
+
+          {/* Mobile dropdown sections */}
+          {[
+            { key: "photo", label: "Photography", links: photographyLinks, href: "/photography" },
+            { key: "video", label: "Videography", links: videographyLinks, href: "/videography" },
+          ].map((section) => (
+            <div key={section.key}>
+              <button
+                onClick={() =>
+                  setMobileSection(mobileSection === section.key ? null : section.key)
+                }
+                className="w-full flex items-center justify-between py-4 border-b border-white/10 text-sm tracking-widest uppercase text-white/70"
               >
-                {link.label}
-              </Link>
-            ))}
+                {section.label}
+                <ChevronDown
+                  size={14}
+                  className={`transition-transform duration-200 ${
+                    mobileSection === section.key ? "rotate-180" : ""
+                  }`}
+                />
+              </button>
+              {mobileSection === section.key && (
+                <div className="pl-4 py-2 flex flex-col gap-1">
+                  {section.links.map((l) => (
+                    <Link
+                      key={l.href}
+                      href={l.href}
+                      className="py-2 text-xs tracking-widest uppercase text-white/50 hover:text-[var(--gold)]"
+                    >
+                      {l.label}
+                    </Link>
+                  ))}
+                </div>
+              )}
+            </div>
+          ))}
+
+          {/* Products mobile */}
+          <div>
+            <button
+              onClick={() =>
+                setMobileSection(mobileSection === "products" ? null : "products")
+              }
+              className="w-full flex items-center justify-between py-4 border-b border-white/10 text-sm tracking-widest uppercase text-white/70"
+            >
+              Products
+              <ChevronDown
+                size={14}
+                className={`transition-transform duration-200 ${
+                  mobileSection === "products" ? "rotate-180" : ""
+                }`}
+              />
+            </button>
+            {mobileSection === "products" && (
+              <div className="pl-4 py-2 flex flex-col gap-1">
+                {productLinks.map((group) => (
+                  <div key={group.group}>
+                    <div className="text-[9px] tracking-[0.3em] uppercase text-[var(--gold)]/50 pt-3 pb-1">
+                      {group.group}
+                    </div>
+                    {group.items.map((l) => (
+                      <Link
+                        key={l.href}
+                        href={l.href}
+                        className="block py-2 text-xs tracking-widest uppercase text-white/50 hover:text-[var(--gold)]"
+                      >
+                        {l.label}
+                      </Link>
+                    ))}
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
 
-          <hr className="my-6 border-slate-200" />
-
-          {/* Auth - Mobile */}
-          <div className="flex flex-col space-y-4">
+          {[
+            { href: "/portfolio", label: "Portfolio" },
+            { href: "/packages", label: "Packages" },
+            { href: "/availability", label: "Availability" },
+            { href: "/about", label: "About" },
+            { href: "/contact", label: "Contact" },
+          ].map((l) => (
             <Link
-              href="/cart"
-              onClick={closeMobileMenu}
-              className="text-slate-700 hover:text-indigo-600 hover:bg-indigo-50 rounded-md py-3 px-4 text-lg transition-colors text-center flex items-center justify-center gap-2"
+              key={l.href}
+              href={l.href}
+              className="py-4 border-b border-white/10 text-sm tracking-widest uppercase text-white/70 hover:text-[var(--gold)]"
             >
-              <ShoppingCart size={20} />
-              Cart
+              {l.label}
+            </Link>
+          ))}
+
+          <div className="mt-8 flex flex-col gap-3">
+            <Link
+              href="/booking"
+              className="w-full py-4 text-center text-xs tracking-widest uppercase border border-[var(--gold)] text-[var(--gold)] hover:bg-[var(--gold)] hover:text-black transition-all duration-300"
+            >
+              Book Now
             </Link>
             {user ? (
-              <>
-                <Link
-                  href="/dashboard"
-                  onClick={closeMobileMenu}
-                  className="text-slate-700 hover:text-indigo-600 hover:bg-indigo-50 rounded-md py-3 px-4 text-lg transition-colors text-center"
-                >
-                  Dashboard
-                </Link>
-                <button
-                  onClick={handleLogout}
-                  className="text-slate-700 hover:text-indigo-600 hover:bg-indigo-50 rounded-md py-3 px-4 text-lg transition-colors text-center"
-                >
-                  Logout
-                </button>
-              </>
+              <button
+                onClick={logout}
+                className="w-full py-3 text-center text-xs tracking-widest uppercase text-white/40"
+              >
+                Logout
+              </button>
             ) : (
               <Link
                 href="/login"
-                onClick={closeMobileMenu}
-                className="bg-indigo-600 text-white rounded-md py-3 px-4 text-lg transition-colors text-center font-semibold"
+                className="w-full py-3 text-center text-xs tracking-widest uppercase text-white/40 hover:text-white/70"
               >
                 Login
               </Link>
@@ -177,6 +338,4 @@ const Navbar = () => {
       </div>
     </nav>
   );
-};
-
-export default Navbar;
+}

@@ -49,7 +49,9 @@ urlpatterns = [
     # App-specific API routes
     path('api/users/', include('users.urls')),
     path('api/services/', include('services.urls')),
-    path('api/store/', include('store.urls')),
+    path('api/portfolio/', include('portfolio.urls')),
+    path('api/bookings/', include('bookings.urls')),
+    path('api/products/', include('products.urls')),
 
     # Auth & JWT
     path('api/auth/token/', EmailOrUsernameTokenObtainPairView.as_view(), name='token_obtain_pair'),

@@ -181,6 +181,7 @@
   },
   "active": "136ca9911f4b0bd2",
   "lastOpenFiles": [
+    "frontend/src/app/(products)",
     "frontend/src/app/api/auth/[...nextauth]/route.ts",
     "frontend/src/app/api/auth/[...nextauth]",
     "frontend/src/app/api/auth",
@@ -191,7 +192,6 @@
     "backend/store/__pycache__/urls.cpython-312.pyc",
     "backend/services/__pycache__/urls.cpython-312.pyc",
     "backend/users/__pycache__/serializers.cpython-312.pyc",
-    "backend/users/__pycache__/views.cpython-312.pyc",
     "frontend/node_modules/eslint-plugin-react/README.md",
     "frontend/node_modules/ms/license.md",
     "backend/static/admin/img/calendar-icons.svg",

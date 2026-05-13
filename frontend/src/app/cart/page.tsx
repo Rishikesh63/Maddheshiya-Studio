@@ -5,16 +5,16 @@ import Image from "next/image";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import { useCart } from "../context/CartContext";
+import { waLink } from "../lib/siteConfig";
 import { Minus, Plus, Trash2, ArrowLeft, ShoppingCart, MessageCircle, ImageIcon } from "lucide-react";
 
 export default function CartPage() {
   const { items, removeItem, updateQty, total, clear } = useCart();
 
-  const whatsappMessage = encodeURIComponent(
-    `Hi Maddheshiya Studio! I'd like to order the following Album PSDs:\n\n` +
+  const whatsappMessage =
+    `Hi Maddheshiya Studio! I'd like to order the following:\n\n` +
     items.map((i) => `• ${i.title} (${i.category}) × ${i.quantity} = ₹${i.price * i.quantity}`).join("\n") +
-    `\n\nTotal: ₹${total}\n\nPlease confirm availability.`
-  );
+    `\n\nTotal: ₹${total}\n\nPlease confirm availability.`;
 
   return (
     <div className="bg-[var(--black)] min-h-screen">
@@ -156,7 +156,7 @@ export default function CartPage() {
                   </div>
 
                   <Link
-                    href={`https://wa.me/919XXXXXXXXX?text=${whatsappMessage}`}
+                    href={waLink(whatsappMessage)}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="flex items-center justify-center gap-3 w-full py-4 bg-[var(--gold)] text-black text-xs tracking-widest uppercase font-medium hover:bg-[var(--gold-light)] transition-colors mb-3"

@@ -3,6 +3,7 @@
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { Calendar, MessageCircle, BookOpen } from "lucide-react";
+import { waLink } from "../lib/siteConfig";
 
 const actions = [
   {
@@ -23,7 +24,7 @@ const actions = [
     icon: MessageCircle,
     label: "WhatsApp Us",
     desc: "Quick response, always",
-    href: "https://wa.me/919XXXXXXXXX",
+    href: waLink(),
     style: "border",
     external: true,
   },

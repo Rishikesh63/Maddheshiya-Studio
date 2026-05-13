@@ -110,7 +110,7 @@ export default function PhotoFramingPage() {
       (form.notes ? `Notes: ${form.notes}\n` : "") +
       `\n_Photo will be shared separately on WhatsApp._`
     );
-    window.open(`https://wa.me/919XXXXXXXXX?text=${msg}`, "_blank");
+    window.open(`https://wa.me/${process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "919XXXXXXXXX"}?text=${msg}`, "_blank");
     setSubmitted(true);
   }
 

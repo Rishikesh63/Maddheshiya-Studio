@@ -4,6 +4,7 @@ import Link from "next/link";
 import Navbar from "../../../components/Navbar";
 import Footer from "../../../components/Footer";
 import { productData } from "../../../lib/serviceData";
+import { waLink } from "../../../lib/siteConfig";
 import { Check, ArrowLeft, Clock, MessageCircle } from "lucide-react";
 
 type Props = { params: Promise<{ slug: string }> };
@@ -70,7 +71,7 @@ export default async function PrintingProductPage({ params }: Props) {
               </div>
               <div className="flex flex-col gap-3">
                 <Link
-                  href="https://wa.me/919XXXXXXXXX"
+                  href={waLink()}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-3 px-8 py-4 bg-[var(--gold)] text-black text-xs tracking-widest uppercase font-medium hover:bg-[var(--gold-light)] transition-colors"

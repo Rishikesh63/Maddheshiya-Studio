@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
+import { waLink } from "../lib/siteConfig";
 import { Mail, Phone, MapPin, Instagram, Facebook, MessageCircle } from "lucide-react";
 
 export default function ContactPage() {
@@ -100,7 +101,7 @@ export default function ContactPage() {
               <h3 className="text-lg font-light text-white mb-4" style={{ fontFamily: "var(--font-cormorant)" }}>Quick Links</h3>
               <div className="flex flex-col gap-3">
                 <a
-                  href="https://wa.me/919XXXXXXXXX"
+                  href={waLink()}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center gap-3 px-6 py-3 bg-[#25D366] text-white text-xs tracking-widest uppercase hover:bg-[#20b558] transition-colors"

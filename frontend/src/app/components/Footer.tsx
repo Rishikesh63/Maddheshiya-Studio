@@ -1,6 +1,7 @@
 import React from "react";
 import Link from "next/link";
 import { Instagram, Facebook, Linkedin } from "lucide-react";
+import { SOCIAL_LINKS } from "../lib/siteConfig";
 
 const WhatsAppIcon = () => (
   <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
@@ -41,10 +42,10 @@ const quickLinks = [
 ];
 
 const socials = [
-  { href: "https://www.instagram.com/mithlesh_mds/", icon: <Instagram size={16} />, label: "Instagram" },
-  { href: "https://www.facebook.com/mithlesh.maddheshiya.3", icon: <Facebook size={16} />, label: "Facebook" },
-  { href: "https://wa.me/919XXXXXXXXX", icon: <WhatsAppIcon />, label: "WhatsApp" },
-  { href: "https://www.linkedin.com/groups/14707064/", icon: <Linkedin size={16} />, label: "LinkedIn" },
+  { href: SOCIAL_LINKS.instagram, icon: <Instagram size={16} />, label: "Instagram" },
+  { href: SOCIAL_LINKS.facebook,  icon: <Facebook size={16} />,  label: "Facebook" },
+  { href: SOCIAL_LINKS.whatsapp,  icon: <WhatsAppIcon />,         label: "WhatsApp" },
+  { href: SOCIAL_LINKS.linkedin,  icon: <Linkedin size={16} />,  label: "LinkedIn" },
 ];
 
 export default function Footer() {

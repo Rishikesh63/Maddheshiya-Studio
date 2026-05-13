@@ -3,6 +3,7 @@
 import { motion } from "framer-motion";
 import { Play, Instagram } from "lucide-react";
 import Link from "next/link";
+import { waLink, SOCIAL_LINKS } from "../lib/siteConfig";
 
 const reels = [1, 2, 3, 4, 5, 6];
 
@@ -76,7 +77,7 @@ export default function ReelsShowcase() {
           className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4"
         >
           <Link
-            href="https://wa.me/919XXXXXXXXX"
+            href={waLink()}
             target="_blank"
             rel="noopener noreferrer"
             className="px-8 py-3 text-xs tracking-widest uppercase bg-[#25D366] text-white hover:bg-[#20b558] transition-colors duration-300 font-medium"
@@ -84,7 +85,7 @@ export default function ReelsShowcase() {
             Chat on WhatsApp
           </Link>
           <Link
-            href="https://www.instagram.com/"
+            href={SOCIAL_LINKS.instagram}
             target="_blank"
             rel="noopener noreferrer"
             className="px-8 py-3 text-xs tracking-widest uppercase border border-[var(--gold)]/30 text-[var(--gold)]/70 hover:border-[var(--gold)] hover:text-[var(--gold)] transition-all duration-300"

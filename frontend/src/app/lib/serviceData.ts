@@ -170,94 +170,6 @@ export const productData: Record<
     features: string[];
   }
 > = {
-  'invitation-video': {
-    title: 'Invitation Videos',
-    subtitle: 'Cinematic digital wedding invitations',
-    description:
-      'Stunning animated invitation videos for weddings, engagements, and events. Shareable via WhatsApp and social media.',
-    category: 'digital',
-    deliveryTime: '2–4 days',
-    startingPrice: '₹1,500',
-    price: 1500,
-    features: ['Custom animation', 'Your photos & details', 'HD delivery', 'WhatsApp-ready size', 'Multiple variants'],
-  },
-  'wedding-highlight': {
-    title: 'Wedding Highlight',
-    subtitle: 'Cinematic same-day wedding highlight reel',
-    description:
-      'A beautifully edited 5–10 minute cinematic highlight reel of your wedding day. Color-graded, music-synced, and delivered in HD.',
-    category: 'digital',
-    deliveryTime: '5–7 days',
-    startingPrice: '₹3,500',
-    price: 3500,
-    features: ['5–10 min highlight film', 'Cinematic color grading', 'Music sync', 'HD delivery', 'WhatsApp-ready teaser'],
-  },
-  'ring-ceremony-highlight': {
-    title: 'Ring Ceremony Highlights',
-    subtitle: 'Elegant short film of your ring exchange',
-    description:
-      'A focused cinematic edit of your ring ceremony — every emotion, every exchange, beautifully preserved in a short film.',
-    category: 'digital',
-    deliveryTime: '3–5 days',
-    startingPrice: '₹2,000',
-    price: 2000,
-    features: ['3–5 min edited film', 'Slow-motion moments', 'Color grading', 'Music sync', 'HD & WhatsApp formats'],
-  },
-  'wedding-title': {
-    title: 'Wedding Title',
-    subtitle: 'Cinematic name title card for your wedding film',
-    description:
-      'Custom animated title cards for wedding films and invitations. Elegant typography, gold accents, and cinematic motion.',
-    category: 'digital',
-    deliveryTime: '1–2 days',
-    startingPrice: '₹500',
-    price: 500,
-    features: ['Custom typography', 'Gold / luxury styles', 'HD export', 'Multiple font options', 'Quick delivery'],
-  },
-  'video-logo': {
-    title: 'Video Logo',
-    subtitle: 'Animated logo intro for your videos',
-    description:
-      'Professional animated logo intros for photographers, studios, and businesses. Cinematic motion and sound design.',
-    category: 'digital',
-    deliveryTime: '2–3 days',
-    startingPrice: '₹800',
-    price: 800,
-    features: ['Custom animation', 'Sound design', 'HD & 4K export', 'Multiple style options', 'Transparent background'],
-  },
-  'birthday-highlight': {
-    title: 'Birthday Highlight',
-    subtitle: 'Fun and cinematic birthday event film',
-    description:
-      'A vibrant, energetic highlight reel of your birthday celebration. Perfect for sharing on social media or keeping as a memory.',
-    category: 'digital',
-    deliveryTime: '3–5 days',
-    startingPrice: '₹2,000',
-    price: 2000,
-    features: ['3–5 min highlight', 'Trending music sync', 'Color grading', 'Reels cut included', 'HD delivery'],
-  },
-  'prewedding-highlight': {
-    title: 'Pre-Wedding Highlight',
-    subtitle: 'Romantic cinematic pre-wedding film',
-    description:
-      'A dreamy, cinematic edit of your pre-wedding shoot. Crafted to tell your love story before the big day.',
-    category: 'digital',
-    deliveryTime: '5–7 days',
-    startingPrice: '₹2,500',
-    price: 2500,
-    features: ['5–8 min film', 'Cinematic grading', 'Romantic music sync', 'Drone shots included', 'HD & Instagram reel'],
-  },
-  'id-cards': {
-    title: 'ID Card Printing',
-    subtitle: 'Professional ID cards for businesses & events',
-    description:
-      'High-quality PVC and paper ID cards for corporate, schools, events, and organizations. Custom design and fast printing.',
-    category: 'printing',
-    deliveryTime: '1–2 days',
-    startingPrice: '₹30/card',
-    price: 30,
-    features: ['PVC & paper options', 'Custom design', 'Bulk orders', 'Lamination available', 'Same-day option'],
-  },
   'tshirt-printing': {
     title: 'T-Shirt Printing',
     subtitle: 'Custom prints for events & teams',
@@ -268,16 +180,5 @@ export const productData: Record<
     startingPrice: '₹299/shirt',
     price: 299,
     features: ['DTF / screen print', 'All sizes available', 'Bulk discounts', 'Color-accurate print', 'Premium fabric options'],
-  },
-  'photo-framing': {
-    title: 'Photo Framing',
-    subtitle: 'Premium frames for your cherished memories',
-    description:
-      'Beautiful photo frames in wood, metal, and acrylic. Custom sizes, collages, and canvas prints for your home and office.',
-    category: 'printing',
-    deliveryTime: '3–7 days',
-    startingPrice: '₹499',
-    price: 499,
-    features: ['Wood & acrylic frames', 'Canvas prints', 'Collage frames', 'Custom sizing', 'Home delivery'],
   },
 };

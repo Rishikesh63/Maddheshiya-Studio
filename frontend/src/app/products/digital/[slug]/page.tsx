@@ -5,7 +5,8 @@ import Navbar from "../../../components/Navbar";
 import Footer from "../../../components/Footer";
 import AddToCartButton from "../../../components/AddToCartButton";
 import { productData } from "../../../lib/serviceData";
-import { Check, ArrowLeft, Clock } from "lucide-react";
+import { waLink } from "../../../lib/siteConfig";
+import { Check, ArrowLeft, Clock, MessageCircle } from "lucide-react";
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -92,10 +93,13 @@ export default async function DigitalProductPage({ params }: Props) {
                   price={data.price}
                 />
                 <Link
-                  href="/contact"
-                  className="inline-flex items-center justify-center gap-3 px-8 py-4 border border-[var(--gold)]/30 text-[var(--gold)]/70 text-xs tracking-widest uppercase hover:border-[var(--gold)] hover:text-[var(--gold)] transition-all"
+                  href={waLink(`Hi, I'm interested in ordering ${data.title} (${data.startingPrice}). Please share details.`)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center justify-center gap-2 px-8 py-4 border border-[var(--gold)]/30 text-[var(--gold)]/70 text-xs tracking-widest uppercase hover:border-[var(--gold)] hover:text-[var(--gold)] transition-all"
                 >
-                  Get Custom Quote
+                  <MessageCircle size={14} />
+                  Order via WhatsApp
                 </Link>
               </div>
             </div>
@@ -118,29 +122,6 @@ export default async function DigitalProductPage({ params }: Props) {
               </ul>
             </div>
           </div>
-        </div>
-      </section>
-
-      {/* Samples placeholder */}
-      <section className="py-12 px-6 pb-24">
-        <div className="max-w-5xl mx-auto">
-          <h2
-            className="text-3xl font-light text-white mb-8"
-            style={{ fontFamily: "var(--font-cormorant)" }}
-          >
-            Samples
-          </h2>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-            {Array.from({ length: 4 }).map((_, i) => (
-              <div
-                key={i}
-                className="aspect-video bg-[var(--black-card)] border border-[var(--gold)]/5 flex items-center justify-center"
-              >
-                <span className="text-[10px] tracking-widest uppercase text-white/10">Preview</span>
-              </div>
-            ))}
-          </div>
-          <p className="text-xs text-white/20 mt-4">Sample videos/images will appear here</p>
         </div>
       </section>
 

@@ -170,17 +170,6 @@ export const productData: Record<
     features: string[];
   }
 > = {
-  'album-psd': {
-    title: 'Album PSD',
-    subtitle: 'Professional album retouching & composites',
-    description:
-      'Advanced Photoshop editing for wedding album pages. Background replacement, skin retouching, cinematic color grading, and composite art.',
-    category: 'digital',
-    deliveryTime: '3–5 days',
-    startingPrice: '₹500',
-    price: 500,
-    features: ['Skin retouching', 'Background removal', 'Color grading', 'Composite art', 'High-res PSD delivery'],
-  },
   'invitation-video': {
     title: 'Invitation Videos',
     subtitle: 'Cinematic digital wedding invitations',

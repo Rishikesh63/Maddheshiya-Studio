@@ -64,15 +64,11 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class EmailOrUsernameTokenObtainPairSerializer(TokenObtainPairSerializer):
+    """
+    Accepts email as the username field.
+    EmailBackend in AUTHENTICATION_BACKENDS handles the actual verification.
+    """
     username_field = 'username'
 
     def validate(self, attrs):
-        login = attrs.get('username') or attrs.get('email')
-
-        if login and '@' in login:
-            # Prefer active accounts — old inactive duplicates are skipped
-            user = CustomUser.objects.filter(email__iexact=login, is_active=True).first()
-            if user:
-                attrs['username'] = user.get_username()
-
         return super().validate(attrs)

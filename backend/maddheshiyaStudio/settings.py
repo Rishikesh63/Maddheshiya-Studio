@@ -275,6 +275,11 @@ REST_FRAMEWORK = {
 
 AUTH_USER_MODEL = 'users.CustomUser'
 
+AUTHENTICATION_BACKENDS = [
+    'users.backends.EmailBackend',
+    'django.contrib.auth.backends.ModelBackend',
+]
+
 POSTMARK_SERVER_TOKEN = env('POSTMARK_SERVER_TOKEN', default='')
 SMTP_FROM = env('SMTP_FROM', default='no-reply@maddheshiyastudio.com')
 SMTP_FROM_NAME = env('SMTP_FROM_NAME', default='Maddheshiya Studio')

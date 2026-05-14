@@ -70,7 +70,8 @@ class EmailOrUsernameTokenObtainPairSerializer(TokenObtainPairSerializer):
         login = attrs.get('username') or attrs.get('email')
 
         if login and '@' in login:
-            user = CustomUser.objects.filter(email__iexact=login).first()
+            # Prefer active accounts — old inactive duplicates are skipped
+            user = CustomUser.objects.filter(email__iexact=login, is_active=True).first()
             if user:
                 attrs['username'] = user.get_username()
 

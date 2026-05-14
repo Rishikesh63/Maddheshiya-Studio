@@ -312,6 +312,8 @@ CSRF_TRUSTED_ORIGINS = env.list(
     default=[
         'https://maddheshiya-studio.onrender.com',
         'https://maddheshiya-studio.vercel.app',
+        'https://madhesiyastudio.com',
+        'https://www.madhesiyastudio.com',
     ],
 )
 
@@ -320,6 +322,8 @@ CORS_ALLOWED_ORIGINS = env.list(
     default=[
         'https://maddheshiya-studio.onrender.com',
         'https://maddheshiya-studio.vercel.app',
+        'https://madhesiyastudio.com',
+        'https://www.madhesiyastudio.com',
         'http://localhost:3000',
         'http://127.0.0.1:3000',
     ],

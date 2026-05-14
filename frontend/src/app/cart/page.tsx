@@ -89,7 +89,7 @@ export default function CartPage() {
       try {
         orderData = JSON.parse(text);
       } catch {
-        throw new Error("Payment service is not reachable. Please try again in a moment or contact us on WhatsApp.");
+        throw new Error(`Backend error: ${text.slice(0, 200)}`);
       }
       if (!res.ok) throw new Error(orderData.error || "Order creation failed.");
     } catch (e: unknown) {

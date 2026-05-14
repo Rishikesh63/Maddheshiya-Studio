@@ -3,7 +3,9 @@ export interface PsdProduct {
   title: string;
   price: number;
   sheets?: number;
-  image: string | null;
+  image: string | null;        // S3 key for cover thumbnail e.g. "products/album-psd/12x36/alb-12x36-01/cover.jpg"
+  sheetPath?: string | null;   // S3 folder for sheet previews e.g. "products/album-psd/12x36/alb-12x36-01"
+  downloadPath?: string | null; // S3 key for purchasable ZIP/PSD file e.g. "products/album-psd/12x36/alb-12x36-01/album.zip"
 }
 
 export interface PsdCategory {

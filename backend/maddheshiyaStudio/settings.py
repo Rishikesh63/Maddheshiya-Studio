@@ -30,6 +30,9 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
+RAZORPAY_KEY_ID = env('RAZORPAY_KEY_ID', default='')
+RAZORPAY_KEY_SECRET = env('RAZORPAY_KEY_SECRET', default='')
+
 AWS_STORAGE_BUCKET_NAME = env('AWS_STORAGE_BUCKET_NAME', default='')
 AWS_S3_REGION_NAME = env('AWS_S3_REGION_NAME', default='us-east-1')
 AWS_ACCESS_KEY_ID = env('AWS_ACCESS_KEY_ID', default='')
@@ -98,6 +101,7 @@ INSTALLED_APPS = [
     'portfolio.apps.PortfolioConfig',
     'bookings.apps.BookingsConfig',
     'products.apps.ProductsConfig',
+    'payments.apps.PaymentsConfig',
     'users.apps.UsersConfig',
     'rest_framework_simplejwt',
     'django.contrib.sites',

@@ -29,8 +29,9 @@ export const metadata: Metadata = {
     'cinematic wedding film',
     'drone photography',
     'prewedding shoot',
-    'wedding photographer Kanpur',
-    'wedding photographer Lucknow',
+    'wedding photographer Gorakhpur',
+    'wedding photographer Maharajganj',
+    'wedding photographer Pipiganj',
     'Maddheshiya Studio',
   ],
   openGraph: {

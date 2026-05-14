@@ -85,7 +85,7 @@ export default function ContactPage() {
               </h2>
               <div className="space-y-4">
                 {[
-                  { icon: MapPin, text: "Kanpur, Uttar Pradesh, India" },
+                  { icon: MapPin, text: "Koilahiya Chauraha, Mangalpur, Post Sarhari, Tikariya Road, Pipiganj, 273165" },
                   { icon: Phone, text: "+91 XXXXX XXXXX" },
                   { icon: Mail, text: "hello@maddheshiyastudio.com" },
                 ].map((c, i) => (
@@ -133,7 +133,7 @@ export default function ContactPage() {
             <div>
               <h3 className="text-lg font-light text-white mb-4" style={{ fontFamily: "var(--font-cormorant)" }}>Service Areas</h3>
               <div className="flex flex-wrap gap-2">
-                {["Kanpur", "Lucknow", "Varanasi", "Agra", "Prayagraj", "Delhi NCR"].map((city) => (
+                {["Gorakhpur", "Maharajganj", "Pipiganj", "Kushinagar", "Deoria", "Basti"].map((city) => (
                   <span key={city} className="text-[10px] tracking-widest uppercase text-white/30 border border-white/10 px-3 py-1.5">
                     {city}
                   </span>

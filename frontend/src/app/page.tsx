@@ -13,7 +13,7 @@ import Footer from "./components/Footer";
 export const metadata: Metadata = {
   title: "Maddheshiya Studio | Premium Wedding Photography & Videography",
   description:
-    "Maddheshiya Studio — Premium wedding photography, cinematic films, drone coverage, and creative services in Kanpur, Lucknow & across India.",
+    "Maddheshiya Studio — Premium wedding photography, cinematic films, drone coverage, and creative services in Gorakhpur, Maharajganj & across Uttar Pradesh.",
 };
 
 export default function Home() {

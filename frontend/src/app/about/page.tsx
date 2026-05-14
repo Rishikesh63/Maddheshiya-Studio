@@ -34,7 +34,7 @@ export default function AboutPage() {
       <section className="py-16 px-6">
         <div className="max-w-3xl mx-auto">
           <p className="text-base text-white/50 leading-relaxed mb-6">
-            Maddheshiya Studio was founded with a single belief: every love story deserves to be told beautifully. Based in Kanpur, we serve couples and families across Uttar Pradesh and beyond, crafting cinematic images and films that last a lifetime.
+            Maddheshiya Studio was founded with a single belief: every love story deserves to be told beautifully. Based in Gorakhpur, we serve couples and families across Uttar Pradesh and beyond, crafting cinematic images and films that last a lifetime.
           </p>
           <p className="text-base text-white/50 leading-relaxed mb-6">
             Our team blends documentary storytelling with fine-art portraiture, creating work that feels authentic and timeless. We use cinema-grade equipment, including drone systems and professional audio rigs, to ensure no moment is missed.

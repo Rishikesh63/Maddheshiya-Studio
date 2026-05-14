@@ -8,6 +8,7 @@ export interface CartItem {
   category: string;
   price: number;
   image?: string | null;
+  downloadPath?: string | null; // S3 key for digital products — null for physical/service items
   quantity: number;
 }
 

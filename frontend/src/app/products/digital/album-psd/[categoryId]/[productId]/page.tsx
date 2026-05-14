@@ -2,10 +2,12 @@
 
 import { useState, useCallback, use } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import Navbar from "../../../../../components/Navbar";
 import Footer from "../../../../../components/Footer";
 import { useCart } from "../../../../../context/CartContext";
 import { albumPsdCategories } from "../../data";
+import { getImageUrl } from "../../../../../utils/s3-media";
 import { ArrowLeft, ShoppingCart, Check, ImageIcon, ZoomIn } from "lucide-react";
 
 type Props = { params: Promise<{ categoryId: string; productId: string }> };
@@ -110,62 +112,89 @@ export default function AlbumProductDetailPage({ params }: Props) {
           </h2>
 
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
-            {sheetNumbers.map((num) => (
-              <div
-                key={num}
-                className="group relative aspect-[4/3] bg-gray-100 overflow-hidden cursor-pointer border border-gray-200 hover:border-[var(--gold)]/50 transition-colors"
-                onClick={() => setLightbox(num)}
-              >
-                {/* Real sheet image would go here */}
-                <div className="absolute inset-0 flex flex-col items-center justify-center gap-1 bg-gray-50">
-                  <ImageIcon size={22} className="text-gray-300" />
-                  <span className="text-[9px] text-gray-400 tracking-wider">Sheet {num}</span>
+            {sheetNumbers.map((num) => {
+              const sheetKey = product.sheetPath
+                ? `${product.sheetPath}/sheet-${String(num).padStart(2, "0")}.jpg`
+                : null;
+              return (
+                <div
+                  key={num}
+                  className="group relative aspect-[4/3] bg-gray-100 overflow-hidden cursor-pointer border border-gray-200 hover:border-[var(--gold)]/50 transition-colors"
+                  onClick={() => setLightbox(num)}
+                >
+                  {sheetKey ? (
+                    <Image
+                      src={getImageUrl(sheetKey)}
+                      alt={`Sheet ${num}`}
+                      fill
+                      className="object-cover"
+                      sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, 20vw"
+                    />
+                  ) : (
+                    <div className="absolute inset-0 flex flex-col items-center justify-center gap-1 bg-gray-50">
+                      <ImageIcon size={22} className="text-gray-300" />
+                      <span className="text-[9px] text-gray-400 tracking-wider">Sheet {num}</span>
+                    </div>
+                  )}
+                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                    <ZoomIn size={20} className="text-white" />
+                  </div>
+                  <span className="absolute bottom-1 right-1 bg-black/60 text-white text-[9px] px-1.5 py-0.5">
+                    {num}/{totalSheets}
+                  </span>
                 </div>
-                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                  <ZoomIn size={20} className="text-white" />
-                </div>
-                <span className="absolute bottom-1 right-1 bg-black/60 text-white text-[9px] px-1.5 py-0.5">
-                  {num}/{totalSheets}
-                </span>
-              </div>
-            ))}
+              );
+            })}
           </div>
-
-          <p className="text-xs text-white/20 mt-6 text-center tracking-wider">
-            Real PSD preview images will appear here once uploaded
-          </p>
         </div>
       </section>
 
       {/* Lightbox */}
       {lightbox !== null && (
         <div
-          className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center"
+          className="fixed inset-0 z-50 bg-black/95 flex items-center justify-center"
           onClick={() => setLightbox(null)}
         >
-          <div className="relative w-[90vw] max-w-3xl aspect-[4/3] bg-gray-900 flex items-center justify-center">
-            <ImageIcon size={48} className="text-gray-600" />
-            <span className="absolute bottom-4 text-white/40 text-sm tracking-widest">
-              Sheet {lightbox} of {totalSheets}
+          <div
+            className="relative w-[92vw] max-w-4xl aspect-[4/3] bg-gray-900 overflow-hidden"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {product.sheetPath ? (
+              <Image
+                src={getImageUrl(`${product.sheetPath}/sheet-${String(lightbox).padStart(2, "0")}.jpg`)}
+                alt={`Sheet ${lightbox}`}
+                fill
+                className="object-contain"
+                sizes="92vw"
+                priority
+              />
+            ) : (
+              <div className="absolute inset-0 flex items-center justify-center">
+                <ImageIcon size={48} className="text-gray-600" />
+              </div>
+            )}
+
+            <span className="absolute bottom-3 left-1/2 -translate-x-1/2 bg-black/70 text-white/60 text-xs px-3 py-1 tracking-widest">
+              {lightbox} / {totalSheets}
             </span>
             <button
-              className="absolute top-4 right-4 text-white/60 hover:text-white text-2xl"
+              className="absolute top-3 right-3 bg-black/60 text-white/70 hover:text-white w-8 h-8 flex items-center justify-center text-lg"
               onClick={() => setLightbox(null)}
             >
               ✕
             </button>
             {lightbox > 1 && (
               <button
-                className="absolute left-4 top-1/2 -translate-y-1/2 text-white/60 hover:text-white text-2xl px-3"
-                onClick={(e) => { e.stopPropagation(); setLightbox(lightbox - 1); }}
+                className="absolute left-3 top-1/2 -translate-y-1/2 bg-black/60 text-white/70 hover:text-white w-10 h-10 flex items-center justify-center text-2xl"
+                onClick={() => setLightbox(lightbox - 1)}
               >
                 ‹
               </button>
             )}
             {lightbox < totalSheets && (
               <button
-                className="absolute right-4 top-1/2 -translate-y-1/2 text-white/60 hover:text-white text-2xl px-3"
-                onClick={(e) => { e.stopPropagation(); setLightbox(lightbox + 1); }}
+                className="absolute right-3 top-1/2 -translate-y-1/2 bg-black/60 text-white/70 hover:text-white w-10 h-10 flex items-center justify-center text-2xl"
+                onClick={() => setLightbox(lightbox + 1)}
               >
                 ›
               </button>

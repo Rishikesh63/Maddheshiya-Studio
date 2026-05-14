@@ -52,6 +52,7 @@ urlpatterns = [
     path('api/portfolio/', include('portfolio.urls')),
     path('api/bookings/', include('bookings.urls')),
     path('api/products/', include('products.urls')),
+    path('api/payments/', include('payments.urls')),
 
     # Auth & JWT
     path('api/auth/token/', EmailOrUsernameTokenObtainPairView.as_view(), name='token_obtain_pair'),

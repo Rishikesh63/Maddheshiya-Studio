@@ -28,6 +28,7 @@ environ = "^1.0"
 drf-yasg = "^1.21.10"
 django-storages = "^1.14.6"
 boto3 = "^1.38.0"
+razorpay = "^1.4.2"
 
 
 [build-system]

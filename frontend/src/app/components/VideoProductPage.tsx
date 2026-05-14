@@ -6,6 +6,7 @@ import Image from "next/image";
 import Navbar from "./Navbar";
 import Footer from "./Footer";
 import { useCart } from "../context/CartContext";
+import { getImageUrl } from "../utils/s3-media";
 import { ShoppingCart, Check, Play, ArrowLeft } from "lucide-react";
 
 export interface VideoProduct {
@@ -46,7 +47,7 @@ function ProductCard({ product, cartCategory }: { product: VideoProduct; cartCat
       <div className="relative aspect-video bg-gray-900 overflow-hidden">
         {product.image ? (
           <Image
-            src={product.image}
+            src={getImageUrl(product.image)}
             alt={product.title}
             fill
             className="object-cover group-hover:scale-105 transition-transform duration-500"

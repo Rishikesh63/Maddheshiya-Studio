@@ -13,7 +13,7 @@ export function waLink(message?: string): string {
 
 export const SITE_PHONE = "+91 9XXXXXXXXX";
 export const SITE_EMAIL = "hello@maddheshiyastudio.com";
-export const SITE_ADDRESS = "Maddheshiya Studio, Kanpur, Uttar Pradesh";
+export const SITE_ADDRESS = "Koilahiya Chauraha, Mangalpur, Post Sarhari, Tikariya Road, Pipiganj, 273165";
 
 export const SOCIAL_LINKS = {
   instagram: "https://www.instagram.com/mithlesh_mds/",

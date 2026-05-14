@@ -7,6 +7,7 @@ import Navbar from "../../../components/Navbar";
 import Footer from "../../../components/Footer";
 import { useCart } from "../../../context/CartContext";
 import { albumPsdCategories, type PsdProduct, type PsdCategory } from "./data";
+import { getImageUrl } from "../../../utils/s3-media";
 import { ArrowLeft, ShoppingCart, Check, ImageIcon } from "lucide-react";
 
 function ProductCard({
@@ -28,6 +29,7 @@ function ProductCard({
       category: categoryLabel,
       price: product.price,
       image: product.image,
+      downloadPath: product.downloadPath || null,
     });
     setAdded(true);
     setTimeout(() => setAdded(false), 1800);
@@ -42,7 +44,7 @@ function ProductCard({
       >
         {product.image ? (
           <Image
-            src={product.image}
+            src={getImageUrl(product.image)}
             alt={product.title}
             fill
             className="object-cover group-hover:scale-105 transition-transform duration-500"

@@ -191,12 +191,29 @@ export default function Navbar() {
         {/* Right: Cart + Book Now + Auth */}
         <div className="hidden lg:flex items-center gap-4">
           {user ? (
-            <button
-              onClick={logout}
-              className="text-xs tracking-widest uppercase text-white/50 hover:text-white/80 transition-colors"
-            >
-              Logout
-            </button>
+            <div className="relative group">
+              <button className="flex items-center gap-2 text-xs tracking-widest uppercase text-white/70 hover:text-[var(--gold)] transition-colors">
+                <span className="w-7 h-7 rounded-full bg-[var(--gold)]/20 border border-[var(--gold)]/40 flex items-center justify-center text-[var(--gold)] text-[10px] font-medium">
+                  {(user.name || user.username || 'U')[0].toUpperCase()}
+                </span>
+                <span className="max-w-[100px] truncate">{user.name || user.username}</span>
+                <ChevronDown size={10} className="opacity-50 group-hover:rotate-180 transition-transform duration-200" />
+              </button>
+              <div className="absolute right-0 top-full mt-2 w-40 bg-[#111111] border border-[var(--gold)]/20 shadow-2xl shadow-black/60 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-150 z-50">
+                <Link
+                  href="/profile"
+                  className="block px-4 py-3 text-[10px] tracking-widest uppercase text-white/60 hover:text-[var(--gold)] hover:bg-[var(--gold)]/5 transition-colors"
+                >
+                  My Profile
+                </Link>
+                <button
+                  onClick={logout}
+                  className="w-full text-left px-4 py-3 text-[10px] tracking-widest uppercase text-white/40 hover:text-red-400 hover:bg-red-400/5 transition-colors border-t border-white/5"
+                >
+                  Logout
+                </button>
+              </div>
+            </div>
           ) : (
             <>
               <Link

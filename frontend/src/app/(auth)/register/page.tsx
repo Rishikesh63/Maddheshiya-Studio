@@ -8,7 +8,7 @@ import { apiUrl } from '@/app/lib/api';
 const RegisterPage = () => {
   const router = useRouter();
   const [formData, setFormData] = useState({
-    username: '',
+    name: '',
     email: '',
     password: '',
     confirmPassword: '',
@@ -26,9 +26,9 @@ const RegisterPage = () => {
     setError(null);
     setSuccess(false);
 
-    const { username, email, password, confirmPassword } = formData;
+    const { name, email, password, confirmPassword } = formData;
 
-    if (!username || !email || !password || !confirmPassword) {
+    if (!name || !email || !password || !confirmPassword) {
       setError('All fields are required.');
       return;
     }
@@ -42,7 +42,7 @@ const RegisterPage = () => {
       const res = await fetch(apiUrl('/api/users/register/'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username, email, password, password2: confirmPassword }),
+        body: JSON.stringify({ name, email, password, password2: confirmPassword }),
       });
       const data = await res.json();
       if (res.ok) {
@@ -63,7 +63,7 @@ const RegisterPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#0A0A0A] flex items-center justify-center px-4">
+    <div className="min-h-screen bg-[#0A0A0A] flex items-center justify-center px-4 py-12">
       <div className="w-full max-w-sm">
 
         {/* Logo */}
@@ -105,14 +105,15 @@ const RegisterPage = () => {
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label className="block text-[10px] tracking-[0.3em] uppercase text-white/40 mb-2">
-                Username
+                Full Name
               </label>
               <input
                 type="text"
-                name="username"
-                placeholder="yourname"
-                value={formData.username}
+                name="name"
+                placeholder="Rishikesh Maddhesiya"
+                value={formData.name}
                 onChange={handleChange}
+                autoComplete="name"
                 className="w-full bg-[#0A0A0A] border border-white/10 text-white text-sm px-4 py-3 placeholder-white/20 focus:outline-none focus:border-[var(--gold)]/50 transition-colors"
                 required
               />
@@ -128,6 +129,7 @@ const RegisterPage = () => {
                 placeholder="your@email.com"
                 value={formData.email}
                 onChange={handleChange}
+                autoComplete="email"
                 className="w-full bg-[#0A0A0A] border border-white/10 text-white text-sm px-4 py-3 placeholder-white/20 focus:outline-none focus:border-[var(--gold)]/50 transition-colors"
                 required
               />
@@ -143,6 +145,7 @@ const RegisterPage = () => {
                 placeholder="••••••••"
                 value={formData.password}
                 onChange={handleChange}
+                autoComplete="new-password"
                 className="w-full bg-[#0A0A0A] border border-white/10 text-white text-sm px-4 py-3 placeholder-white/20 focus:outline-none focus:border-[var(--gold)]/50 transition-colors"
                 required
               />
@@ -158,6 +161,7 @@ const RegisterPage = () => {
                 placeholder="••••••••"
                 value={formData.confirmPassword}
                 onChange={handleChange}
+                autoComplete="new-password"
                 className="w-full bg-[#0A0A0A] border border-white/10 text-white text-sm px-4 py-3 placeholder-white/20 focus:outline-none focus:border-[var(--gold)]/50 transition-colors"
                 required
               />

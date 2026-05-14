@@ -20,6 +20,7 @@ interface User {
   user_id: number;
   email: string;
   username?: string;
+  name?: string;
   is_social?: boolean;
 }
 
@@ -59,8 +60,18 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         const decoded: User = jwtDecode(parsedTokens.access);
         setTokens(parsedTokens);
         setUser(decoded);
+        // Hydrate display name from profile
+        fetch(apiUrl('/api/users/me/'), {
+          headers: { Authorization: `Bearer ${parsedTokens.access}` },
+        })
+          .then((r) => r.ok ? r.json() : null)
+          .then((profile) => {
+            if (profile) {
+              setUser((prev) => prev ? { ...prev, name: profile.name || profile.first_name || prev.username } : prev);
+            }
+          })
+          .catch(() => {});
       } catch {
-        console.error('Invalid token, clearing session');
         clearStoredTokens();
       }
     }
@@ -85,10 +96,21 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       }
       return (await response.json()) as AuthToken;
     },
-    onSuccess: (data) => {
+    onSuccess: async (data) => {
       storeTokens(data);
       setTokens(data);
-      setUser(jwtDecode(data.access));
+      const decoded: User = jwtDecode(data.access);
+      // Fetch full profile to get display name
+      try {
+        const res = await fetch(apiUrl('/api/users/me/'), {
+          headers: { Authorization: `Bearer ${data.access}` },
+        });
+        if (res.ok) {
+          const profile = await res.json();
+          decoded.name = profile.name || profile.first_name || decoded.username;
+        }
+      } catch { /* use decoded fallback */ }
+      setUser(decoded);
     },
   });
 

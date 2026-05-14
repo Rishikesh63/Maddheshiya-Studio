@@ -74,7 +74,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username, password }),
       });
-      if (!response.ok) throw new Error('Login failed');
+      if (!response.ok) {
+        const text = await response.text();
+        let msg = 'Invalid email or password';
+        try {
+          const data = JSON.parse(text);
+          msg = data.detail || data.non_field_errors?.[0] || msg;
+        } catch { /* use default */ }
+        throw new Error(msg);
+      }
       return (await response.json()) as AuthToken;
     },
     onSuccess: (data) => {

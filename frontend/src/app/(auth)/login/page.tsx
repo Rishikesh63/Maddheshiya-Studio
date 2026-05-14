@@ -14,6 +14,7 @@ export default function LoginPage() {
   const [formData, setFormData] = useState<LoginPayload>({ email: '', password: '' });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [failedAttempts, setFailedAttempts] = useState(0);
   const router = useRouter();
   const { login } = useAuth();
 
@@ -25,7 +26,8 @@ export default function LoginPage() {
       await login(formData.email, formData.password);
       router.push('/');
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Invalid credentials');
+      setError(err instanceof Error ? err.message : 'Invalid email or password');
+      setFailedAttempts((n) => n + 1);
     } finally {
       setLoading(false);
     }
@@ -93,6 +95,21 @@ export default function LoginPage() {
 
             {error && (
               <p className="text-red-400 text-xs tracking-wide">{error}</p>
+            )}
+
+            {/* No-account prompt — appears after first failed attempt */}
+            {failedAttempts >= 1 && (
+              <div className="border border-[var(--gold)]/20 bg-[var(--gold)]/5 px-4 py-3">
+                <p className="text-[10px] tracking-widest uppercase text-white/50 mb-2">
+                  Don&apos;t have an account yet?
+                </p>
+                <Link
+                  href="/register"
+                  className="block w-full py-2 text-center text-[10px] tracking-[0.25em] uppercase bg-[var(--gold)] text-black font-medium hover:opacity-90 transition-opacity"
+                >
+                  Create Account
+                </Link>
+              </div>
             )}
 
             <div className="flex justify-end">

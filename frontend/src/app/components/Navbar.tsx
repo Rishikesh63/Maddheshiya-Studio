@@ -190,13 +190,28 @@ export default function Navbar() {
 
         {/* Right: Cart + Book Now + Auth */}
         <div className="hidden lg:flex items-center gap-4">
-          {user && (
+          {user ? (
             <button
               onClick={logout}
               className="text-xs tracking-widest uppercase text-white/50 hover:text-white/80 transition-colors"
             >
               Logout
             </button>
+          ) : (
+            <>
+              <Link
+                href="/login"
+                className="text-xs tracking-widest uppercase text-white/50 hover:text-[var(--gold)] transition-colors"
+              >
+                Login
+              </Link>
+              <Link
+                href="/register"
+                className="text-xs tracking-widest uppercase text-white/50 hover:text-[var(--gold)] transition-colors"
+              >
+                Register
+              </Link>
+            </>
           )}
           <Link
             href="/cart"

@@ -8,11 +8,13 @@ class RegisterSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True, required=True, validators=[validate_password])
     password2 = serializers.CharField(write_only=True, required=True)
     name = serializers.CharField(required=True, write_only=True)
+    # username is sent by frontend for backward compat but we auto-generate it
+    username = serializers.CharField(required=False, allow_blank=True, write_only=True)
 
     class Meta:
         model = CustomUser
         ref_name = "CustomUserRegisterSerializer"
-        fields = ['name', 'email', 'password', 'password2']
+        fields = ['name', 'username', 'email', 'password', 'password2']
 
     def validate(self, attrs):
         if attrs['password'] != attrs['password2']:
@@ -22,6 +24,7 @@ class RegisterSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         validated_data.pop('password2')
         name = validated_data.pop('name')
+        validated_data.pop('username', None)  # we auto-generate it
         email = validated_data['email']
 
         # Auto-generate a clean username from email (no spaces, unique)

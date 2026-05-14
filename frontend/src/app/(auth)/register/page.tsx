@@ -39,10 +39,12 @@ const RegisterPage = () => {
 
     try {
       setLoading(true);
+      // Auto-generate a valid username from email (no spaces/special chars)
+      const username = email.split('@')[0].replace(/[^a-zA-Z0-9_]/g, '');
       const res = await fetch(apiUrl('/api/users/register/'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, email, password, password2: confirmPassword }),
+        body: JSON.stringify({ name, username, email, password, password2: confirmPassword }),
       });
       const data = await res.json();
       if (res.ok) {

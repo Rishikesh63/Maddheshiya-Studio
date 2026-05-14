@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
 set -e
 
-# Regenerate lock file to pick up any new dependencies, then install
+# Install dependencies
 poetry lock --no-update
 poetry install --no-dev
+
+# Run database migrations
+poetry run python manage.py migrate

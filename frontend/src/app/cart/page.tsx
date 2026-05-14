@@ -85,8 +85,13 @@ export default function CartPage() {
           })),
         }),
       });
-      orderData = await res.json();
-      if (!res.ok) throw new Error(orderData.error || "Order creation failed");
+      const text = await res.text();
+      try {
+        orderData = JSON.parse(text);
+      } catch {
+        throw new Error("Payment service is not reachable. Please try again in a moment or contact us on WhatsApp.");
+      }
+      if (!res.ok) throw new Error(orderData.error || "Order creation failed.");
     } catch (e: unknown) {
       setFormError(e instanceof Error ? e.message : "Could not create order. Try again.");
       setStep("checkout");

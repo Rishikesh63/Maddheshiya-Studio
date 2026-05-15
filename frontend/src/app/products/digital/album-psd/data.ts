@@ -33,7 +33,7 @@ export const albumPsdCategories: PsdCategory[] = [
     id: "18x24",
     label: "Albums 18×24",
     products: [
-      { id: "alb-18x24-01", title: "Birthday Album 18×24", price: 169, sheets: 19, image: "products/album-psd/18X24/birthday/cover.jpg", sheetPath: "products/album-psd/18X24/birthday", downloadPath: "products/album-psd/18X24/birthday/birthday.zip" },
+      { id: "alb-18x24-01", title: "Birthday Album 18×24", price: 169, sheets: 20, image: "products/album-psd/18X24/birthday/cover.jpg", sheetPath: "products/album-psd/18X24/birthday", downloadPath: "products/album-psd/18X24/birthday/birthday.zip" },
       { id: "alb-18x24-02", title: "Premium Elite 18×24", price: 199, sheets: 40, image: null },
       { id: "alb-18x24-03", title: "Floral Garden 18×24", price: 179, sheets: 30, image: null },
       { id: "alb-18x24-04", title: "Luxury Gold 18×24", price: 229, sheets: 35, image: null },

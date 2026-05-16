@@ -1,5 +1,6 @@
 import type { VideoProduct } from "../../../components/VideoProductPage";
 
+// youtubeId: the video ID from YouTube URL  e.g. https://youtu.be/dQw4w9WgXcQ → "dQw4w9WgXcQ"
 export const invitationVideoProducts: VideoProduct[] = [
   { id: "iv-01", title: "Hindu Wedding Invitation Vol.1", price: 1500, image: null },
   { id: "iv-02", title: "Hindu Wedding Invitation Vol.2", price: 1500, image: null },

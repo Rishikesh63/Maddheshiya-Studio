@@ -7,7 +7,7 @@ import Navbar from "./Navbar";
 import Footer from "./Footer";
 import { useCart } from "../context/CartContext";
 import { getImageUrl } from "../utils/s3-media";
-import { ShoppingCart, Check, Play, ArrowLeft } from "lucide-react";
+import { ShoppingCart, Check, Play, ArrowLeft, X } from "lucide-react";
 
 export interface VideoProduct {
   id: string;
@@ -15,6 +15,8 @@ export interface VideoProduct {
   price: number;
   duration?: string;
   image: string | null;
+  youtubeId?: string;
+  downloadPath?: string | null; // S3 key for ZIP e.g. "products/invitation-video/iv-01/invitation-vol1.zip"
   badge?: string;
 }
 
@@ -26,9 +28,40 @@ interface Props {
   products: VideoProduct[];
 }
 
+function YoutubeModal({ youtubeId, title, onClose }: { youtubeId: string; title: string; onClose: () => void }) {
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 p-4"
+      onClick={onClose}
+    >
+      <div
+        className="relative w-full max-w-3xl"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <button
+          onClick={onClose}
+          className="absolute -top-10 right-0 text-white/60 hover:text-white transition-colors flex items-center gap-1 text-xs tracking-wider"
+        >
+          <X size={14} /> Close
+        </button>
+        <div className="relative aspect-video w-full bg-black">
+          <iframe
+            src={`https://www.youtube.com/embed/${youtubeId}?autoplay=1&rel=0`}
+            title={title}
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowFullScreen
+            className="absolute inset-0 w-full h-full"
+          />
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function ProductCard({ product, cartCategory }: { product: VideoProduct; cartCategory: string }) {
   const { addItem } = useCart();
   const [added, setAdded] = useState(false);
+  const [previewOpen, setPreviewOpen] = useState(false);
 
   const handleAdd = useCallback(() => {
     addItem({
@@ -37,56 +70,83 @@ function ProductCard({ product, cartCategory }: { product: VideoProduct; cartCat
       category: cartCategory,
       price: product.price,
       image: product.image,
+      downloadPath: product.downloadPath || null,
     });
     setAdded(true);
     setTimeout(() => setAdded(false), 1800);
   }, [addItem, product, cartCategory]);
 
-  return (
-    <div className="group bg-white border border-gray-200 flex flex-col overflow-hidden">
-      <div className="relative aspect-video bg-gray-900 overflow-hidden">
-        {product.image ? (
-          <Image
-            src={getImageUrl(product.image)}
-            alt={product.title}
-            fill
-            className="object-cover group-hover:scale-105 transition-transform duration-500"
-          />
-        ) : (
-          <div className="absolute inset-0 flex flex-col items-center justify-center gap-2">
-            <Play size={28} className="text-[#C9A84C]/50" />
-            <span className="text-[10px] tracking-widest uppercase text-white/20">Preview</span>
-          </div>
-        )}
-        {product.badge && (
-          <span className="absolute top-2 left-2 bg-[#C9A84C] text-black text-[9px] px-2 py-0.5 tracking-wider font-semibold">
-            {product.badge}
-          </span>
-        )}
-        {product.duration && (
-          <span className="absolute top-2 right-2 bg-black/70 text-white text-[9px] px-2 py-0.5 tracking-wider">
-            {product.duration}
-          </span>
-        )}
-      </div>
+  const thumbnailSrc = product.youtubeId
+    ? `https://img.youtube.com/vi/${product.youtubeId}/maxresdefault.jpg`
+    : product.image
+    ? getImageUrl(product.image)
+    : null;
 
-      <div className="p-3 flex flex-col flex-1 gap-2 bg-white">
-        <h3 className="text-sm font-semibold text-gray-800 leading-snug">{product.title}</h3>
-        <p className="text-[#2eaa2e] font-bold text-base">₹{product.price.toLocaleString()}.00</p>
-        <button
-          onClick={handleAdd}
-          className={`mt-auto py-2.5 text-xs font-semibold transition-all duration-200 flex items-center justify-center gap-1.5 ${
-            added ? "bg-green-500 text-white" : "bg-[#C9A84C] text-black hover:bg-[#b8933e]"
-          }`}
+  return (
+    <>
+      {previewOpen && product.youtubeId && (
+        <YoutubeModal
+          youtubeId={product.youtubeId}
+          title={product.title}
+          onClose={() => setPreviewOpen(false)}
+        />
+      )}
+      <div className="group bg-white border border-gray-200 flex flex-col overflow-hidden">
+        <div
+          className={`relative aspect-video bg-gray-900 overflow-hidden ${product.youtubeId ? "cursor-pointer" : ""}`}
+          onClick={() => product.youtubeId && setPreviewOpen(true)}
         >
-          {added ? (
-            <><Check size={11} /> Added</>
+          {thumbnailSrc ? (
+            <Image
+              src={thumbnailSrc}
+              alt={product.title}
+              fill
+              className="object-cover group-hover:scale-105 transition-transform duration-500"
+              unoptimized={!!product.youtubeId}
+            />
           ) : (
-            <><ShoppingCart size={11} /> Add to Cart</>
+            <div className="absolute inset-0 flex flex-col items-center justify-center gap-2">
+              <Play size={28} className="text-[#C9A84C]/50" />
+              <span className="text-[10px] tracking-widest uppercase text-white/20">Preview</span>
+            </div>
           )}
-        </button>
+          {product.youtubeId && (
+            <div className="absolute inset-0 flex items-center justify-center bg-black/20 group-hover:bg-black/40 transition-colors">
+              <div className="w-12 h-12 rounded-full bg-[#C9A84C]/90 flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
+                <Play size={20} className="text-black ml-1" fill="black" />
+              </div>
+            </div>
+          )}
+          {product.badge && (
+            <span className="absolute top-2 left-2 bg-[#C9A84C] text-black text-[9px] px-2 py-0.5 tracking-wider font-semibold">
+              {product.badge}
+            </span>
+          )}
+          {product.duration && (
+            <span className="absolute top-2 right-2 bg-black/70 text-white text-[9px] px-2 py-0.5 tracking-wider">
+              {product.duration}
+            </span>
+          )}
+        </div>
+
+        <div className="p-3 flex flex-col flex-1 gap-2 bg-white">
+          <h3 className="text-sm font-semibold text-gray-800 leading-snug">{product.title}</h3>
+          <p className="text-[#2eaa2e] font-bold text-base">₹{product.price.toLocaleString()}.00</p>
+          <button
+            onClick={handleAdd}
+            className={`mt-auto py-2.5 text-xs font-semibold transition-all duration-200 flex items-center justify-center gap-1.5 ${
+              added ? "bg-green-500 text-white" : "bg-[#C9A84C] text-black hover:bg-[#b8933e]"
+            }`}
+          >
+            {added ? (
+              <><Check size={11} /> Added</>
+            ) : (
+              <><ShoppingCart size={11} /> Add to Cart</>
+            )}
+          </button>
+        </div>
       </div>
-    </div>
+    </>
   );
 }
 

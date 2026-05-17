@@ -2,16 +2,15 @@ import type { VideoProduct } from "../../../components/VideoProductPage";
 
 // youtubeId: the video ID from YouTube URL  e.g. https://youtu.be/dQw4w9WgXcQ → "dQw4w9WgXcQ"
 export const invitationVideoProducts: VideoProduct[] = [
-  { id: "iv-01", title: "Haldi & Shaadi Invitation Video Template | Premiere Pro", price: 1500, image: null, youtubeId: "nyN79ukDc_E" },
-  { id: "iv-02", title: "Hindu Wedding Invitation Vol.2", price: 1500, image: null },
-  { id: "iv-03", title: "Hindu Wedding Invitation Vol.3", price: 1800, image: null, badge: "Popular" },
-  { id: "iv-04", title: "Muslim Wedding Invitation", price: 1500, image: null },
-  { id: "iv-05", title: "Muslim Wedding Invitation Premium", price: 2000, image: null },
-  { id: "iv-06", title: "Christian Wedding Invitation", price: 1500, image: null },
-  { id: "iv-07", title: "Engagement Ceremony Invitation", price: 1200, image: null },
-  { id: "iv-08", title: "Ring Ceremony Invitation", price: 1200, image: null },
-  { id: "iv-09", title: "Mehendi Ceremony Invitation", price: 1200, image: null },
-  { id: "iv-10", title: "Birthday Invitation", price: 1000, image: null },
-  { id: "iv-11", title: "Anniversary Invitation", price: 1000, image: null },
-  { id: "iv-12", title: "Royal Premium Invitation", price: 2500, image: null, badge: "Premium" },
+  { id: "iv-01", title: "Haldi & Shaadi Invitation Video Template | Premiere Pro", price: 199, image: null, youtubeId: "nyN79ukDc_E" },
+  { id: "iv-02", title: "Animated Wedding Invitation Video Template | Cartoon Wedding Invite | Adobe Premiere Pro", price: 99, image: null, youtubeId: "dcrrWARp8v8" },
+  { id: "iv-03", title: "Royal Wedding Invitation Video Template | Traditional Digital Wedding Invite | Adobe Premiere Pro", price: 99, image: null, youtubeId: "Y8d6iLsHCa4" },
+  { id: "iv-04", title: "Cute Animated Wedding Invitation Video | Cartoon Couple Invite Template | Adobe Premiere Pro", price: 99, image: null, youtubeId: "YTEc_oAZjmc" },
+  { id: "iv-05", title: "Animated Save The Date Wedding Invitation Video Template | Wedding Invite | Adobe Premiere Pro", price: 99, image: null, youtubeId: "ZFx2mScbkiE" },
+  { id: "iv-06", title: "Bride Groom Cartoon Wedding Invitation | Digital Invite Video | Adobe Premiere Pro Template", price: 99, image: null, youtubeId: "IUlfoB7uAyY" },
+  { id: "iv-07", title: "Marathi Animated Save The Date Wedding Invitation Video Template | Wedding Invite | Premiere Pro", price: 99, image: null, youtubeId: "0bVQO27JU-k" },
+  { id: "iv-08", title: "Rang Lageya Animated Save The Date Wedding Invitation Video Template | Premiere Pro", price: 99, image: null, youtubeId: "OeiVix-atQI" },
+  { id: "iv-09", title: "Singaar Ko Rehne Do Animated Save The Date Wedding Invitation Video Template | Premiere Pro", price: 99, image: null, youtubeId: "V-ljdkT5gcQ" },
+  { id: "iv-10", title: "Laal Ishq Animated Save The Date Wedding Invitation Video Template | Premiere Pro", price: 99, image: null, youtubeId: "VXIzWz5fz_c" },
+  { id: "iv-11", title: "Mora Saajan Animated Save The Date Wedding Invitation Video Template | Premiere Pro", price: 99, image: null, youtubeId: "x_HtL0pZfdg" },
 ];

@@ -19,8 +19,8 @@ export const albumPsdCategories: PsdCategory[] = [
     id: "12x36",
     label: "Albums 12×36",
     products: [
-      { id: "alb-12x36-01", title: "Traditional Wedding 12×36", price: 149, sheets: 40, image: "products/album-psd/12X36/traditional-wedding/cover.jpg", sheetPath: "products/album-psd/12X36/traditional-wedding", downloadPath: "products/album-psd/12X36/traditional-wedding/traditional-wedding.zip" },
-      { id: "alb-12x36-02", title: "Cinematic Wedding 12×36", price: 149, sheets: 40, image: "products/album-psd/12X36/cinematic-wedding/cover.jpg", sheetPath: "products/album-psd/12X36/cinematic-wedding", downloadPath: "products/album-psd/12X36/cinematic-wedding/cinematic-wedding.zip" },
+      { id: "alb-12x36-01", title: "Traditional Wedding 12×36", price: 89, sheets: 40, image: "products/album-psd/12X36/traditional-wedding/cover.jpg", sheetPath: "products/album-psd/12X36/traditional-wedding", downloadPath: "products/album-psd/12X36/traditional-wedding/traditional-wedding.zip" },
+      { id: "alb-12x36-02", title: "Cinematic Wedding 12×36", price: 89, sheets: 40, image: "products/album-psd/12X36/cinematic-wedding/cover.jpg", sheetPath: "products/album-psd/12X36/cinematic-wedding", downloadPath: "products/album-psd/12X36/cinematic-wedding/cinematic-wedding.zip" },
       { id: "alb-12x36-03", title: "Premium Gold 12×36", price: 199, sheets: 40, image: null },
       { id: "alb-12x36-04", title: "Floral Theme 12×36", price: 179, sheets: 25, image: null },
       { id: "alb-12x36-05", title: "Modern Minimal 12×36", price: 159, sheets: 20, image: null },
@@ -33,7 +33,7 @@ export const albumPsdCategories: PsdCategory[] = [
     id: "18x24",
     label: "Albums 18×24",
     products: [
-      { id: "alb-18x24-01", title: "Birthday Album 18×24", price: 169, sheets: 20, image: "products/album-psd/18X24/birthday/cover.jpg", sheetPath: "products/album-psd/18X24/birthday", downloadPath: "products/album-psd/18X24/birthday/birthday.zip" },
+      { id: "alb-18x24-01", title: "Birthday Album 18×24", price: 49, sheets: 20, image: "products/album-psd/18X24/birthday/cover.jpg", sheetPath: "products/album-psd/18X24/birthday", downloadPath: "products/album-psd/18X24/birthday/birthday.zip" },
       { id: "alb-18x24-02", title: "Premium Elite 18×24", price: 199, sheets: 40, image: null },
       { id: "alb-18x24-03", title: "Floral Garden 18×24", price: 179, sheets: 30, image: null },
       { id: "alb-18x24-04", title: "Luxury Gold 18×24", price: 229, sheets: 35, image: null },

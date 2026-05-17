@@ -11,14 +11,14 @@ export const metadata: Metadata = {
 };
 
 const products = [
-  { slug: "album-psd", title: "Album PSD", desc: "Professional album retouching & composites", price: "From ₹500" },
-  { slug: "invitation-video", title: "Invitation Videos", desc: "Cinematic digital wedding invitations", price: "From ₹1,500" },
-  { slug: "wedding-highlight", title: "Wedding Highlight", desc: "Cinematic wedding highlight reel", price: "From ₹3,500" },
-  { slug: "ring-ceremony-highlight", title: "Ring Ceremony Highlights", desc: "Elegant short film of your ring exchange", price: "From ₹2,000" },
-  { slug: "wedding-title", title: "Wedding Title", desc: "Cinematic title card for wedding films", price: "From ₹500" },
-  { slug: "video-logo", title: "Video Logo", desc: "Animated logo intro for your videos", price: "From ₹800" },
-  { slug: "birthday-highlight", title: "Birthday Highlight", desc: "Fun cinematic birthday event film", price: "From ₹2,000" },
-  { slug: "prewedding-highlight", title: "Pre-Wedding Highlight", desc: "Romantic cinematic pre-wedding film", price: "From ₹2,500" },
+  { slug: "album-psd", title: "Album PSD", desc: "Professional album retouching & composites", price: "From ₹49" },
+  { slug: "invitation-video", title: "Invitation Videos", desc: "Cinematic digital wedding invitations", price: "From ₹49" },
+  { slug: "wedding-highlight", title: "Wedding Highlight", desc: "Cinematic wedding highlight reel", price: "From ₹49" },
+  { slug: "ring-ceremony-highlight", title: "Ring Ceremony Highlights", desc: "Elegant short film of your ring exchange", price: "From ₹49" },
+  { slug: "wedding-title", title: "Wedding Title", desc: "Cinematic title card for wedding films", price: "From ₹49" },
+  { slug: "video-logo", title: "Video Logo", desc: "Animated logo intro for your videos", price: "From ₹49" },
+  { slug: "birthday-highlight", title: "Birthday Highlight", desc: "Fun cinematic birthday event film", price: "From ₹49" },
+  { slug: "prewedding-highlight", title: "Pre-Wedding Highlight", desc: "Romantic cinematic pre-wedding film", price: "From ₹49" },
 ];
 
 export default function DigitalProductsPage() {

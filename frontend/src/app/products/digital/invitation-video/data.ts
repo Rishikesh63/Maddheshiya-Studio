@@ -2,7 +2,7 @@ import type { VideoProduct } from "../../../components/VideoProductPage";
 
 // youtubeId: the video ID from YouTube URL  e.g. https://youtu.be/dQw4w9WgXcQ → "dQw4w9WgXcQ"
 export const invitationVideoProducts: VideoProduct[] = [
-  { id: "iv-01", title: "Hindu Wedding Invitation Vol.1", price: 1500, image: null },
+  { id: "iv-01", title: "Haldi & Shaadi Invitation Video Template | Premiere Pro", price: 1500, image: null, youtubeId: "nyN79ukDc_E" },
   { id: "iv-02", title: "Hindu Wedding Invitation Vol.2", price: 1500, image: null },
   { id: "iv-03", title: "Hindu Wedding Invitation Vol.3", price: 1800, image: null, badge: "Popular" },
   { id: "iv-04", title: "Muslim Wedding Invitation", price: 1500, image: null },

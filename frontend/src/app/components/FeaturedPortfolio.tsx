@@ -1,15 +1,12 @@
 import Link from "next/link";
 import Image from "next/image";
 import { ArrowRight } from "lucide-react";
-import { getPortfolioItems } from "../lib/api";
+import { staticPortfolioItems } from "../portfolio/staticData";
+import { getImageUrl } from "../utils/s3-media";
 
-export default async function FeaturedPortfolio() {
-  let items: Awaited<ReturnType<typeof getPortfolioItems>> = [];
-  try {
-    items = await getPortfolioItems({ featured: true });
-  } catch {
-    // API not available — show skeleton
-  }
+export default function FeaturedPortfolio() {
+  // Show first 6 items as featured on homepage
+  const featured = staticPortfolioItems.slice(0, 6);
 
   return (
     <section className="py-24 px-6 bg-[var(--black-soft)]">
@@ -36,27 +33,36 @@ export default async function FeaturedPortfolio() {
           </Link>
         </div>
 
-        {/* Masonry grid */}
-        {items.length > 0 ? (
-          <div className="columns-1 sm:columns-2 lg:columns-3 gap-4 space-y-4">
-            {items.map((item) => (
+        {/* Grid */}
+        <div className="columns-1 sm:columns-2 lg:columns-3 gap-4 space-y-4">
+          {featured.map((item) => {
+            const src = item.youtubeId
+              ? `https://img.youtube.com/vi/${item.youtubeId}/maxresdefault.jpg`
+              : item.image
+              ? getImageUrl(item.image)
+              : null;
+
+            if (!src) return null;
+
+            return (
               <Link
                 key={item.id}
-                href={`/portfolio/${item.category.slug}/${item.slug}`}
+                href={item.href}
                 className="group block break-inside-avoid"
               >
                 <div className="relative overflow-hidden bg-[var(--black-card)]">
                   <Image
-                    src={item.thumbnail}
+                    src={src}
                     alt={item.title}
                     width={600}
                     height={400}
+                    unoptimized={!!item.youtubeId}
                     className="w-full object-cover transition-transform duration-700 group-hover:scale-105"
                   />
-                  <div className="absolute inset-0 cinematic-overlay opacity-0 group-hover:opacity-100 transition-opacity duration-400" />
-                  <div className="absolute bottom-0 left-0 right-0 p-5 translate-y-4 group-hover:translate-y-0 opacity-0 group-hover:opacity-100 transition-all duration-400">
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                  <div className="absolute bottom-0 left-0 right-0 p-5 translate-y-4 group-hover:translate-y-0 opacity-0 group-hover:opacity-100 transition-all duration-500">
                     <span className="text-[9px] tracking-[0.3em] uppercase text-[var(--gold)]/70 block mb-1">
-                      {item.service_type || item.category.name}
+                      {item.categoryLabel}
                     </span>
                     <h3
                       className="text-lg font-light text-white"
@@ -67,27 +73,9 @@ export default async function FeaturedPortfolio() {
                   </div>
                 </div>
               </Link>
-            ))}
-          </div>
-        ) : (
-          /* Skeleton placeholders */
-          <div className="columns-1 sm:columns-2 lg:columns-3 gap-4 space-y-4">
-            {[320, 280, 360, 300, 340, 290].map((h, i) => (
-              <div
-                key={i}
-                className="break-inside-avoid bg-[var(--black-card)] border border-[var(--gold)]/5 animate-pulse"
-                style={{ height: h }}
-              >
-                <div className="w-full h-full flex items-end p-5">
-                  <div className="space-y-2 w-full">
-                    <div className="h-2 w-16 bg-[var(--gold)]/10 rounded" />
-                    <div className="h-4 w-32 bg-white/5 rounded" />
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
+            );
+          })}
+        </div>
       </div>
     </section>
   );

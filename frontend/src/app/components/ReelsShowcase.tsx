@@ -8,9 +8,9 @@ import Image from "next/image";
 import { waLink, SOCIAL_LINKS } from "../lib/siteConfig";
 
 const reels = [
-  { id: "Ti3RipE7eMw", title: "Wedding Reel" },
-  { id: "U7LAeHs1jH0", title: "Wedding Reel" },
-  { id: "XHDCtnCA5FY", title: "Wedding Reel" },
+  { id: "Ti3RipE7eMw", title: "Short Film" },
+  { id: "U7LAeHs1jH0", title: "Photoshop Plugin Tutorial" },
+  { id: "XHDCtnCA5FY", title: "Short Film" },
   { id: "YTEc_oAZjmc", title: "Cute Animated Wedding Invitation" },
   { id: "ZFx2mScbkiE", title: "Animated Save The Date Invitation" },
   { id: "IUlfoB7uAyY", title: "Bride Groom Cartoon Invitation" },

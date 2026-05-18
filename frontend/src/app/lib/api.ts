@@ -153,7 +153,7 @@ export interface BookingPayload {
   location: number;
   venue_name?: string;
   venue_address?: string;
-  package: number;
+  package?: number;
   guest_count?: number;
   notes?: string;
 }

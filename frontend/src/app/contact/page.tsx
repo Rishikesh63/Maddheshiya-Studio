@@ -84,16 +84,26 @@ export default function ContactPage() {
                 Studio Details
               </h2>
               <div className="space-y-4">
-                {[
-                  { icon: MapPin, text: "Koilahiya Chauraha, Mangalpur, Post Sarhari, Tikariya Road, Pipiganj, 273165" },
-                  { icon: Phone, text: "+91 XXXXX XXXXX" },
-                  { icon: Mail, text: "hello@maddheshiyastudio.com" },
-                ].map((c, i) => (
-                  <div key={i} className="flex items-start gap-3">
-                    <c.icon size={14} className="text-[var(--gold)]/50 mt-0.5 shrink-0" />
-                    <span className="text-sm text-white/50">{c.text}</span>
+                <div className="flex items-start gap-3">
+                  <MapPin size={14} className="text-[var(--gold)]/50 mt-0.5 shrink-0" />
+                  <span className="text-sm text-white/50">Koilahiya Chauraha, Mangalpur, Post Sarhari, Tikariya Road, Pipiganj, 273165</span>
+                </div>
+                <div className="flex items-start gap-3">
+                  <Phone size={14} className="text-[var(--gold)]/50 mt-1 shrink-0" />
+                  <div className="flex flex-col gap-1">
+                    {["+91 73173 71874", "+91 70717 20077", "+91 63896 32464"].map((num) => (
+                      <a key={num} href={`tel:${num.replace(/\s/g, "")}`} className="text-sm text-white/50 hover:text-[var(--gold)] transition-colors">
+                        {num}
+                      </a>
+                    ))}
                   </div>
-                ))}
+                </div>
+                <div className="flex items-start gap-3">
+                  <Mail size={14} className="text-[var(--gold)]/50 mt-0.5 shrink-0" />
+                  <a href="mailto:rishikesh6389@gmail.com" className="text-sm text-white/50 hover:text-[var(--gold)] transition-colors">
+                    rishikesh6389@gmail.com
+                  </a>
+                </div>
               </div>
             </div>
 

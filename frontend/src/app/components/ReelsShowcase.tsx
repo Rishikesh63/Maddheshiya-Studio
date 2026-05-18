@@ -2,10 +2,10 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Play, Instagram, X } from "lucide-react";
+import { Play, X } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
-import { waLink, SOCIAL_LINKS } from "../lib/siteConfig";
+import { waLink } from "../lib/siteConfig";
 
 const reels = [
   { id: "Ti3RipE7eMw", title: "Short Film" },
@@ -65,15 +65,27 @@ export default function ReelsShowcase() {
             Follow Our Journey
           </h2>
           <div className="divider-gold mx-auto mb-6" />
-          <Link
-            href={SOCIAL_LINKS.instagram}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 text-xs tracking-widest uppercase text-[var(--gold)]/60 hover:text-[var(--gold)] transition-colors"
-          >
-            <Instagram size={14} />
-            @maddheshiyastudio
-          </Link>
+          <div className="flex items-center justify-center gap-4">
+            <a
+              href="https://www.youtube.com/@mithlesh_mds"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 text-xs tracking-widest uppercase text-[var(--gold)]/60 hover:text-[var(--gold)] transition-colors"
+            >
+              <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+              @mithlesh_mds
+            </a>
+            <span className="text-white/20">·</span>
+            <a
+              href="https://www.youtube.com/@mdsYariyan"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 text-xs tracking-widest uppercase text-[var(--gold)]/60 hover:text-[var(--gold)] transition-colors"
+            >
+              <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+              @mdsYariyan
+            </a>
+          </div>
         </motion.div>
 
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
@@ -121,14 +133,14 @@ export default function ReelsShowcase() {
           >
             Chat on WhatsApp
           </Link>
-          <Link
-            href={SOCIAL_LINKS.instagram}
+          <a
+            href="https://www.youtube.com/@mithlesh_mds"
             target="_blank"
             rel="noopener noreferrer"
             className="px-8 py-3 text-xs tracking-widest uppercase border border-[var(--gold)]/30 text-[var(--gold)]/70 hover:border-[var(--gold)] hover:text-[var(--gold)] transition-all duration-300"
           >
-            Follow on Instagram
-          </Link>
+            Subscribe on YouTube
+          </a>
         </motion.div>
       </div>
     </section>

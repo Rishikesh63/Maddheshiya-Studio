@@ -4,7 +4,8 @@ import Image from "next/image";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import BookingCTA from "../components/BookingCTA";
-import { getPortfolioItems } from "../lib/api";
+import { staticPortfolioItems } from "./staticData";
+import { getImageUrl } from "../utils/s3-media";
 
 export const metadata: Metadata = {
   title: "Portfolio",
@@ -16,9 +17,9 @@ const categories = [
   { slug: "all", label: "All" },
   { slug: "photography", label: "Photography" },
   { slug: "videography", label: "Videography" },
-  { slug: "printing", label: "Printing" },
   { slug: "invitation-video", label: "Invitation" },
   { slug: "album-design", label: "Albums" },
+  { slug: "printing", label: "Printing" },
   { slug: "framing", label: "Framing" },
 ];
 
@@ -30,12 +31,9 @@ export default async function PortfolioPage({
   const { category } = await searchParams;
   const activeCategory = category && category !== "all" ? category : undefined;
 
-  let items: Awaited<ReturnType<typeof getPortfolioItems>> = [];
-  try {
-    items = await getPortfolioItems({ category: activeCategory });
-  } catch {
-    // API unavailable
-  }
+  const filtered = activeCategory
+    ? staticPortfolioItems.filter((i) => i.category === activeCategory)
+    : staticPortfolioItems;
 
   return (
     <div className="bg-[var(--black)]">
@@ -80,57 +78,48 @@ export default async function PortfolioPage({
         </div>
       </section>
 
-      {/* Masonry grid */}
+      {/* Grid */}
       <section className="pb-24 px-6">
         <div className="max-w-7xl mx-auto">
-          {items.length > 0 ? (
-            <div className="columns-1 sm:columns-2 lg:columns-3 gap-4 space-y-4">
-              {items.map((item) => (
+          <div className="columns-1 sm:columns-2 lg:columns-3 gap-4 space-y-4">
+            {filtered.map((item) => {
+              const src = item.youtubeId
+                ? `https://img.youtube.com/vi/${item.youtubeId}/maxresdefault.jpg`
+                : item.image
+                ? getImageUrl(item.image)
+                : null;
+
+              if (!src) return null;
+
+              return (
                 <Link
                   key={item.id}
-                  href={`/portfolio/${item.category.slug}/${item.slug}`}
+                  href={item.href}
                   className="group block break-inside-avoid"
                 >
                   <div className="relative overflow-hidden bg-[var(--black-card)]">
                     <Image
-                      src={item.thumbnail}
+                      src={src}
                       alt={item.title}
                       width={600}
                       height={400}
+                      unoptimized={!!item.youtubeId}
                       className="w-full object-cover transition-transform duration-700 group-hover:scale-105"
                     />
-                    <div className="absolute inset-0 cinematic-overlay opacity-0 group-hover:opacity-100 transition-opacity duration-400" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-400" />
                     <div className="absolute bottom-0 left-0 right-0 p-5 translate-y-4 group-hover:translate-y-0 opacity-0 group-hover:opacity-100 transition-all duration-400">
                       <span className="text-[9px] tracking-[0.3em] uppercase text-[var(--gold)]/70 block mb-1">
-                        {item.service_type || item.category.name}
+                        {item.categoryLabel}
                       </span>
-                      <h3
-                        className="text-lg font-light text-white"
-                        style={{ fontFamily: "var(--font-cormorant)" }}
-                      >
+                      <h3 className="text-lg font-light text-white" style={{ fontFamily: "var(--font-cormorant)" }}>
                         {item.title}
                       </h3>
                     </div>
                   </div>
                 </Link>
-              ))}
-            </div>
-          ) : (
-            <div className="text-center py-24">
-              <p className="text-white/20 text-sm tracking-widest uppercase">
-                Portfolio items will appear here once published
-              </p>
-              <div className="mt-8 columns-1 sm:columns-2 lg:columns-3 gap-4 space-y-4">
-                {[320, 240, 360, 280, 300, 260].map((h, i) => (
-                  <div
-                    key={i}
-                    className="break-inside-avoid bg-[var(--black-card)] border border-[var(--gold)]/5"
-                    style={{ height: h }}
-                  />
-                ))}
-              </div>
-            </div>
-          )}
+              );
+            })}
+          </div>
         </div>
       </section>
 

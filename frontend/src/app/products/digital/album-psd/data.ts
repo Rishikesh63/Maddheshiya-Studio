@@ -19,7 +19,7 @@ export const albumPsdCategories: PsdCategory[] = [
     id: "12x36",
     label: "Albums 12×36",
     products: [
-      { id: "alb-12x36-01", title: "Traditional Wedding 12×36", price: 89, sheets: 40, image: "products/album-psd/12X36/traditional-wedding/cover.jpg", sheetPath: "products/album-psd/12X36/traditional-wedding", downloadPath: "products/album-psd/12X36/traditional-wedding/traditional-wedding.zip" },
+      { id: "alb-12x36-01", title: "Traditional Wedding 12×36", price: 1, sheets: 40, image: "products/album-psd/12X36/traditional-wedding/cover.jpg", sheetPath: "products/album-psd/12X36/traditional-wedding", downloadPath: "products/album-psd/12X36/traditional-wedding/traditional-wedding.zip" },
       { id: "alb-12x36-02", title: "Cinematic Wedding 12×36", price: 89, sheets: 40, image: "products/album-psd/12X36/cinematic-wedding/cover.jpg", sheetPath: "products/album-psd/12X36/cinematic-wedding", downloadPath: "products/album-psd/12X36/cinematic-wedding/cinematic-wedding.zip" },
       { id: "alb-12x36-03", title: "Premium Gold 12×36", price: 199, sheets: 40, image: null },
       { id: "alb-12x36-04", title: "Floral Theme 12×36", price: 179, sheets: 25, image: null },

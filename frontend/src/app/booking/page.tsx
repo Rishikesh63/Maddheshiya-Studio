@@ -4,7 +4,7 @@ import { useState } from "react";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import { useForm } from "react-hook-form";
-import { createBooking, getLocations, getPackages, type Location, type Package } from "../lib/api";
+import { createBooking, getLocations, type Location } from "../lib/api";
 import { Check, ChevronRight } from "lucide-react";
 import { useEffect } from "react";
 
@@ -19,15 +19,13 @@ type FormData = {
   notes: string;
   service_type: string;
   location: number;
-  package: number;
 };
 
-const steps = ["Service", "Location", "Package", "Event Details", "Contact"];
+const steps = ["Service", "Location", "Event Details", "Contact"];
 
 export default function BookingPage() {
   const [step, setStep] = useState(0);
   const [locations, setLocations] = useState<Location[]>([]);
-  const [packages, setPackages] = useState<Package[]>([]);
   const [bookingId, setBookingId] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -39,12 +37,6 @@ export default function BookingPage() {
   useEffect(() => {
     getLocations().then(setLocations).catch(() => {});
   }, []);
-
-  useEffect(() => {
-    if (serviceType) {
-      getPackages(serviceType).then(setPackages).catch(() => {});
-    }
-  }, [serviceType]);
 
   const onSubmit = async (data: FormData) => {
     setSubmitting(true);
@@ -60,7 +52,6 @@ export default function BookingPage() {
         guest_count: data.guest_count,
         notes: data.notes,
         location: Number(data.location),
-        package: Number(data.package),
       });
       setBookingId(result.booking_id);
     } catch {
@@ -190,7 +181,6 @@ export default function BookingPage() {
                   <div className="mb-8">
                     <label className="block text-xs tracking-widest uppercase text-white/40 mb-2">City / Location</label>
                     <input
-                      {...register("event_type")}
                       placeholder="Enter your city"
                       className="w-full bg-[var(--black-card)] border border-[var(--gold)]/20 text-white px-4 py-3 text-sm focus:outline-none focus:border-[var(--gold)]/50"
                     />
@@ -203,48 +193,8 @@ export default function BookingPage() {
               </div>
             )}
 
-            {/* Step 2: Package */}
+            {/* Step 2: Event Details */}
             {step === 2 && (
-              <div>
-                <h2 className="text-2xl font-light text-white mb-8" style={{ fontFamily: "var(--font-cormorant)" }}>
-                  Select a Package
-                </h2>
-                {packages.length > 0 ? (
-                  <div className="flex flex-col gap-4 mb-8">
-                    {packages.map((pkg) => (
-                      <button
-                        key={pkg.id}
-                        type="button"
-                        onClick={() => { setValue("package", pkg.id); setStep(3); }}
-                        className="text-left p-6 border border-[var(--gold)]/10 hover:border-[var(--gold)]/40 bg-[var(--black-card)] transition-all duration-300"
-                      >
-                        <div className="flex justify-between mb-2">
-                          <p className="text-base font-light text-white" style={{ fontFamily: "var(--font-cormorant)" }}>{pkg.name}</p>
-                          <p className="text-[var(--gold)]">₹{pkg.price}</p>
-                        </div>
-                        <p className="text-xs text-white/40 mb-3">{pkg.description}</p>
-                        <div className="flex flex-wrap gap-2">
-                          {pkg.inclusions_list.slice(0, 3).map((inc) => (
-                            <span key={inc} className="text-[9px] tracking-widest uppercase text-white/30 border border-white/10 px-2 py-0.5">{inc}</span>
-                          ))}
-                        </div>
-                      </button>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="mb-8 p-6 border border-[var(--gold)]/10 bg-[var(--black-card)]">
-                    <p className="text-sm text-white/40">Packages will be shown here. Please continue to fill in your details.</p>
-                    <button type="button" onClick={() => setStep(3)} className="mt-4 px-8 py-3 bg-[var(--gold)] text-black text-xs tracking-widest uppercase">
-                      Continue
-                    </button>
-                  </div>
-                )}
-                <button type="button" onClick={() => setStep(1)} className="text-xs text-white/30 hover:text-white/60">← Back</button>
-              </div>
-            )}
-
-            {/* Step 3: Event Details */}
-            {step === 3 && (
               <div>
                 <h2 className="text-2xl font-light text-white mb-8" style={{ fontFamily: "var(--font-cormorant)" }}>
                   Event Details
@@ -277,16 +227,16 @@ export default function BookingPage() {
                   </div>
                 </div>
                 <div className="flex gap-4">
-                  <button type="button" onClick={() => setStep(2)} className="text-xs text-white/30 hover:text-white/60">← Back</button>
-                  <button type="button" onClick={() => setStep(4)} className="px-8 py-3 bg-[var(--gold)] text-black text-xs tracking-widest uppercase">
+                  <button type="button" onClick={() => setStep(1)} className="text-xs text-white/30 hover:text-white/60">← Back</button>
+                  <button type="button" onClick={() => setStep(3)} className="px-8 py-3 bg-[var(--gold)] text-black text-xs tracking-widest uppercase">
                     Continue →
                   </button>
                 </div>
               </div>
             )}
 
-            {/* Step 4: Contact */}
-            {step === 4 && (
+            {/* Step 3: Contact */}
+            {step === 3 && (
               <div>
                 <h2 className="text-2xl font-light text-white mb-8" style={{ fontFamily: "var(--font-cormorant)" }}>
                   Your Contact Details
@@ -312,7 +262,7 @@ export default function BookingPage() {
                     <label className="block text-xs tracking-widest uppercase text-white/40 mb-2">Additional Notes</label>
                     <textarea
                       {...register("notes")}
-                      placeholder="Any specific requirements or questions..."
+                      placeholder="Mention preferred package or any specific requirements..."
                       rows={4}
                       className="w-full bg-[var(--black-card)] border border-[var(--gold)]/20 text-white px-4 py-3 text-sm focus:outline-none focus:border-[var(--gold)]/50 resize-none"
                     />
@@ -320,7 +270,7 @@ export default function BookingPage() {
                 </div>
                 {error && <p className="text-red-400 text-sm mb-4">{error}</p>}
                 <div className="flex gap-4">
-                  <button type="button" onClick={() => setStep(3)} className="text-xs text-white/30 hover:text-white/60">← Back</button>
+                  <button type="button" onClick={() => setStep(2)} className="text-xs text-white/30 hover:text-white/60">← Back</button>
                   <button
                     type="submit"
                     disabled={submitting}

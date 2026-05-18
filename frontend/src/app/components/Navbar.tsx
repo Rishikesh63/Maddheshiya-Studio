@@ -174,7 +174,6 @@ export default function Navbar() {
 
           {[
             { href: "/portfolio", label: "Portfolio" },
-            { href: "/packages", label: "Packages" },
             { href: "/about", label: "About" },
             { href: "/contact", label: "Contact" },
           ].map((l) => (
@@ -215,20 +214,12 @@ export default function Navbar() {
               </div>
             </div>
           ) : (
-            <>
-              <Link
-                href="/login"
-                className="text-xs tracking-widest uppercase text-white/50 hover:text-[var(--gold)] transition-colors"
-              >
-                Login
-              </Link>
-              <Link
-                href="/register"
-                className="text-xs tracking-widest uppercase text-white/50 hover:text-[var(--gold)] transition-colors"
-              >
-                Register
-              </Link>
-            </>
+            <Link
+              href="/login"
+              className="text-xs tracking-widest uppercase px-4 py-2 border border-[var(--gold)]/30 text-[var(--gold)]/70 hover:border-[var(--gold)] hover:text-[var(--gold)] transition-all"
+            >
+              Sign In
+            </Link>
           )}
           <Link
             href="/cart"
@@ -375,9 +366,9 @@ export default function Navbar() {
             ) : (
               <Link
                 href="/login"
-                className="w-full py-3 text-center text-xs tracking-widest uppercase text-white/40 hover:text-white/70"
+                className="w-full py-3 text-center text-xs tracking-widest uppercase border border-[var(--gold)]/30 text-[var(--gold)]/70 hover:border-[var(--gold)] hover:text-[var(--gold)] transition-all"
               >
-                Login
+                Sign In
               </Link>
             )}
           </div>

@@ -1,15 +1,52 @@
 "use client";
 
+import { useState } from "react";
 import { motion } from "framer-motion";
-import { Play, Instagram } from "lucide-react";
+import { Play, Instagram, X } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
 import { waLink, SOCIAL_LINKS } from "../lib/siteConfig";
 
-const reels = [1, 2, 3, 4, 5, 6];
+const reels = [
+  { id: "Ti3RipE7eMw", title: "Wedding Reel" },
+  { id: "U7LAeHs1jH0", title: "Wedding Reel" },
+  { id: "XHDCtnCA5FY", title: "Wedding Reel" },
+  { id: "YTEc_oAZjmc", title: "Cute Animated Wedding Invitation" },
+  { id: "ZFx2mScbkiE", title: "Animated Save The Date Invitation" },
+  { id: "IUlfoB7uAyY", title: "Bride Groom Cartoon Invitation" },
+];
 
 export default function ReelsShowcase() {
+  const [activeId, setActiveId] = useState<string | null>(null);
+
   return (
     <section className="py-24 px-6 bg-[var(--black-soft)]">
+      {/* YouTube modal */}
+      {activeId && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 p-4"
+          onClick={() => setActiveId(null)}
+        >
+          <div className="relative w-full max-w-3xl" onClick={(e) => e.stopPropagation()}>
+            <button
+              onClick={() => setActiveId(null)}
+              className="absolute -top-10 right-0 text-white/60 hover:text-white transition-colors flex items-center gap-1 text-xs tracking-wider"
+            >
+              <X size={14} /> Close
+            </button>
+            <div className="relative aspect-video w-full bg-black">
+              <iframe
+                src={`https://www.youtube.com/embed/${activeId}?autoplay=1&rel=0`}
+                title="Video preview"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+                className="absolute inset-0 w-full h-full"
+              />
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="max-w-6xl mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -29,7 +66,7 @@ export default function ReelsShowcase() {
           </h2>
           <div className="divider-gold mx-auto mb-6" />
           <Link
-            href="https://www.instagram.com/"
+            href={SOCIAL_LINKS.instagram}
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-2 text-xs tracking-widest uppercase text-[var(--gold)]/60 hover:text-[var(--gold)] transition-colors"
@@ -40,30 +77,30 @@ export default function ReelsShowcase() {
         </motion.div>
 
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-          {reels.map((i) => (
+          {reels.map((reel, i) => (
             <motion.div
-              key={i}
+              key={reel.id}
               initial={{ opacity: 0, scale: 0.96 }}
               whileInView={{ opacity: 1, scale: 1 }}
               viewport={{ once: true }}
               transition={{ duration: 0.5, delay: i * 0.07 }}
-              className="group relative aspect-square bg-[var(--black-card)] border border-[var(--gold)]/5 hover:border-[var(--gold)]/20 overflow-hidden cursor-pointer transition-all duration-300"
+              className="group relative aspect-square bg-[var(--black-card)] border border-[var(--gold)]/5 hover:border-[var(--gold)]/30 overflow-hidden cursor-pointer transition-all duration-300"
+              onClick={() => setActiveId(reel.id)}
             >
-              {/* Placeholder gradient */}
-              <div
-                className="absolute inset-0"
-                style={{
-                  background: `linear-gradient(${135 + i * 20}deg, #161616, #0d0d0d)`,
-                }}
+              <Image
+                src={`https://img.youtube.com/vi/${reel.id}/maxresdefault.jpg`}
+                alt={reel.title}
+                fill
+                unoptimized
+                className="object-cover group-hover:scale-105 transition-transform duration-700"
               />
-              <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                <div className="w-12 h-12 border border-[var(--gold)]/50 flex items-center justify-center rounded-full">
-                  <Play size={18} className="text-[var(--gold)] ml-0.5" />
+              {/* Dark overlay */}
+              <div className="absolute inset-0 bg-black/30 group-hover:bg-black/50 transition-colors duration-300" />
+              {/* Play button */}
+              <div className="absolute inset-0 flex items-center justify-center">
+                <div className="w-12 h-12 border border-[var(--gold)]/60 flex items-center justify-center rounded-full bg-black/30 group-hover:bg-[var(--gold)]/20 group-hover:border-[var(--gold)] transition-all duration-300">
+                  <Play size={18} className="text-[var(--gold)] ml-0.5" fill="currentColor" />
                 </div>
-              </div>
-              <div className="absolute bottom-3 left-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                <div className="h-1.5 w-12 bg-[var(--gold)]/20 rounded mb-1.5" />
-                <div className="h-1.5 w-8 bg-[var(--gold)]/10 rounded" />
               </div>
             </motion.div>
           ))}

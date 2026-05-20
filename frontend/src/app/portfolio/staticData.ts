@@ -12,10 +12,10 @@ export const staticPortfolioItems: StaticPortfolioItem[] = [
   // Album PSD — same S3 keys as product pages, zero extra storage cost
   {
     id: "static-alb-01",
-    title: "Traditional Wedding Album 12×36",
+    title: "Candid Wedding Album 12×36",
     category: "album-design",
     categoryLabel: "Album Design",
-    image: "products/album-psd/12X36/traditional-wedding/cover.jpg",
+    image: "products/album-psd/12X36/candid-wedding/cover.jpg",
     href: "/products/digital/album-psd",
   },
   {
@@ -26,8 +26,16 @@ export const staticPortfolioItems: StaticPortfolioItem[] = [
     image: "products/album-psd/12X36/cinematic-wedding/cover.jpg",
     href: "/products/digital/album-psd",
   },
-  {
+    {
     id: "static-alb-03",
+    title: "Traditional Wedding Album 12×36",
+    category: "album-design",
+    categoryLabel: "Album Design",
+    image: "products/album-psd/12X36/traditional-wedding/cover.jpg",
+    href: "/products/digital/album-psd",
+  },
+  {
+    id: "static-alb-04",
     title: "Birthday Album 18×24",
     category: "album-design",
     categoryLabel: "Album Design",

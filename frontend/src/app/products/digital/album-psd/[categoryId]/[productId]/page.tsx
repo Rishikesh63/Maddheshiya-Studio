@@ -2,7 +2,6 @@
 
 import { useState, useCallback, use } from "react";
 import Link from "next/link";
-import Image from "next/image";
 import Navbar from "../../../../../components/Navbar";
 import Footer from "../../../../../components/Footer";
 import { useCart } from "../../../../../context/CartContext";
@@ -64,13 +63,12 @@ function SheetTile({
       onClick={onClick}
     >
       {currentKey && attempt < 2 ? (
-        <Image
-          key={currentKey}               /* force remount when src changes */
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          key={currentKey}
           src={getImageUrl(currentKey)}
           alt={`Sheet ${num}`}
-          fill
-          className="object-contain"
-          sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, 20vw"
+          className="absolute inset-0 w-full h-full object-contain"
           onError={handleError}
         />
       ) : (
@@ -114,14 +112,12 @@ function LightboxImage({ product, num }: { product: PsdProduct; num: number }) {
   }
 
   return (
-    <Image
+    // eslint-disable-next-line @next/next/no-img-element
+    <img
       key={currentKey}
       src={getImageUrl(currentKey)}
       alt={`Sheet ${num}`}
-      fill
-      className="object-contain"
-      sizes="92vw"
-      priority
+      className="absolute inset-0 w-full h-full object-contain"
       onError={handleError}
     />
   );

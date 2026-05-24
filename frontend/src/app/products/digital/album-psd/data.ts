@@ -5,8 +5,18 @@ export interface PsdProduct {
   sheets?: number;
   image?: string | null;        // S3 key for an explicit cover thumbnail. If omitted, sheet-{coverSheet} is used instead.
   coverSheet?: number;          // Which sheet number to use as cover when no explicit `image` is set. Defaults to 1.
+  sheetExt?: "jpg" | "png";    // File extension for sheet images. Defaults to "jpg". Use "png" for PNG packs.
   sheetPath?: string | null;   // S3 folder for sheet previews e.g. "products/album-psd/12x36/alb-12x36-01"
   downloadPath?: string | null; // S3 key for purchasable ZIP/PSD file e.g. "products/album-psd/12x36/alb-12x36-01/album.zip"
+}
+
+/**
+ * Returns the S3 key for a specific sheet number.
+ */
+export function getSheetKey(product: PsdProduct, num: number): string | null {
+  if (!product.sheetPath) return null;
+  const ext = product.sheetExt ?? "jpg";
+  return `${product.sheetPath}/sheet-${String(num).padStart(2, "0")}.${ext}`;
 }
 
 /**
@@ -15,11 +25,7 @@ export interface PsdProduct {
  */
 export function getProductCoverKey(product: PsdProduct): string | null {
   if (product.image) return product.image;
-  if (product.sheetPath) {
-    const n = product.coverSheet ?? 1;
-    return `${product.sheetPath}/sheet-${String(n).padStart(2, "0")}.jpg`;
-  }
-  return null;
+  return getSheetKey(product, product.coverSheet ?? 1);
 }
 
 export interface PsdCategory {
@@ -57,28 +63,6 @@ export const albumPsdCategories: PsdCategory[] = [
     ],
   },
   {
-    id: "16x24",
-    label: "Albums 16×24",
-    products: [
-      { id: "alb-16x24-01", title: "Elegance Series 16×24", price: 159, sheets: 25, image: null },
-      { id: "alb-16x24-02", title: "Classic Romance 16×24", price: 149, sheets: 20, image: null },
-      { id: "alb-16x24-03", title: "Premium Gold 16×24", price: 199, sheets: 35, image: null },
-      { id: "alb-16x24-04", title: "Dark Luxury 16×24", price: 179, sheets: 30, image: null },
-      { id: "alb-16x24-05", title: "Soft Pastel 16×24", price: 139, sheets: 18, image: null },
-    ],
-  },
-  {
-    id: "15x30",
-    label: "Albums 15×30",
-    products: [
-      { id: "alb-15x30-01", title: "Panoramic Wedding 15×30", price: 179, sheets: 25, image: null },
-      { id: "alb-15x30-02", title: "Wide Cinematic 15×30", price: 199, sheets: 30, image: null },
-      { id: "alb-15x30-03", title: "Royal Edition 15×30", price: 229, sheets: 40, image: null },
-      { id: "alb-15x30-04", title: "Classic Elegance 15×30", price: 159, sheets: 22, image: null },
-      { id: "alb-15x30-05", title: "Premium Series 15×30", price: 189, sheets: 28, image: null },
-    ],
-  },
-  {
     id: "ported-sheet",
     label: "Ported Sheet",
     products: [
@@ -104,26 +88,26 @@ export const albumPsdCategories: PsdCategory[] = [
     id: "design-material",
     label: "Design Material",
     products: [
-      { id: "dm-01", title: "Album Typography",            price: 199, sheetPath: "products/album-psd/design-material/albumb-typography",        downloadPath: "products/album-psd/design-material/albumb-typography/albumb-typography.zip" },
-      { id: "dm-02", title: "Birds PNG",                   price: 149, sheetPath: "products/album-psd/design-material/birds",                    downloadPath: "products/album-psd/design-material/birds/birds.zip" },
-      { id: "dm-03", title: "Birthday Wishes PNG",         price: 149, sheetPath: "products/album-psd/design-material/birthday-wishes",          downloadPath: "products/album-psd/design-material/birthday-wishes/birthday-wishes.zip" },
-      { id: "dm-04", title: "Falling Leaves PNG",          price: 149, sheetPath: "products/album-psd/design-material/falling-leaves",           downloadPath: "products/album-psd/design-material/falling-leaves/falling-leaves.zip" },
-      { id: "dm-05", title: "Fire PNG",                    price: 149, sheetPath: "products/album-psd/design-material/fire",                     downloadPath: "products/album-psd/design-material/fire/fire.zip" },
-      { id: "dm-06", title: "Gift PNG",                    price: 149, sheetPath: "products/album-psd/design-material/gift",                     downloadPath: "products/album-psd/design-material/gift/gift.zip" },
-      { id: "dm-07", title: "Islamic Wedding PNG",         price: 199, sheetPath: "products/album-psd/design-material/islamic-wedding",          downloadPath: "products/album-psd/design-material/islamic-wedding/islamic-wedding.zip" },
-      { id: "dm-08", title: "Light Effects PNG",           price: 199, sheetPath: "products/album-psd/design-material/light-effects",            downloadPath: "products/album-psd/design-material/light-effects/light-effects.zip" },
-      { id: "dm-09", title: "Love Designs PNG",            price: 149, sheetPath: "products/album-psd/design-material/love-designs",             downloadPath: "products/album-psd/design-material/love-designs/love-designs.zip" },
-      { id: "dm-10", title: "Newborn Baby Wishes PNG",     price: 149, sheetPath: "products/album-psd/design-material/newbord-babywishes",       downloadPath: "products/album-psd/design-material/newbord-babywishes/newbord-babywishes.zip" },
-      { id: "dm-11", title: "Photo Mask PNG",              price: 199, sheetPath: "products/album-psd/design-material/photo-mask",               downloadPath: "products/album-psd/design-material/photo-mask/photo-mask.zip" },
-      { id: "dm-12", title: "Photo Overlay PNG",           price: 199, sheetPath: "products/album-psd/design-material/photo-overlay",            downloadPath: "products/album-psd/design-material/photo-overlay/photo-overlay.zip" },
-      { id: "dm-13", title: "Sky Background PNG",          price: 149, sheetPath: "products/album-psd/design-material/sky-background",           downloadPath: "products/album-psd/design-material/sky-background/sky-background.zip" },
-      { id: "dm-14", title: "Studio Background PNG",       price: 199, sheetPath: "products/album-psd/design-material/studio-background",        downloadPath: "products/album-psd/design-material/studio-background/studio-background.zip" },
-      { id: "dm-15", title: "Water Drop PNG",              price: 149, sheetPath: "products/album-psd/design-material/water-drop",               downloadPath: "products/album-psd/design-material/water-drop/water-drop.zip" },
-      { id: "dm-16", title: "Wedding Album Background PNG",price: 199, sheetPath: "products/album-psd/design-material/wedding-albumb-background", downloadPath: "products/album-psd/design-material/wedding-albumb-background/wedding-albumb-background.zip" },
-      { id: "dm-17", title: "Wedding Album Frame PNG",     price: 199, sheetPath: "products/album-psd/design-material/wedding-albumb-frame",     downloadPath: "products/album-psd/design-material/wedding-albumb-frame/wedding-albumb-frame.zip" },
-      { id: "dm-18", title: "Wedding Album PNG",           price: 249, sheetPath: "products/album-psd/design-material/wedding-albumb",           downloadPath: "products/album-psd/design-material/wedding-albumb/wedding-albumb.zip" },
-      { id: "dm-19", title: "Wedding Quotes PNG",          price: 149, sheetPath: "products/album-psd/design-material/wedding-quotes",           downloadPath: "products/album-psd/design-material/wedding-quotes/wedding-quotes.zip" },
-      { id: "dm-20", title: "Wedding Text PNG",            price: 149, sheetPath: "products/album-psd/design-material/wedding-text",             downloadPath: "products/album-psd/design-material/wedding-text/wedding-text.zip" },
+      { id: "dm-01", title: "Album Typography",            price: 199, sheetExt: "png", sheetPath: "products/album-psd/design-material/albumb-typography",        downloadPath: "products/album-psd/design-material/albumb-typography/albumb-typography.zip" },
+      { id: "dm-02", title: "Birds PNG",                   price: 149, sheetExt: "png", sheetPath: "products/album-psd/design-material/birds",                    downloadPath: "products/album-psd/design-material/birds/birds.zip" },
+      { id: "dm-03", title: "Birthday Wishes PNG",         price: 149, sheetExt: "png", sheetPath: "products/album-psd/design-material/birthday-wishes",          downloadPath: "products/album-psd/design-material/birthday-wishes/birthday-wishes.zip" },
+      { id: "dm-04", title: "Falling Leaves PNG",          price: 149, sheetExt: "png", sheetPath: "products/album-psd/design-material/falling-leaves",           downloadPath: "products/album-psd/design-material/falling-leaves/falling-leaves.zip" },
+      { id: "dm-05", title: "Fire PNG",                    price: 149, sheetExt: "png", sheetPath: "products/album-psd/design-material/fire",                     downloadPath: "products/album-psd/design-material/fire/fire.zip" },
+      { id: "dm-06", title: "Gift PNG",                    price: 149, sheetExt: "png", sheetPath: "products/album-psd/design-material/gift",                     downloadPath: "products/album-psd/design-material/gift/gift.zip" },
+      { id: "dm-07", title: "Islamic Wedding PNG",         price: 199, sheetExt: "png", sheetPath: "products/album-psd/design-material/islamic-wedding",          downloadPath: "products/album-psd/design-material/islamic-wedding/islamic-wedding.zip" },
+      { id: "dm-08", title: "Light Effects PNG",           price: 199, sheetExt: "png", sheetPath: "products/album-psd/design-material/light-effects",            downloadPath: "products/album-psd/design-material/light-effects/light-effects.zip" },
+      { id: "dm-09", title: "Love Designs PNG",            price: 149, sheetExt: "png", sheetPath: "products/album-psd/design-material/love-designs",             downloadPath: "products/album-psd/design-material/love-designs/love-designs.zip" },
+      { id: "dm-10", title: "Newborn Baby Wishes PNG",     price: 149, sheetExt: "png", sheetPath: "products/album-psd/design-material/newbord-babywishes",       downloadPath: "products/album-psd/design-material/newbord-babywishes/newbord-babywishes.zip" },
+      { id: "dm-11", title: "Photo Mask PNG",              price: 199, sheetExt: "png", sheetPath: "products/album-psd/design-material/photo-mask",               downloadPath: "products/album-psd/design-material/photo-mask/photo-mask.zip" },
+      { id: "dm-12", title: "Photo Overlay PNG",           price: 199, sheetExt: "png", sheetPath: "products/album-psd/design-material/photo-overlay",            downloadPath: "products/album-psd/design-material/photo-overlay/photo-overlay.zip" },
+      { id: "dm-13", title: "Sky Background PNG",          price: 149, sheetExt: "png", sheetPath: "products/album-psd/design-material/sky-background",           downloadPath: "products/album-psd/design-material/sky-background/sky-background.zip" },
+      { id: "dm-14", title: "Studio Background PNG",       price: 199, sheetExt: "png", sheetPath: "products/album-psd/design-material/studio-background",        downloadPath: "products/album-psd/design-material/studio-background/studio-background.zip" },
+      { id: "dm-15", title: "Water Drop PNG",              price: 149, sheetExt: "png", sheetPath: "products/album-psd/design-material/water-drop",               downloadPath: "products/album-psd/design-material/water-drop/water-drop.zip" },
+      { id: "dm-16", title: "Wedding Album Background PNG",price: 199, sheetExt: "png", sheetPath: "products/album-psd/design-material/wedding-albumb-background", downloadPath: "products/album-psd/design-material/wedding-albumb-background/wedding-albumb-background.zip" },
+      { id: "dm-17", title: "Wedding Album Frame PNG",     price: 199, sheetExt: "png", sheetPath: "products/album-psd/design-material/wedding-albumb-frame",     downloadPath: "products/album-psd/design-material/wedding-albumb-frame/wedding-albumb-frame.zip" },
+      { id: "dm-18", title: "Wedding Album PNG",           price: 249, sheetExt: "png", sheetPath: "products/album-psd/design-material/wedding-albumb",           downloadPath: "products/album-psd/design-material/wedding-albumb/wedding-albumb.zip" },
+      { id: "dm-19", title: "Wedding Quotes PNG",          price: 149, sheetExt: "png", sheetPath: "products/album-psd/design-material/wedding-quotes",           downloadPath: "products/album-psd/design-material/wedding-quotes/wedding-quotes.zip" },
+      { id: "dm-20", title: "Wedding Text PNG",            price: 149, sheetExt: "png", sheetPath: "products/album-psd/design-material/wedding-text",             downloadPath: "products/album-psd/design-material/wedding-text/wedding-text.zip" },
     ],
   },
 ];

@@ -6,7 +6,7 @@ import Image from "next/image";
 import Navbar from "../../../../../components/Navbar";
 import Footer from "../../../../../components/Footer";
 import { useCart } from "../../../../../context/CartContext";
-import { albumPsdCategories, getProductCoverKey } from "../../data";
+import { albumPsdCategories, getProductCoverKey, getSheetKey } from "../../data";
 import { getImageUrl } from "../../../../../utils/s3-media";
 import { ArrowLeft, ShoppingCart, Check, ImageIcon, ZoomIn } from "lucide-react";
 
@@ -115,9 +115,7 @@ export default function AlbumProductDetailPage({ params }: Props) {
 
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
             {sheetNumbers.map((num) => {
-              const sheetKey = product.sheetPath
-                ? `${product.sheetPath}/sheet-${String(num).padStart(2, "0")}.jpg`
-                : null;
+              const sheetKey = getSheetKey(product, num);
               return (
                 <div
                   key={num}
@@ -161,9 +159,9 @@ export default function AlbumProductDetailPage({ params }: Props) {
             className="relative w-[92vw] max-w-4xl aspect-[4/3] bg-gray-900 overflow-hidden"
             onClick={(e) => e.stopPropagation()}
           >
-            {product.sheetPath ? (
+            {product.sheetPath && lightbox !== null ? (
               <Image
-                src={getImageUrl(`${product.sheetPath}/sheet-${String(lightbox).padStart(2, "0")}.jpg`)}
+                src={getImageUrl(getSheetKey(product, lightbox)!)}
                 alt={`Sheet ${lightbox}`}
                 fill
                 className="object-contain"

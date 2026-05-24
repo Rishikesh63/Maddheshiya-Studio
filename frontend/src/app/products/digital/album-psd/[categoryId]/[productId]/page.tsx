@@ -6,7 +6,7 @@ import Image from "next/image";
 import Navbar from "../../../../../components/Navbar";
 import Footer from "../../../../../components/Footer";
 import { useCart } from "../../../../../context/CartContext";
-import { albumPsdCategories } from "../../data";
+import { albumPsdCategories, getProductCoverKey } from "../../data";
 import { getImageUrl } from "../../../../../utils/s3-media";
 import { ArrowLeft, ShoppingCart, Check, ImageIcon, ZoomIn } from "lucide-react";
 
@@ -21,6 +21,8 @@ export default function AlbumProductDetailPage({ params }: Props) {
   const cat = albumPsdCategories.find((c) => c.id === categoryId);
   const product = cat?.products.find((p) => p.id === productId);
 
+  const coverKey = product ? getProductCoverKey(product) : null;
+
   const handleAdd = useCallback(() => {
     if (!product || !cat) return;
     addItem({
@@ -28,11 +30,11 @@ export default function AlbumProductDetailPage({ params }: Props) {
       title: product.title,
       category: cat.label,
       price: product.price,
-      image: product.image,
+      image: coverKey,
     });
     setAdded(true);
     setTimeout(() => setAdded(false), 1800);
-  }, [addItem, product, cat]);
+  }, [addItem, product, cat, coverKey]);
 
   if (!cat || !product) {
     return (

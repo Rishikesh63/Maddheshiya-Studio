@@ -6,7 +6,7 @@ import Image from "next/image";
 import Navbar from "../../../components/Navbar";
 import Footer from "../../../components/Footer";
 import { useCart } from "../../../context/CartContext";
-import { albumPsdCategories, type PsdProduct, type PsdCategory } from "./data";
+import { albumPsdCategories, getProductCoverKey, type PsdProduct, type PsdCategory } from "./data";
 import { getImageUrl } from "../../../utils/s3-media";
 import { ArrowLeft, ShoppingCart, Check, ImageIcon } from "lucide-react";
 
@@ -22,18 +22,20 @@ function ProductCard({
   const { addItem } = useCart();
   const [added, setAdded] = useState(false);
 
+  const coverKey = getProductCoverKey(product);
+
   const handleAdd = useCallback(() => {
     addItem({
       id: product.id,
       title: product.title,
       category: categoryLabel,
       price: product.price,
-      image: product.image,
+      image: coverKey,
       downloadPath: product.downloadPath || null,
     });
     setAdded(true);
     setTimeout(() => setAdded(false), 1800);
-  }, [addItem, product, categoryLabel]);
+  }, [addItem, product, categoryLabel, coverKey]);
 
   return (
     <div className="group bg-white border border-gray-200 flex flex-col overflow-hidden">
@@ -42,9 +44,9 @@ function ProductCard({
         href={`/products/digital/album-psd/${categoryId}/${product.id}`}
         className="relative aspect-[4/3] bg-gray-100 overflow-hidden block"
       >
-        {product.image ? (
+        {coverKey ? (
           <Image
-            src={getImageUrl(product.image)}
+            src={getImageUrl(coverKey)}
             alt={product.title}
             fill
             className="object-cover group-hover:scale-105 transition-transform duration-500"

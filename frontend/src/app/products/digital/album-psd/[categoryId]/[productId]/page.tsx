@@ -140,14 +140,13 @@ export default function AlbumProductDetailPage({ params }: Props) {
   const { addItem } = useCart();
   const [added, setAdded] = useState(false);
   const [lightbox, setLightbox] = useState<number | null>(null);
-  const [loadedCount, setLoadedCount] = useState(0);
 
   const cat = albumPsdCategories.find((c) => c.id === categoryId);
   const product = cat?.products.find((p) => p.id === productId);
   const coverKey = product ? getProductCoverKey(product) : null;
 
-  const handleTileLoad = useCallback(() => setLoadedCount((c) => c + 1), []);
-  // onFail: no-op — tile just hides itself, no count change needed
+  // no-ops: tiles hide themselves on failure, no count tracking needed
+  const handleTileLoad = useCallback(() => {}, []);
   const handleTileFail = useCallback(() => {}, []);
 
   const handleAdd = useCallback(() => {
@@ -205,9 +204,9 @@ export default function AlbumProductDetailPage({ params }: Props) {
                 {product.title}
               </h1>
               <p className="text-[#2eaa2e] text-xl font-semibold mb-2">₹{product.price}.00</p>
-              {loadedCount > 0 && (
+              {product.sheets && (
                 <p className="text-xs text-white/40 tracking-wider">
-                  {loadedCount} {isPng ? "PNG Files" : "PSD Sheets"} included
+                  {product.sheets} {isPng ? "PNG Files" : "PSD Sheets"} included
                 </p>
               )}
             </div>
@@ -238,9 +237,9 @@ export default function AlbumProductDetailPage({ params }: Props) {
             style={{ fontFamily: "var(--font-cormorant)" }}
           >
             {isPng ? "All Files" : "All Sheets"}
-            {loadedCount > 0 && (
+            {product.sheets && (
               <span className="text-lg text-white/40 ml-2">
-                — {loadedCount} {isPng ? "PNG" : "Pages"}
+                — {product.sheets} {isPng ? "PNG" : "Pages"}
               </span>
             )}
           </h2>
@@ -251,7 +250,7 @@ export default function AlbumProductDetailPage({ params }: Props) {
                 key={num}
                 product={product}
                 num={num}
-                totalSheets={loadedCount || probeLimit}
+                totalSheets={probeLimit}
                 onClick={() => setLightbox(num)}
                 onLoad={handleTileLoad}
                 onFail={handleTileFail}
@@ -284,7 +283,7 @@ export default function AlbumProductDetailPage({ params }: Props) {
             <LightboxImage product={product} num={lightbox} />
 
             <span className="absolute bottom-3 left-1/2 -translate-x-1/2 bg-black/70 text-white/60 text-xs px-3 py-1 tracking-widest">
-              {lightbox} / {loadedCount || probeLimit}
+              {lightbox} / {probeLimit}
             </span>
             <button
               className="absolute top-3 right-3 bg-black/60 text-white/70 hover:text-white w-8 h-8 flex items-center justify-center text-lg"
@@ -300,7 +299,7 @@ export default function AlbumProductDetailPage({ params }: Props) {
                 ‹
               </button>
             )}
-            {lightbox < (loadedCount || probeLimit) && (
+            {lightbox < probeLimit && (
               <button
                 className="absolute right-3 top-1/2 -translate-y-1/2 bg-black/60 text-white/70 hover:text-white w-10 h-10 flex items-center justify-center text-2xl"
                 onClick={() => setLightbox(lightbox + 1)}

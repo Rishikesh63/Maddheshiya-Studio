@@ -2,6 +2,7 @@
 
 import { useState, useCallback } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import Navbar from "../../../components/Navbar";
 import Footer from "../../../components/Footer";
 import { useCart } from "../../../context/CartContext";
@@ -61,12 +62,13 @@ function ProductCard({
         className="relative aspect-[4/3] bg-gray-100 overflow-hidden block"
       >
         {currentCover && coverAttempt < 2 ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
+          <Image
             key={currentCover}
             src={getImageUrl(currentCover)}
             alt={product.title}
-            className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+            fill
+            unoptimized
+            className="object-cover group-hover:scale-105 transition-transform duration-500"
             onError={handleCoverError}
           />
         ) : (

@@ -2,6 +2,7 @@
 
 import { useState, useCallback, use } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import Navbar from "../../../../../components/Navbar";
 import Footer from "../../../../../components/Footer";
 import { useCart } from "../../../../../context/CartContext";
@@ -76,12 +77,13 @@ function SheetTile({
       onClick={onClick}
     >
       {currentKey && (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img
+        <Image
           key={currentKey}
           src={getImageUrl(currentKey)}
           alt={`Sheet ${num}`}
-          className="absolute inset-0 w-full h-full object-contain"
+          fill
+          unoptimized
+          className="object-contain"
           onLoad={onLoad}
           onError={handleError}
         />
@@ -119,12 +121,13 @@ function LightboxImage({ product, num }: { product: PsdProduct; num: number }) {
   }
 
   return (
-    // eslint-disable-next-line @next/next/no-img-element
-    <img
+    <Image
       key={currentKey}
       src={getImageUrl(currentKey)}
       alt={`Sheet ${num}`}
-      className="absolute inset-0 w-full h-full object-contain"
+      fill
+      unoptimized
+      className="object-contain"
       onError={handleError}
     />
   );
@@ -170,8 +173,8 @@ export default function AlbumProductDetailPage({ params }: Props) {
   }
 
   const isPng = product.sheetExt === "png";
-  // probe up to product.sheets if set, otherwise scan up to 100
-  const probeLimit = product.sheets ?? 100;
+  // probe up to product.sheets if set, otherwise scan up to 50
+  const probeLimit = product.sheets ?? 50;
   const sheetNumbers = Array.from({ length: probeLimit }, (_, i) => i + 1);
 
   return (

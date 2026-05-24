@@ -82,7 +82,7 @@ function SheetTile({
           src={getImageUrl(currentKey)}
           alt={`Sheet ${num}`}
           fill
-          unoptimized
+          sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, 20vw"
           className="object-contain"
           onLoad={onLoad}
           onError={handleError}
@@ -126,7 +126,8 @@ function LightboxImage({ product, num }: { product: PsdProduct; num: number }) {
       src={getImageUrl(currentKey)}
       alt={`Sheet ${num}`}
       fill
-      unoptimized
+      sizes="92vw"
+      priority
       className="object-contain"
       onError={handleError}
     />

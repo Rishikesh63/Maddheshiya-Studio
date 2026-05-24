@@ -67,7 +67,7 @@ function ProductCard({
             src={getImageUrl(currentCover)}
             alt={product.title}
             fill
-            unoptimized
+            sizes="(max-width: 640px) 50vw, (max-width: 1280px) 25vw, 20vw"
             className="object-cover group-hover:scale-105 transition-transform duration-500"
             onError={handleCoverError}
           />

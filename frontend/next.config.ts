@@ -3,6 +3,9 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   images: {
     domains: ['images.unsplash.com'],
+    minimumCacheTTL: 3600,          // cache optimised images for 1 hour
+    deviceSizes: [640, 1080, 1920], // only generate 3 sizes instead of 7
+    imageSizes: [64, 128, 256, 384],
     remotePatterns: [
       {
         protocol: 'https',

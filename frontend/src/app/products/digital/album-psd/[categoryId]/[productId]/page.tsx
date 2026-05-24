@@ -63,17 +63,7 @@ function SheetTile({
 
   return (
     <div
-      className="group relative aspect-[4/3] overflow-hidden cursor-pointer border border-gray-700 hover:border-[var(--gold)]/50 transition-colors"
-      style={{
-        backgroundImage:
-          "linear-gradient(45deg,#2a2a2a 25%,transparent 25%)," +
-          "linear-gradient(-45deg,#2a2a2a 25%,transparent 25%)," +
-          "linear-gradient(45deg,transparent 75%,#2a2a2a 75%)," +
-          "linear-gradient(-45deg,transparent 75%,#2a2a2a 75%)",
-        backgroundSize: "16px 16px",
-        backgroundPosition: "0 0,0 8px,8px -8px,-8px 0",
-        backgroundColor: "#1a1a1a",
-      }}
+      className="group relative aspect-[4/3] overflow-hidden cursor-pointer hover:ring-1 hover:ring-[var(--gold)]/50 transition-all"
       onClick={onClick}
     >
       {currentKey && (
@@ -268,16 +258,6 @@ export default function AlbumProductDetailPage({ params }: Props) {
         >
           <div
             className="relative w-[92vw] max-w-4xl aspect-[4/3] overflow-hidden"
-            style={{
-              backgroundImage:
-                "linear-gradient(45deg,#2a2a2a 25%,transparent 25%)," +
-                "linear-gradient(-45deg,#2a2a2a 25%,transparent 25%)," +
-                "linear-gradient(45deg,transparent 75%,#2a2a2a 75%)," +
-                "linear-gradient(-45deg,transparent 75%,#2a2a2a 75%)",
-              backgroundSize: "24px 24px",
-              backgroundPosition: "0 0,0 12px,12px -12px,-12px 0",
-              backgroundColor: "#111",
-            }}
             onClick={(e) => e.stopPropagation()}
           >
             <LightboxImage product={product} num={lightbox} />

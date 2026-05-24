@@ -11,7 +11,7 @@ import { ArrowLeft, ShoppingCart, Check, ImageIcon, ZoomIn } from "lucide-react"
 
 type Props = { params: Promise<{ categoryId: string; productId: string }> };
 
-/** Swap extension: jpg→png, png→jpg */
+/** Swap extension: jpg ↔ png */
 function altKey(key: string | null): string | null {
   if (!key) return null;
   if (key.endsWith(".jpg")) return key.slice(0, -4) + ".png";
@@ -20,32 +20,45 @@ function altKey(key: string | null): string | null {
 }
 
 /**
- * SheetTile — tries primary extension first, then the alternate extension,
- * then falls back to the placeholder icon.
- * Supports mixed JPG + PNG inside the same product folder.
+ * SheetTile
+ * - Tries primary extension (jpg or png based on sheetExt)
+ * - On failure → tries the other extension automatically
+ * - If both fail → returns null (tile is hidden, no placeholder shown)
+ * - Supports fully mixed JPG + PNG in the same product folder
  */
 function SheetTile({
   product,
   num,
   totalSheets,
   onClick,
+  onLoad,
+  onFail,
 }: {
   product: PsdProduct;
   num: number;
   totalSheets: number;
   onClick: () => void;
+  onLoad: () => void;
+  onFail: () => void;
 }) {
-  // 0 = try primary  |  1 = try alternate  |  2 = both failed → placeholder
+  // 0 = trying primary | 1 = trying alternate | 2 = both failed → hide
   const [attempt, setAttempt] = useState<0 | 1 | 2>(0);
 
-  const primaryKey = getSheetKey(product, num);           // e.g. sheet-01.png
-  const fallbackKey = altKey(primaryKey);                 // e.g. sheet-01.jpg
+  const primaryKey = getSheetKey(product, num);
+  const fallbackKey = altKey(primaryKey);
   const currentKey = attempt === 0 ? primaryKey : fallbackKey;
 
   const handleError = () => {
-    if (attempt === 0) setAttempt(1);   // try the other extension
-    else setAttempt(2);                  // both failed — show placeholder
+    if (attempt === 0) {
+      setAttempt(1); // try alternate extension
+    } else {
+      setAttempt(2); // both failed — hide this tile
+      onFail();
+    }
   };
+
+  // Both extensions failed — render nothing
+  if (attempt >= 2) return null;
 
   return (
     <div
@@ -62,20 +75,16 @@ function SheetTile({
       }}
       onClick={onClick}
     >
-      {currentKey && attempt < 2 ? (
+      {currentKey && (
         // eslint-disable-next-line @next/next/no-img-element
         <img
           key={currentKey}
           src={getImageUrl(currentKey)}
           alt={`Sheet ${num}`}
           className="absolute inset-0 w-full h-full object-contain"
+          onLoad={onLoad}
           onError={handleError}
         />
-      ) : (
-        <div className="absolute inset-0 flex flex-col items-center justify-center gap-1">
-          <ImageIcon size={22} className="text-gray-600" />
-          <span className="text-[9px] text-gray-500 tracking-wider">Sheet {num}</span>
-        </div>
       )}
 
       <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
@@ -88,9 +97,7 @@ function SheetTile({
   );
 }
 
-/**
- * LightboxImage — same two-step fallback for the full-size lightbox.
- */
+/** LightboxImage — same two-step JPG ↔ PNG fallback */
 function LightboxImage({ product, num }: { product: PsdProduct; num: number }) {
   const [attempt, setAttempt] = useState<0 | 1 | 2>(0);
 
@@ -129,10 +136,15 @@ export default function AlbumProductDetailPage({ params }: Props) {
   const { addItem } = useCart();
   const [added, setAdded] = useState(false);
   const [lightbox, setLightbox] = useState<number | null>(null);
+  const [loadedCount, setLoadedCount] = useState(0);
 
   const cat = albumPsdCategories.find((c) => c.id === categoryId);
   const product = cat?.products.find((p) => p.id === productId);
   const coverKey = product ? getProductCoverKey(product) : null;
+
+  const handleTileLoad = useCallback(() => setLoadedCount((c) => c + 1), []);
+  // onFail: no-op — tile just hides itself, no count change needed
+  const handleTileFail = useCallback(() => {}, []);
 
   const handleAdd = useCallback(() => {
     if (!product || !cat) return;
@@ -158,8 +170,9 @@ export default function AlbumProductDetailPage({ params }: Props) {
   }
 
   const isPng = product.sheetExt === "png";
-  const totalSheets = product.sheets ?? 20;
-  const sheetNumbers = Array.from({ length: totalSheets }, (_, i) => i + 1);
+  // probe up to product.sheets if set, otherwise scan up to 100
+  const probeLimit = product.sheets ?? 100;
+  const sheetNumbers = Array.from({ length: probeLimit }, (_, i) => i + 1);
 
   return (
     <div className="bg-[var(--black)]">
@@ -188,9 +201,9 @@ export default function AlbumProductDetailPage({ params }: Props) {
                 {product.title}
               </h1>
               <p className="text-[#2eaa2e] text-xl font-semibold mb-2">₹{product.price}.00</p>
-              {product.sheets && (
+              {loadedCount > 0 && (
                 <p className="text-xs text-white/40 tracking-wider">
-                  {product.sheets} {isPng ? "PNG Files" : "PSD Sheets"} included
+                  {loadedCount} {isPng ? "PNG Files" : "PSD Sheets"} included
                 </p>
               )}
             </div>
@@ -220,7 +233,12 @@ export default function AlbumProductDetailPage({ params }: Props) {
             className="text-2xl font-light text-white mb-6 pb-3 border-b border-[var(--gold)]/10"
             style={{ fontFamily: "var(--font-cormorant)" }}
           >
-            {isPng ? "All Files" : "All Sheets"} — {totalSheets} {isPng ? "PNG" : "Pages"}
+            {isPng ? "All Files" : "All Sheets"}
+            {loadedCount > 0 && (
+              <span className="text-lg text-white/40 ml-2">
+                — {loadedCount} {isPng ? "PNG" : "Pages"}
+              </span>
+            )}
           </h2>
 
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
@@ -229,8 +247,10 @@ export default function AlbumProductDetailPage({ params }: Props) {
                 key={num}
                 product={product}
                 num={num}
-                totalSheets={totalSheets}
+                totalSheets={loadedCount || probeLimit}
                 onClick={() => setLightbox(num)}
+                onLoad={handleTileLoad}
+                onFail={handleTileFail}
               />
             ))}
           </div>
@@ -260,7 +280,7 @@ export default function AlbumProductDetailPage({ params }: Props) {
             <LightboxImage product={product} num={lightbox} />
 
             <span className="absolute bottom-3 left-1/2 -translate-x-1/2 bg-black/70 text-white/60 text-xs px-3 py-1 tracking-widest">
-              {lightbox} / {totalSheets}
+              {lightbox} / {loadedCount || probeLimit}
             </span>
             <button
               className="absolute top-3 right-3 bg-black/60 text-white/70 hover:text-white w-8 h-8 flex items-center justify-center text-lg"
@@ -276,7 +296,7 @@ export default function AlbumProductDetailPage({ params }: Props) {
                 ‹
               </button>
             )}
-            {lightbox < totalSheets && (
+            {lightbox < (loadedCount || probeLimit) && (
               <button
                 className="absolute right-3 top-1/2 -translate-y-1/2 bg-black/60 text-white/70 hover:text-white w-10 h-10 flex items-center justify-center text-2xl"
                 onClick={() => setLightbox(lightbox + 1)}

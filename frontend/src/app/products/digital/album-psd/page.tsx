@@ -2,13 +2,20 @@
 
 import { useState, useCallback } from "react";
 import Link from "next/link";
-import Image from "next/image";
 import Navbar from "../../../components/Navbar";
 import Footer from "../../../components/Footer";
 import { useCart } from "../../../context/CartContext";
 import { albumPsdCategories, getProductCoverKey, type PsdProduct, type PsdCategory } from "./data";
 import { getImageUrl } from "../../../utils/s3-media";
 import { ArrowLeft, ShoppingCart, Check, ImageIcon } from "lucide-react";
+
+/** Swap jpg↔png for cover fallback */
+function altCoverKey(key: string | null): string | null {
+  if (!key) return null;
+  if (key.endsWith(".jpg")) return key.slice(0, -4) + ".png";
+  if (key.endsWith(".png")) return key.slice(0, -4) + ".jpg";
+  return null;
+}
 
 function ProductCard({
   product,
@@ -21,8 +28,17 @@ function ProductCard({
 }) {
   const { addItem } = useCart();
   const [added, setAdded] = useState(false);
+  // 0 = try primary | 1 = try alternate | 2 = both failed → placeholder
+  const [coverAttempt, setCoverAttempt] = useState<0 | 1 | 2>(0);
 
-  const coverKey = getProductCoverKey(product);
+  const primaryCover = getProductCoverKey(product);
+  const fallbackCover = altCoverKey(primaryCover);
+  const currentCover = coverAttempt === 0 ? primaryCover : fallbackCover;
+
+  const handleCoverError = () => {
+    if (coverAttempt === 0) setCoverAttempt(1);
+    else setCoverAttempt(2);
+  };
 
   const handleAdd = useCallback(() => {
     addItem({
@@ -30,12 +46,12 @@ function ProductCard({
       title: product.title,
       category: categoryLabel,
       price: product.price,
-      image: coverKey,
+      image: primaryCover,
       downloadPath: product.downloadPath || null,
     });
     setAdded(true);
     setTimeout(() => setAdded(false), 1800);
-  }, [addItem, product, categoryLabel, coverKey]);
+  }, [addItem, product, categoryLabel, primaryCover]);
 
   return (
     <div className="group bg-white border border-gray-200 flex flex-col overflow-hidden">
@@ -44,12 +60,14 @@ function ProductCard({
         href={`/products/digital/album-psd/${categoryId}/${product.id}`}
         className="relative aspect-[4/3] bg-gray-100 overflow-hidden block"
       >
-        {coverKey ? (
-          <Image
-            src={getImageUrl(coverKey)}
+        {currentCover && coverAttempt < 2 ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            key={currentCover}
+            src={getImageUrl(currentCover)}
             alt={product.title}
-            fill
-            className="object-cover group-hover:scale-105 transition-transform duration-500"
+            className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+            onError={handleCoverError}
           />
         ) : (
           <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-gray-50">

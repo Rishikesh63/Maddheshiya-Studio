@@ -42,7 +42,6 @@ function SheetTile({
   const primaryKey = getSheetKey(product, num);           // e.g. sheet-01.png
   const fallbackKey = altKey(primaryKey);                 // e.g. sheet-01.jpg
   const currentKey = attempt === 0 ? primaryKey : fallbackKey;
-  const isPng = product.sheetExt === "png";
 
   const handleError = () => {
     if (attempt === 0) setAttempt(1);   // try the other extension

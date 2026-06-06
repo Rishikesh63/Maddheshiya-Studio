@@ -24,11 +24,20 @@ const videographyLinks = [
   { href: "/videography/events", label: "Event Videography" },
 ];
 
-const productsLinks = [
-  { href: "/products/digital/invitation-video", label: "Invitation Videos" },
-  { href: "/products/digital/wedding-highlight", label: "Wedding Highlight" },
+const digitalProductLinks = [
   { href: "/products/digital/album-psd", label: "Album PSD" },
+  { href: "/products/digital/invitation-video", label: "Invitation Video" },
+  { href: "/products/digital/wedding-highlight", label: "Wedding Highlight" },
+  { href: "/products/digital/prewedding-highlight", label: "Pre-Wedding Highlight" },
+  { href: "/products/digital/ring-ceremony-highlight", label: "Ring Ceremony Highlight" },
+  { href: "/products/digital/wedding-title", label: "Wedding Title" },
+  { href: "/products/digital/video-logo", label: "Video Logo" },
+  { href: "/products/digital/birthday-highlight", label: "Birthday Highlight" },
+];
+
+const printingProductLinks = [
   { href: "/products/printing/id-cards", label: "ID Cards" },
+  { href: "/products/printing/tshirt-printing", label: "T-Shirt Printing" },
   { href: "/products/printing/photo-framing", label: "Photo Framing" },
 ];
 
@@ -53,7 +62,7 @@ export default function Footer() {
     <footer className="bg-[#080808] border-t border-[var(--gold)]/10 pt-20 pb-8">
       <div className="max-w-7xl mx-auto px-6">
         {/* Main grid */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-10 mb-16">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-10 mb-16">
           {/* Brand */}
           <div className="col-span-2 md:col-span-1">
             <Link href="/" className="block mb-5">
@@ -121,11 +130,29 @@ export default function Footer() {
                 </li>
               ))}
             </ul>
-            <h4 className="text-[10px] tracking-[0.3em] uppercase text-[var(--gold)]/60 mb-5 mt-8">
+          </div>
+
+          {/* Products */}
+          <div>
+            <h4 className="text-[10px] tracking-[0.3em] uppercase text-[var(--gold)]/60 mb-5">
               Products
             </h4>
+            <p className="text-[9px] tracking-[0.25em] uppercase text-[var(--gold)]/40 mb-3">Digital</p>
+            <ul className="space-y-3 mb-6">
+              {digitalProductLinks.map((l) => (
+                <li key={l.href}>
+                  <Link
+                    href={l.href}
+                    className="text-xs text-white/40 hover:text-[var(--gold)]/80 transition-colors duration-200"
+                  >
+                    {l.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+            <p className="text-[9px] tracking-[0.25em] uppercase text-[var(--gold)]/40 mb-3">Printing</p>
             <ul className="space-y-3">
-              {productsLinks.map((l) => (
+              {printingProductLinks.map((l) => (
                 <li key={l.href}>
                   <Link
                     href={l.href}

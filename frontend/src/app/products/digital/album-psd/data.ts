@@ -88,7 +88,7 @@ export const albumPsdCategories: PsdCategory[] = [
     id: "design-material",
     label: "Design Material",
     products: [
-      { id: "dm-01", title: "Album Typography",            price: 199, sheetExt: "png", sheetPath: "products/album-psd/design-material/albumb-typography",        downloadPath: "products/album-psd/design-material/albumb-typography/albumb-typography.zip" },
+      { id: "dm-01", title: "Album Typography",            price: 49, sheetExt: "png", sheetPath: "products/album-psd/design-material/albumb-typography",        downloadPath: "products/album-psd/design-material/albumb-typography/albumb-typography.zip" },
       { id: "dm-02", title: "Birds PNG",                   price: 149, sheetExt: "png", sheetPath: "products/album-psd/design-material/birds",                    downloadPath: "products/album-psd/design-material/birds/birds.zip" },
       { id: "dm-03", title: "Birthday Wishes PNG",         price: 149, sheetExt: "png", sheetPath: "products/album-psd/design-material/birthday-wishes",          downloadPath: "products/album-psd/design-material/birthday-wishes/birthday-wishes.zip" },
       { id: "dm-04", title: "Falling Leaves PNG",          price: 149, sheetExt: "png", sheetPath: "products/album-psd/design-material/falling-leaves",           downloadPath: "products/album-psd/design-material/falling-leaves/falling-leaves.zip" },

@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion";
 import Link from "next/link";
-import { Film, FrameIcon, Wand2, CreditCard, Shirt, Clapperboard, Star, ArrowRight } from "lucide-react";
+import { Film, FrameIcon, Wand2, CreditCard, Shirt, Clapperboard, Star, ArrowRight, Gem, Type, PlayCircle, PartyPopper } from "lucide-react";
 
 const products = [
   {
@@ -22,6 +22,30 @@ const products = [
     label: "Pre-Wedding Highlight",
     desc: "Romantic cinematic film of your pre-wedding shoot",
     href: "/products/digital/prewedding-highlight",
+  },
+  {
+    icon: Gem,
+    label: "Ring Ceremony Highlight",
+    desc: "Elegant short film of your ring exchange ceremony",
+    href: "/products/digital/ring-ceremony-highlight",
+  },
+  {
+    icon: Type,
+    label: "Wedding Title",
+    desc: "Cinematic title card for wedding films",
+    href: "/products/digital/wedding-title",
+  },
+  {
+    icon: PlayCircle,
+    label: "Video Logo",
+    desc: "Animated logo intro for your videos",
+    href: "/products/digital/video-logo",
+  },
+  {
+    icon: PartyPopper,
+    label: "Birthday Highlight",
+    desc: "Fun cinematic birthday event film",
+    href: "/products/digital/birthday-highlight",
   },
   {
     icon: Wand2,

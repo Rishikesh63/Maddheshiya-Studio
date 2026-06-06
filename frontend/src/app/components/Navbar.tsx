@@ -24,15 +24,19 @@ const videographyLinks = [
 
 const productLinks = [
   { group: "Digital", items: [
-    { href: "/products/digital/album-psd", label: "Album PSD" },
-    { href: "/products/digital/invitation-video", label: "Invitation Video" },
-    { href: "/products/digital/wedding-highlight", label: "Wedding Highlight" },
-    { href: "/products/digital/prewedding-highlight", label: "Pre-Wedding Highlight" },
+    { href: "/products/digital/album-psd",              label: "Album PSD" },
+    { href: "/products/digital/invitation-video",        label: "Invitation Video" },
+    { href: "/products/digital/wedding-highlight",       label: "Wedding Highlight" },
+    { href: "/products/digital/prewedding-highlight",    label: "Pre-Wedding Highlight" },
+    { href: "/products/digital/ring-ceremony-highlight", label: "Ring Ceremony Highlight" },
+    { href: "/products/digital/wedding-title",           label: "Wedding Title" },
+    { href: "/products/digital/video-logo",              label: "Video Logo" },
+    { href: "/products/digital/birthday-highlight",      label: "Birthday Highlight" },
   ]},
   { group: "Printing", items: [
-    { href: "/products/printing/id-cards", label: "ID Cards" },
+    { href: "/products/printing/id-cards",        label: "ID Cards" },
     { href: "/products/printing/tshirt-printing", label: "T-Shirt Printing" },
-    { href: "/products/printing/photo-framing", label: "Photo Framing" },
+    { href: "/products/printing/photo-framing",   label: "Photo Framing" },
   ]},
 ];
 

@@ -3,7 +3,7 @@ services:
     name: maddheshiyaStudio
     env: python
     rootDir: backend 
-    buildCommand: "poetry install --no-root"
+    buildCommand: "poetry install --no-root && poetry run python manage.py migrate"
     startCommand: "poetry run waitress-serve --port=$PORT maddheshiyaStudio.wsgi:application"
     envVars:
       - key: SECRET_KEY

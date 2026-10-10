@@ -312,15 +312,18 @@ ACCOUNT_USER_MODEL_USERNAME_FIELD = 'username'
 LOGIN_REDIRECT_URL = "/"
 LOGOUT_REDIRECT_URL = "/"
 
-CSRF_TRUSTED_ORIGINS = env.list(
+_CSRF_TRUSTED_ORIGINS = env.list(
     'CSRF_TRUSTED_ORIGINS',
-    default=[
-        'https://maddheshiya-studio.onrender.com',
-        'https://maddheshiya-studio.vercel.app',
-        'https://madhesiyastudio.com',
-        'https://www.madhesiyastudio.com',
-    ],
+    default=[],
 )
+# Always include the backend's own domain so Django admin forms work
+CSRF_TRUSTED_ORIGINS = list({
+    'https://maddheshiya-studio.onrender.com',
+    'https://maddheshiya-studio.vercel.app',
+    'https://madhesiyastudio.com',
+    'https://www.madhesiyastudio.com',
+    *_CSRF_TRUSTED_ORIGINS,
+})
 
 CORS_ALLOWED_ORIGINS = env.list(
     'CORS_ALLOWED_ORIGINS',

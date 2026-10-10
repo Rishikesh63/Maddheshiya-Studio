@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import ProductCategory, Product, ProductSample, ProductFeature
+from .models import ProductCategory, Product, ProductSample, ProductFeature, ProductReview
 
 
 class ProductCategorySerializer(serializers.ModelSerializer):
@@ -59,3 +59,23 @@ class ProductDetailSerializer(serializers.ModelSerializer):
         if obj.customization_options:
             return [o.strip() for o in obj.customization_options.split(',') if o.strip()]
         return []
+
+
+class AdminProductWriteSerializer(serializers.ModelSerializer):
+    """Used by admin to create/update products."""
+    class Meta:
+        model = Product
+        fields = [
+            'id', 'name', 'slug', 'category', 'description', 'short_description',
+            'thumbnail', 'hero_image', 'price', 'discount_price', 'status', 'stock',
+            'delivery_timeframe', 'customization_available', 'customization_options',
+            'featured', 'order',
+        ]
+        read_only_fields = ['id', 'slug']
+
+
+class AdminProductCategoryWriteSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ProductCategory
+        fields = ['id', 'name', 'slug', 'category_type', 'description', 'icon', 'image', 'order', 'is_active']
+        read_only_fields = ['id', 'slug']

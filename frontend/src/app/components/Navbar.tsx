@@ -202,13 +202,21 @@ export default function Navbar() {
                 <span className="max-w-[100px] truncate">{user.name || user.username}</span>
                 <ChevronDown size={10} className="opacity-50 group-hover:rotate-180 transition-transform duration-200" />
               </button>
-              <div className="absolute right-0 top-full mt-2 w-40 bg-[#111111] border border-[var(--gold)]/20 shadow-2xl shadow-black/60 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-150 z-50">
+              <div className="absolute right-0 top-full mt-2 w-44 bg-[#111111] border border-[var(--gold)]/20 shadow-2xl shadow-black/60 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-150 z-50">
                 <Link
                   href="/profile"
                   className="block px-4 py-3 text-[10px] tracking-widest uppercase text-white/60 hover:text-[var(--gold)] hover:bg-[var(--gold)]/5 transition-colors"
                 >
                   My Profile
                 </Link>
+                {user.is_admin_user && (
+                  <Link
+                    href="/admin"
+                    className="block px-4 py-3 text-[10px] tracking-widest uppercase text-[var(--gold)]/70 hover:text-[var(--gold)] hover:bg-[var(--gold)]/5 transition-colors border-t border-white/5"
+                  >
+                    Admin Panel
+                  </Link>
+                )}
                 <button
                   onClick={logout}
                   className="w-full text-left px-4 py-3 text-[10px] tracking-widest uppercase text-white/40 hover:text-red-400 hover:bg-red-400/5 transition-colors border-t border-white/5"
@@ -360,6 +368,14 @@ export default function Navbar() {
             >
               Book Now
             </Link>
+            {user?.is_admin_user && (
+              <Link
+                href="/admin"
+                className="w-full py-3 text-center text-xs tracking-widest uppercase border border-[var(--gold)]/30 text-[var(--gold)]/70 hover:border-[var(--gold)] hover:text-[var(--gold)] transition-all"
+              >
+                Admin Panel
+              </Link>
+            )}
             {user ? (
               <button
                 onClick={logout}

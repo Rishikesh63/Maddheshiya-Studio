@@ -51,14 +51,31 @@ const RegisterPage = () => {
         setSuccess(true);
         setTimeout(() => router.push('/login'), 2000);
       } else {
-        const firstError =
-          data && typeof data === 'object'
-            ? Object.values(data).flat().join(' ')
-            : '';
-        setError(firstError || 'Registration failed');
+        // Flatten DRF error format: { email: ["msg"], password: ["msg"] }
+        if (data && typeof data === 'object') {
+          const messages: string[] = [];
+          for (const [field, val] of Object.entries(data)) {
+            const msgs = Array.isArray(val) ? val : [String(val)];
+            msgs.forEach((m) => {
+              if (field === 'email' && String(m).toLowerCase().includes('already')) {
+                messages.push('An account with this email already exists. Please log in instead.');
+              } else {
+                messages.push(String(m));
+              }
+            });
+          }
+          setError(messages.join(' ') || 'Registration failed');
+        } else {
+          setError('Registration failed');
+        }
       }
-    } catch {
-      setError('An unexpected error occurred.');
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : '';
+      if (msg.toLowerCase().includes('failed to fetch')) {
+        setError('Cannot connect to server. Please try again in a moment.');
+      } else {
+        setError('An unexpected error occurred.');
+      }
     } finally {
       setLoading(false);
     }

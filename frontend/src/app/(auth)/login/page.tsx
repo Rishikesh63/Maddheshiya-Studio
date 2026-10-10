@@ -26,7 +26,12 @@ export default function LoginPage() {
       await login(formData.email, formData.password);
       router.push('/');
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Invalid email or password');
+      const msg = err instanceof Error ? err.message : '';
+      if (msg.toLowerCase().includes('failed to fetch') || msg.toLowerCase().includes('networkerror')) {
+        setError('Cannot connect to server. Please try again in a moment.');
+      } else {
+        setError(msg || 'Invalid email or password');
+      }
       setFailedAttempts((n) => n + 1);
     } finally {
       setLoading(false);

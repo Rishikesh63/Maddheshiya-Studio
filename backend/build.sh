@@ -5,6 +5,9 @@ set -e
 poetry lock --no-update
 poetry install --no-dev
 
+# Collect static files (required for WhiteNoise + Django admin CSS/JS)
+poetry run python manage.py collectstatic --no-input
+
 # Run database migrations
 poetry run python manage.py migrate
 

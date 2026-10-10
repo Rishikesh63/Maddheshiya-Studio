@@ -56,7 +56,7 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
         fields = ['id', 'username', 'email', 'name', 'first_name', 'last_name',
-                  'phone', 'profile_image', 'bio', 'is_creator', 'is_client']
+                  'phone', 'profile_image', 'bio', 'is_creator', 'is_client', 'is_admin_user']
 
     def get_name(self, obj):
         full = f"{obj.first_name} {obj.last_name}".strip()
@@ -69,6 +69,12 @@ class EmailOrUsernameTokenObtainPairSerializer(TokenObtainPairSerializer):
     EmailBackend in AUTHENTICATION_BACKENDS handles the actual verification.
     """
     username_field = 'username'
+
+    @classmethod
+    def get_token(cls, user):
+        token = super().get_token(user)
+        token['is_admin_user'] = user.is_admin_user
+        return token
 
     def validate(self, attrs):
         return super().validate(attrs)

@@ -1,11 +1,17 @@
-from rest_framework import viewsets, filters
+from rest_framework import viewsets, filters, permissions
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, BasePermission
 from .models import ProductCategory, Product
 from .serializers import (
     ProductCategorySerializer, ProductListSerializer, ProductDetailSerializer,
+    AdminProductWriteSerializer, AdminProductCategoryWriteSerializer,
 )
+
+
+class IsAdminUserCustom(BasePermission):
+    def has_permission(self, request, view):
+        return bool(request.user and request.user.is_authenticated and request.user.is_admin_user)
 
 
 class ProductCategoryViewSet(viewsets.ReadOnlyModelViewSet):
@@ -52,3 +58,28 @@ class ProductViewSet(viewsets.ReadOnlyModelViewSet):
         qs = self.get_queryset().filter(featured=True)
         serializer = ProductListSerializer(qs, many=True, context={'request': request})
         return Response(serializer.data)
+
+
+class AdminProductViewSet(viewsets.ModelViewSet):
+    """Full CRUD for products — admin only."""
+    permission_classes = [IsAdminUserCustom]
+    serializer_class = AdminProductWriteSerializer
+    lookup_field = 'id'
+
+    def get_queryset(self):
+        return Product.objects.select_related('category').order_by('category', 'order')
+
+    def get_serializer_class(self):
+        if self.action in ('list', 'retrieve'):
+            return ProductDetailSerializer
+        return AdminProductWriteSerializer
+
+
+class AdminProductCategoryViewSet(viewsets.ModelViewSet):
+    """Full CRUD for product categories — admin only."""
+    permission_classes = [IsAdminUserCustom]
+    serializer_class = AdminProductCategoryWriteSerializer
+    lookup_field = 'id'
+
+    def get_queryset(self):
+        return ProductCategory.objects.all().order_by('category_type', 'order')

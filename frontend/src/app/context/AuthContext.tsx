@@ -22,6 +22,7 @@ interface User {
   username?: string;
   name?: string;
   is_social?: boolean;
+  is_admin_user?: boolean;
 }
 
 interface AuthContextType {
@@ -67,7 +68,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           .then((r) => r.ok ? r.json() : null)
           .then((profile) => {
             if (profile) {
-              setUser((prev) => prev ? { ...prev, name: profile.name || profile.first_name || prev.username } : prev);
+              setUser((prev) => prev ? {
+                ...prev,
+                name: profile.name || profile.first_name || prev.username,
+                is_admin_user: profile.is_admin_user,
+              } : prev);
             }
           })
           .catch(() => {});
@@ -108,6 +113,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         if (res.ok) {
           const profile = await res.json();
           decoded.name = profile.name || profile.first_name || decoded.username;
+          decoded.is_admin_user = profile.is_admin_user;
         }
       } catch { /* use decoded fallback */ }
       setUser(decoded);

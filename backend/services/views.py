@@ -1,10 +1,20 @@
-from rest_framework import generics, permissions
+from rest_framework import generics, permissions, viewsets
 from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework.permissions import BasePermission
 from django.http import HttpResponse
-from .models import Service, UploadedMedia
-from .serializers import ServiceSerializer, UploadedMediaSerializer
+from .models import Service, UploadedMedia, Package, PortfolioItem, PortfolioCategory
+from .serializers import (
+    ServiceSerializer, UploadedMediaSerializer,
+    AdminServiceSerializer, AdminPackageSerializer,
+    AdminPortfolioCategorySerializer, AdminPortfolioItemSerializer,
+)
+
+
+class IsAdminUserCustom(BasePermission):
+    def has_permission(self, request, view):
+        return bool(request.user and request.user.is_authenticated and request.user.is_admin_user)
 
 def home(request):
     return HttpResponse('Welcome to Maddheshiya Studio')
@@ -60,3 +70,45 @@ class UploadMediaView(APIView):
             }, status=400)
 
         return Response(UploadedMediaSerializer(uploaded_media, many=True).data)
+
+
+class AdminServiceViewSet(viewsets.ModelViewSet):
+    """Full CRUD for services — admin only."""
+    permission_classes = [IsAdminUserCustom]
+    serializer_class = AdminServiceSerializer
+    parser_classes = [MultiPartParser, FormParser]
+    lookup_field = 'id'
+
+    def get_queryset(self):
+        return Service.objects.all().order_by('-is_featured', 'name')
+
+
+class AdminPackageViewSet(viewsets.ModelViewSet):
+    """Full CRUD for packages — admin only."""
+    permission_classes = [IsAdminUserCustom]
+    serializer_class = AdminPackageSerializer
+    lookup_field = 'id'
+
+    def get_queryset(self):
+        return Package.objects.all().order_by('service_type', 'category')
+
+
+class AdminPortfolioCategoryViewSet(viewsets.ModelViewSet):
+    """Full CRUD for portfolio categories — admin only."""
+    permission_classes = [IsAdminUserCustom]
+    serializer_class = AdminPortfolioCategorySerializer
+    lookup_field = 'id'
+
+    def get_queryset(self):
+        return PortfolioCategory.objects.all().order_by('name')
+
+
+class AdminPortfolioItemViewSet(viewsets.ModelViewSet):
+    """Full CRUD for portfolio items — admin only."""
+    permission_classes = [IsAdminUserCustom]
+    serializer_class = AdminPortfolioItemSerializer
+    parser_classes = [MultiPartParser, FormParser]
+    lookup_field = 'id'
+
+    def get_queryset(self):
+        return PortfolioItem.objects.select_related('category').order_by('-is_featured', '-display_order')

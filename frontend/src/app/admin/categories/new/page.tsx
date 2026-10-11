@@ -68,7 +68,7 @@ export default function NewCategoryPage() {
 
       <h1 className="text-2xl font-bold text-white mb-1">New Category</h1>
       <p className="text-sm text-zinc-400 mb-6">
-        The slug is generated automatically from the name (e.g. "Photo Framing" → <code className="text-zinc-300">photo-framing</code>).
+        The slug is generated automatically from the name (e.g. &ldquo;Photo Framing&rdquo; → <code className="text-zinc-300">photo-framing</code>).
       </p>
 
       {error && (

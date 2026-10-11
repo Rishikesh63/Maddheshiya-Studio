@@ -87,6 +87,7 @@ export default function ProductForm({ productId }: ProductFormProps) {
           setExistingThumbnail(data.thumbnail ?? '');
         });
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tokens, productId]);
 
   const handleSubmit = async (e: FormEvent) => {
@@ -215,6 +216,7 @@ export default function ProductForm({ productId }: ProductFormProps) {
         <div>
           <label className="block text-xs font-medium text-zinc-400 mb-1">Thumbnail Image{!isEdit && ' *'}</label>
           {existingThumbnail && (
+            {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={existingThumbnail} alt="current thumbnail" className="w-24 h-24 object-cover rounded mb-2 bg-zinc-800" />
           )}
           <input

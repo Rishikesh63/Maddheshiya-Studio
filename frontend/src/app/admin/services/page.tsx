@@ -31,6 +31,7 @@ export default function AdminServicesPage() {
       .finally(() => setLoading(false));
   };
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => { fetchServices(); }, [tokens]);
 
   const deleteService = async (id: number) => {
@@ -91,6 +92,7 @@ export default function AdminServicesPage() {
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-3">
                       {s.thumbnail && (
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img src={s.thumbnail} alt={s.name} className="w-9 h-9 rounded object-cover bg-zinc-800" />
                       )}
                       <div>

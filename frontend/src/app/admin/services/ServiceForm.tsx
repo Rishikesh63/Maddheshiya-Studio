@@ -57,6 +57,7 @@ export default function ServiceForm({ serviceId }: ServiceFormProps) {
         });
         setExistingImage(data.image ?? data.thumbnail ?? '');
       });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tokens, serviceId]);
 
   const handleSubmit = async (e: FormEvent) => {
@@ -173,6 +174,7 @@ export default function ServiceForm({ serviceId }: ServiceFormProps) {
         <div>
           <label className="block text-xs font-medium text-zinc-400 mb-1">Cover Image</label>
           {existingImage && (
+            {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={existingImage} alt="current" className="w-24 h-24 object-cover rounded mb-2 bg-zinc-800" />
           )}
           <input

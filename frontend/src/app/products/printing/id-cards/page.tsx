@@ -1,281 +1,320 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import Navbar from "../../../components/Navbar";
 import Footer from "../../../components/Footer";
 import { useCart } from "../../../context/CartContext";
-import { ArrowLeft, ShoppingCart, Check, CreditCard, Shield, Layers, Zap } from "lucide-react";
+import { apiUrl } from "@/app/lib/api";
+import { ArrowLeft, ShoppingCart, Check, ImageIcon, Truck, Zap } from "lucide-react";
 
-interface CardType {
-  id: string;
-  label: string;
-  tagline: string;
-  description: string;
-  features: string[];
-  icon: React.ElementType;
-  tiers: { label: string; price: number; unit: string; note?: string }[];
-  badge?: string;
-}
+// ── Pricing ────────────────────────────────────────────────────────────────────
 
-const cardTypes: CardType[] = [
-  {
-    id: "pvc",
-    label: "PVC ID Card",
-    tagline: "Professional & Durable",
-    description:
-      "Standard hard-plastic PVC ID cards with vibrant full-color printing. Lightweight, waterproof, and scratch-resistant. Ideal for offices, schools, events, and institutions.",
-    features: [
-      "CR80 standard size (85.6 × 54 mm)",
-      "Full-color digital printing",
-      "Waterproof & scratch-resistant",
-      "Optional lamination (gloss/matte)",
-      "Barcode, QR code, photo support",
-      "Punch hole / slot hole available",
-      "Delivery in 1–2 working days",
-    ],
-    icon: CreditCard,
-    badge: "Most Popular",
-    tiers: [
-      { label: "Single-Sided", price: 30,  unit: "per card", note: "Min. 10 cards" },
-      { label: "Double-Sided", price: 45,  unit: "per card", note: "Min. 10 cards" },
-      { label: "Bulk (50+)",   price: 25,  unit: "per card", note: "Single-sided" },
-      { label: "Bulk (100+)",  price: 20,  unit: "per card", note: "Best value" },
-    ],
-  },
-  {
-    id: "acrylic",
-    label: "Acrylic ID Card",
-    tagline: "Premium & Transparent",
-    description:
-      "High-end acrylic ID cards with a crystal-clear or frosted finish. Gives a luxury, corporate look — perfect for premium brands, corporate events, and VIP access passes.",
-    features: [
-      "Crystal-clear or frosted acrylic",
-      "UV-printed sharp text & graphics",
-      "Premium thick feel (1.2 mm)",
-      "Custom shape & die-cut available",
-      "Magnetic stripe / RFID chip option",
-      "Holographic overlay available",
-      "Delivery in 2–4 working days",
-    ],
-    icon: Shield,
-    tiers: [
-      { label: "Single-Sided", price: 80,  unit: "per card", note: "Min. 5 cards" },
-      { label: "Double-Sided", price: 120, unit: "per card", note: "Min. 5 cards" },
-      { label: "Bulk (25+)",   price: 70,  unit: "per card", note: "Single-sided" },
-      { label: "Bulk (50+)",   price: 60,  unit: "per card", note: "Best value" },
-    ],
-  },
+const CARD_TYPES = [
+  { id: "pvc-single",   label: "PVC Single-Side",  pricePerCard: 30,  minQty: 10 },
+  { id: "pvc-double",   label: "PVC Double-Side",   pricePerCard: 45,  minQty: 10 },
+  { id: "acrylic",      label: "Acrylic",            pricePerCard: 80,  minQty: 5  },
 ];
 
-function CardSection({ card }: { card: CardType }) {
-  const { addItem } = useCart();
-  const [selectedTier, setSelectedTier] = useState(card.tiers[0]);
-  const [qty, setQty] = useState(10);
-  const [added, setAdded] = useState(false);
+const QTY_OPTIONS = [10, 25, 50, 100, 250];
 
-  const totalPrice = selectedTier.price * qty;
+// ── API product shape ──────────────────────────────────────────────────────────
+
+interface CardProduct {
+  id: number;
+  name: string;
+  slug: string;
+  thumbnail: string;
+  short_description: string;
+  status: string;
+}
+
+// ── ID Card card ───────────────────────────────────────────────────────────────
+
+function IdCardCard({ card }: { card: CardProduct }) {
+  const { addItem } = useCart();
+  const [typeId, setTypeId]     = useState(CARD_TYPES[0].id);
+  const [qty, setQty]           = useState(10);
+  const [added, setAdded]       = useState(false);
+  const [imgError, setImgError] = useState(false);
+
+  const cardType = CARD_TYPES.find((t) => t.id === typeId)!;
+  const total    = cardType.pricePerCard * qty;
 
   const handleAdd = useCallback(() => {
     addItem({
-      id: `id-${card.id}-${selectedTier.label.toLowerCase().replace(/\s/g, "-")}`,
-      title: `${card.label} — ${selectedTier.label} × ${qty}`,
+      id: `idcard-${card.id}-${typeId}-${qty}`,
+      title: `${card.name} — ${cardType.label} × ${qty}`,
       category: "ID Cards",
-      price: totalPrice,
-      image: null,
+      price: total,
+      image: card.thumbnail || null,
     });
     setAdded(true);
     setTimeout(() => setAdded(false), 1800);
-  }, [addItem, card, selectedTier, qty, totalPrice]);
-
-  const Icon = card.icon;
+  }, [addItem, card, typeId, qty, cardType, total]);
 
   return (
-    <div className="bg-[var(--black-card)] border border-[var(--gold)]/10 hover:border-[var(--gold)]/20 transition-all p-8 relative">
-      {card.badge && (
-        <span className="absolute -top-3 left-6 bg-[var(--gold)] text-black text-[9px] px-3 py-1 tracking-wider uppercase font-bold">
-          {card.badge}
-        </span>
-      )}
-
-      <div className="flex items-start gap-4 mb-6">
-        <div className="w-12 h-12 border border-[var(--gold)]/20 flex items-center justify-center shrink-0">
-          <Icon size={22} className="text-[var(--gold)]/60" />
-        </div>
-        <div>
-          <h2 className="text-2xl font-light text-white" style={{ fontFamily: "var(--font-cormorant)" }}>
-            {card.label}
-          </h2>
-          <p className="text-xs text-[var(--gold)]/60 tracking-wider">{card.tagline}</p>
-        </div>
+    <div className="bg-[#111111] border border-[var(--gold)]/10 flex flex-col overflow-hidden group">
+      {/* Design preview */}
+      <div className="relative aspect-[4/3] bg-[#0a0a0a] overflow-hidden">
+        {card.thumbnail && !imgError ? (
+          <Image
+            src={card.thumbnail}
+            alt={card.name}
+            fill
+            sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+            className="object-cover group-hover:scale-105 transition-transform duration-500"
+            onError={() => setImgError(true)}
+          />
+        ) : (
+          <div className="absolute inset-0 flex flex-col items-center justify-center gap-2">
+            <ImageIcon size={28} className="text-white/10" />
+            <span className="text-[9px] tracking-widest uppercase text-white/20">Design Preview</span>
+          </div>
+        )}
       </div>
 
-      <p className="text-sm text-white/40 leading-relaxed mb-6">{card.description}</p>
+      {/* Card body */}
+      <div className="p-4 flex flex-col flex-1 gap-3">
+        <h3 className="text-sm font-light text-white leading-snug" style={{ fontFamily: "var(--font-cormorant)" }}>
+          {card.name}
+        </h3>
 
-      {/* Features */}
-      <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-8">
-        {card.features.map((f) => (
-          <li key={f} className="flex items-start gap-2 text-xs text-white/50">
-            <Check size={11} className="text-[var(--gold)]/50 mt-0.5 shrink-0" />
-            {f}
-          </li>
-        ))}
-      </ul>
-
-      <div className="border-t border-[var(--gold)]/10 pt-6">
-        {/* Pricing tiers */}
-        <p className="text-[10px] tracking-[0.3em] uppercase text-[var(--gold)]/50 mb-3">Select Pricing Tier</p>
-        <div className="grid grid-cols-2 gap-2 mb-6">
-          {card.tiers.map((tier) => (
-            <button
-              key={tier.label}
-              onClick={() => setSelectedTier(tier)}
-              className={`p-3 border text-left transition-all duration-200 ${
-                selectedTier.label === tier.label
-                  ? "border-[var(--gold)] bg-[var(--gold)]/5"
-                  : "border-[var(--gold)]/10 hover:border-[var(--gold)]/30"
-              }`}
-            >
-              <p className="text-xs font-medium text-white">{tier.label}</p>
-              <p className="text-[var(--gold)] text-sm font-semibold mt-0.5">₹{tier.price} <span className="text-[10px] text-white/30 font-normal">{tier.unit}</span></p>
-              {tier.note && <p className="text-[9px] text-white/25 mt-0.5">{tier.note}</p>}
-            </button>
-          ))}
+        {/* Type picker */}
+        <div>
+          <p className="text-[9px] tracking-[0.3em] uppercase text-[var(--gold)]/50 mb-1.5">Card Type</p>
+          <div className="flex flex-col gap-1">
+            {CARD_TYPES.map((t) => (
+              <button
+                key={t.id}
+                onClick={() => { setTypeId(t.id); setQty(Math.max(qty, t.minQty)); }}
+                className={`flex items-center justify-between px-2.5 py-1.5 border text-[9px] transition-all ${
+                  typeId === t.id
+                    ? "border-[var(--gold)] bg-[var(--gold)]/10 text-[var(--gold)]"
+                    : "border-white/10 text-white/40 hover:border-white/30"
+                }`}
+              >
+                <span className="tracking-wide">{t.label}</span>
+                <span>₹{t.pricePerCard}/card</span>
+              </button>
+            ))}
+          </div>
         </div>
 
-        {/* Quantity + total */}
-        <div className="flex items-center gap-4 mb-5">
+        {/* Quantity */}
+        <div>
+          <p className="text-[9px] tracking-[0.3em] uppercase text-[var(--gold)]/50 mb-1.5">
+            Quantity <span className="text-white/20 normal-case tracking-normal">(min {cardType.minQty})</span>
+          </p>
+          <div className="flex flex-wrap gap-1">
+            {QTY_OPTIONS.filter((q) => q >= cardType.minQty).map((q) => (
+              <button
+                key={q}
+                onClick={() => setQty(q)}
+                className={`px-2.5 py-1 text-[9px] border transition-all ${
+                  qty === q
+                    ? "border-[var(--gold)] bg-[var(--gold)]/10 text-[var(--gold)]"
+                    : "border-white/10 text-white/40 hover:border-white/30"
+                }`}
+              >
+                {q}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Total + CTA */}
+        <div className="flex items-center justify-between mt-auto pt-2 border-t border-white/5">
           <div>
-            <p className="text-[10px] tracking-widest uppercase text-white/30 mb-2">Quantity</p>
-            <div className="flex items-center gap-2">
-              <button
-                onClick={() => setQty((q) => Math.max(1, q - 1))}
-                className="w-8 h-8 border border-[var(--gold)]/20 text-white hover:border-[var(--gold)]/50 flex items-center justify-center"
-              >
-                −
-              </button>
-              <input
-                type="number"
-                value={qty}
-                min={1}
-                onChange={(e) => setQty(Math.max(1, parseInt(e.target.value) || 1))}
-                className="w-16 bg-[var(--black)] border border-[var(--gold)]/20 px-2 py-1.5 text-sm text-white text-center outline-none"
-              />
-              <button
-                onClick={() => setQty((q) => q + 1)}
-                className="w-8 h-8 border border-[var(--gold)]/20 text-white hover:border-[var(--gold)]/50 flex items-center justify-center"
-              >
-                +
-              </button>
-            </div>
+            <p className="text-[8px] text-white/20 uppercase tracking-widest">Total</p>
+            <span className="text-xl font-light text-[var(--gold)]" style={{ fontFamily: "var(--font-cormorant)" }}>
+              ₹{total.toLocaleString("en-IN")}
+            </span>
           </div>
-
-          <div className="flex-1 text-right">
-            <p className="text-[10px] tracking-widest uppercase text-white/30 mb-1">Total</p>
-            <p className="text-2xl text-[var(--gold)]" style={{ fontFamily: "var(--font-cormorant)" }}>
-              ₹{totalPrice.toLocaleString("en-IN")}
-            </p>
-          </div>
-        </div>
-
-        {/* Buttons */}
-        <div className="flex gap-3">
           <button
             onClick={handleAdd}
-            className={`flex-1 flex items-center justify-center gap-2 py-3 text-xs tracking-widest uppercase font-medium transition-all ${
+            className={`flex items-center gap-1.5 px-4 py-2 text-[10px] tracking-widest uppercase font-medium transition-all ${
               added
                 ? "bg-green-600 text-white"
-                : "bg-[var(--gold)] text-black hover:bg-[var(--gold-light)]"
+                : "border border-[var(--gold)] text-[var(--gold)] hover:bg-[var(--gold)] hover:text-black"
             }`}
           >
-            {added ? <><Check size={12} /> Added</> : <><ShoppingCart size={12} /> Add to Cart</>}
+            {added ? <><Check size={11} /> Added</> : <><ShoppingCart size={11} /> Add to Cart</>}
           </button>
-          <Link
-            href="/contact"
-            className="flex-1 flex items-center justify-center gap-2 py-3 border border-[var(--gold)]/30 text-[var(--gold)]/60 text-xs tracking-widest uppercase hover:border-[var(--gold)] hover:text-[var(--gold)] transition-all"
-          >
-            Custom Quote
-          </Link>
         </div>
       </div>
     </div>
   );
 }
 
+// ── Skeleton loader ────────────────────────────────────────────────────────────
+
+function SkeletonCard() {
+  return (
+    <div className="bg-[#111111] border border-[var(--gold)]/10 overflow-hidden animate-pulse">
+      <div className="aspect-[4/3] bg-white/5" />
+      <div className="p-4 space-y-3">
+        <div className="h-4 bg-white/5 rounded w-3/4" />
+        <div className="h-3 bg-white/5 rounded w-1/2" />
+        {[...Array(3)].map((_, i) => <div key={i} className="h-8 bg-white/5 rounded" />)}
+        <div className="h-8 bg-white/5 rounded" />
+      </div>
+    </div>
+  );
+}
+
+// ── Floating cart ──────────────────────────────────────────────────────────────
+
+function FloatingCart() {
+  const { count } = useCart();
+  if (count === 0) return null;
+  return (
+    <Link
+      href="/cart"
+      className="fixed bottom-8 right-8 z-40 flex items-center gap-3 px-5 py-3 bg-[var(--gold)] text-black text-xs tracking-widest uppercase font-medium shadow-2xl shadow-black/60 hover:bg-[#b8933e] transition-colors"
+    >
+      <ShoppingCart size={16} />
+      Cart
+      <span className="bg-black/20 w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold">
+        {count}
+      </span>
+    </Link>
+  );
+}
+
+// ── Main page ──────────────────────────────────────────────────────────────────
+
 export default function IdCardsPage() {
+  const [cards, setCards]     = useState<CardProduct[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetch(apiUrl("/api/products/products/?category=id-cards"))
+      .then((r) => r.json())
+      .then((data) => setCards(Array.isArray(data) ? data : data.results ?? []))
+      .catch(() => setCards([]))
+      .finally(() => setLoading(false));
+  }, []);
+
   return (
     <div className="bg-[var(--black)]">
       <Navbar />
 
       {/* Header */}
       <section className="pt-36 pb-8 px-6">
-        <div className="max-w-6xl mx-auto">
-          <Link href="/products" className="inline-flex items-center gap-2 text-[10px] tracking-widest uppercase text-white/30 hover:text-[var(--gold)]/60 transition-colors mb-8">
+        <div className="max-w-7xl mx-auto">
+          <Link
+            href="/products"
+            className="inline-flex items-center gap-2 text-[10px] tracking-widest uppercase text-white/30 hover:text-[var(--gold)]/60 transition-colors mb-8"
+          >
             <ArrowLeft size={12} /> Products
           </Link>
-          <span className="text-[10px] tracking-[0.4em] uppercase text-[var(--gold)]/60 block mb-3">Printing Service</span>
-          <h1 className="text-4xl md:text-6xl font-light text-white mb-2" style={{ fontFamily: "var(--font-cormorant)" }}>
+          <span className="text-[10px] tracking-[0.4em] uppercase text-[var(--gold)]/60 block mb-3">
+            Printing Service
+          </span>
+          <h1
+            className="text-4xl md:text-6xl font-light text-white mb-3"
+            style={{ fontFamily: "var(--font-cormorant)" }}
+          >
             ID Card Printing
           </h1>
-          <div className="w-12 h-px bg-[var(--gold)]/40 mb-4" />
+          <div className="w-12 h-px bg-[var(--gold)]/40 mb-5" />
           <p className="text-sm text-white/40 max-w-xl leading-relaxed">
-            Professional ID cards for businesses, schools, events, and institutions. Choose between standard PVC or premium acrylic finish.
+            Choose a design, pick your card type and quantity, then add to cart.
+            Share your details on WhatsApp after ordering — we print and deliver.
           </p>
-        </div>
-      </section>
 
-      {/* Comparison highlight */}
-      <section className="py-4 px-6">
-        <div className="max-w-6xl mx-auto">
-          <div className="grid grid-cols-3 gap-4 p-5 bg-[var(--black-card)] border border-[var(--gold)]/10">
-            <div className="flex items-center gap-3">
-              <Zap size={16} className="text-[var(--gold)]/60" />
-              <div>
-                <p className="text-xs text-white/60 font-medium">Fast Turnaround</p>
-                <p className="text-[10px] text-white/30">1–4 working days</p>
-              </div>
+          {/* Quick info strip */}
+          <div className="flex flex-wrap items-center gap-6 mt-6">
+            <div className="flex items-center gap-2 text-xs text-white/30">
+              <Zap size={12} className="text-[var(--gold)]/40" />
+              1–4 working days
             </div>
-            <div className="flex items-center gap-3">
-              <Layers size={16} className="text-[var(--gold)]/60" />
-              <div>
-                <p className="text-xs text-white/60 font-medium">Two Premium Types</p>
-                <p className="text-[10px] text-white/30">PVC &amp; Acrylic</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-3">
-              <Shield size={16} className="text-[var(--gold)]/60" />
-              <div>
-                <p className="text-xs text-white/60 font-medium">Custom Design</p>
-                <p className="text-[10px] text-white/30">Your logo &amp; details</p>
-              </div>
+            <div className="flex items-center gap-2 text-xs text-white/30">
+              <Truck size={12} className="text-[var(--gold)]/40" />
+              Free delivery above ₹999
             </div>
           </div>
         </div>
       </section>
 
-      {/* Two card types */}
-      <section className="py-10 px-6 pb-24">
-        <div className="max-w-6xl mx-auto">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {cardTypes.map((card) => (
-              <CardSection key={card.id} card={card} />
+      {/* Pricing reference */}
+      <div className="px-6 mb-2">
+        <div className="max-w-7xl mx-auto">
+          <div className="flex flex-wrap gap-3">
+            {CARD_TYPES.map((t) => (
+              <div key={t.id} className="px-4 py-2 border border-[var(--gold)]/10 bg-[#111]">
+                <p className="text-[9px] tracking-widest uppercase text-[var(--gold)]/50">{t.label}</p>
+                <p className="text-sm text-white/70 font-light">₹{t.pricePerCard}<span className="text-[9px] text-white/30">/card · min {t.minQty}</span></p>
+              </div>
             ))}
           </div>
+        </div>
+      </div>
 
-          {/* Note */}
-          <div className="mt-10 p-5 border border-[var(--gold)]/10 bg-[var(--black-card)]">
-            <p className="text-xs text-white/40 leading-relaxed">
-              <strong className="text-white/60">How to order:</strong> Add cards to cart and place order, or{" "}
-              <Link href="/contact" className="text-[var(--gold)]/60 hover:text-[var(--gold)] transition-colors">
-                contact us
-              </Link>{" "}
-              with your design file (PSD / CDR / AI / PDF). We also offer free basic design for bulk orders of 50+.
-              Design file can be shared on WhatsApp after placing order.
-            </p>
+      {/* Grid */}
+      <section className="py-8 px-6 pb-28">
+        <div className="max-w-7xl mx-auto">
+          {loading ? (
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+              {[...Array(8)].map((_, i) => <SkeletonCard key={i} />)}
+            </div>
+          ) : cards.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-28 text-center">
+              <ImageIcon size={40} className="text-white/10 mb-4" />
+              <p className="text-white/30 text-sm tracking-widest uppercase">
+                Design examples coming soon
+              </p>
+              <p className="text-white/20 text-xs mt-2">
+                The admin is uploading ID card designs. Check back shortly.
+              </p>
+              <Link
+                href="/contact"
+                className="mt-6 px-6 py-2.5 border border-[var(--gold)]/30 text-[var(--gold)]/60 text-xs tracking-widest uppercase hover:border-[var(--gold)] hover:text-[var(--gold)] transition-all"
+              >
+                Request Custom Quote
+              </Link>
+            </div>
+          ) : (
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+              {cards.map((c) => (
+                <IdCardCard key={c.id} card={c} />
+              ))}
+            </div>
+          )}
+        </div>
+      </section>
+
+      {/* How it works */}
+      <section className="px-6 pb-20 border-t border-[var(--gold)]/10">
+        <div className="max-w-4xl mx-auto pt-14">
+          <h2
+            className="text-2xl font-light text-white text-center mb-10"
+            style={{ fontFamily: "var(--font-cormorant)" }}
+          >
+            How It Works
+          </h2>
+          <div className="grid grid-cols-1 sm:grid-cols-4 gap-6 text-center">
+            {[
+              { step: "1", title: "Choose Design",   desc: "Pick an ID card design from our catalog." },
+              { step: "2", title: "Select Type & Qty", desc: "Choose PVC/Acrylic and how many cards you need." },
+              { step: "3", title: "Add to Cart",      desc: "Add to cart and complete checkout." },
+              { step: "4", title: "Send Your Details", desc: "Share name, photo, logo on WhatsApp — we print and deliver." },
+            ].map(({ step, title, desc }) => (
+              <div key={step} className="flex flex-col items-center gap-3">
+                <div className="w-9 h-9 bg-[var(--gold)] text-black text-sm font-bold flex items-center justify-center">
+                  {step}
+                </div>
+                <p className="text-sm font-medium text-white">{title}</p>
+                <p className="text-[11px] text-white/30 leading-relaxed">{desc}</p>
+              </div>
+            ))}
           </div>
         </div>
       </section>
 
+      <FloatingCart />
       <Footer />
     </div>
   );

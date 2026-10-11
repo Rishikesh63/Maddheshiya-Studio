@@ -35,6 +35,7 @@ function ProductCard({
   const primaryCover = getProductCoverKey(product);
   const fallbackCover = altCoverKey(primaryCover);
   const currentCover = coverAttempt === 0 ? primaryCover : fallbackCover;
+  const coverUrl = coverAttempt < 2 ? getImageUrl(currentCover) : null;
 
   const handleCoverError = () => {
     if (coverAttempt === 0) setCoverAttempt(1);
@@ -61,10 +62,10 @@ function ProductCard({
         href={`/products/digital/album-psd/${categoryId}/${product.id}`}
         className="relative aspect-[4/3] bg-gray-100 overflow-hidden block"
       >
-        {currentCover && coverAttempt < 2 ? (
+        {coverUrl ? (
           <Image
             key={currentCover}
-            src={getImageUrl(currentCover)}
+            src={coverUrl}
             alt={product.title}
             fill
             sizes="(max-width: 640px) 50vw, (max-width: 1280px) 25vw, 20vw"

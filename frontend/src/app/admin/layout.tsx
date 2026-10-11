@@ -9,10 +9,12 @@ import {
   Camera,
   LogOut,
   ChevronRight,
+  FolderOpen,
 } from 'lucide-react';
 
 const navItems = [
   { href: '/admin', label: 'Dashboard', icon: LayoutDashboard },
+  { href: '/admin/categories', label: 'Categories', icon: FolderOpen },
   { href: '/admin/products', label: 'Products', icon: Package },
   { href: '/admin/services', label: 'Services', icon: Camera },
 ];

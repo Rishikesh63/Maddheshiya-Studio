@@ -16,8 +16,9 @@ const AWS_REGION = process.env.NEXT_PUBLIC_AWS_REGION || 'us-east-1';
  * @param options - Optional transformations
  */
 export const getImageUrl = (
-  key: string
-): string => {
+  key: string | null | undefined
+): string | null => {
+  if (!key) return null;
   // If CloudFront URL is configured, use it (recommended for production)
   if (CLOUDFRONT_URL) {
     return `${CLOUDFRONT_URL}/${key}`;
@@ -28,26 +29,27 @@ export const getImageUrl = (
     return `https://${S3_BUCKET}.s3.${AWS_REGION}.amazonaws.com/${key}`;
   }
   
-  // Fallback to key if no configuration
-  console.warn('AWS S3 configuration missing. Please set environment variables.');
-  return key;
+  // S3 not configured locally — return null so callers show a placeholder instead
+  if (process.env.NODE_ENV === 'development') {
+    console.warn('AWS S3 configuration missing. Set NEXT_PUBLIC_AWS_CLOUDFRONT_URL or NEXT_PUBLIC_AWS_S3_BUCKET.');
+  }
+  return null;
 };
 
 /**
  * Generates a video URL from S3/CloudFront
  * @param key - The S3 object key (path to the video)
  */
-export const getVideoUrl = (key: string): string => {
+export const getVideoUrl = (key: string): string | null => {
   if (CLOUDFRONT_URL) {
     return `${CLOUDFRONT_URL}/${key}`;
   }
-  
+
   if (S3_BUCKET && AWS_REGION) {
     return `https://${S3_BUCKET}.s3.${AWS_REGION}.amazonaws.com/${key}`;
   }
-  
-  console.warn('AWS S3 configuration missing. Please set environment variables.');
-  return key;
+
+  return null;
 };
 
 /**

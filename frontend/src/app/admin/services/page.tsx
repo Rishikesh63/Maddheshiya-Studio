@@ -18,36 +18,39 @@ interface Service {
 }
 
 export default function AdminServicesPage() {
-  const { tokens } = useAuth();
+  const { getValidToken } = useAuth();
   const [services, setServices] = useState<Service[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const headers = () => ({ Authorization: `Bearer ${tokens?.access}` });
-
-  const fetchServices = () => {
-    if (!tokens) return;
-    fetch(apiUrl('/api/services/admin/services/'), { headers: headers() })
+  const fetchServices = async () => {
+    const token = await getValidToken();
+    if (!token) return;
+    fetch(apiUrl('/api/services/admin/services/'), { headers: { Authorization: `Bearer ${token}` } })
       .then(r => r.json())
       .then(data => setServices(Array.isArray(data) ? data : data.results ?? []))
       .finally(() => setLoading(false));
   };
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  useEffect(() => { fetchServices(); }, [tokens]);
+  useEffect(() => { fetchServices(); }, []);
 
   const deleteService = async (id: number) => {
     if (!confirm('Delete this service?')) return;
+    const token = await getValidToken();
+    if (!token) return;
     await fetch(apiUrl(`/api/services/admin/services/${id}/`), {
       method: 'DELETE',
-      headers: headers(),
+      headers: { Authorization: `Bearer ${token}` },
     });
     fetchServices();
   };
 
   const toggleActive = async (service: Service) => {
+    const token = await getValidToken();
+    if (!token) return;
     await fetch(apiUrl(`/api/services/admin/services/${service.id}/`), {
       method: 'PATCH',
-      headers: { ...headers(), 'Content-Type': 'application/json' },
+      headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
       body: JSON.stringify({ is_active: !service.is_active }),
     });
     fetchServices();

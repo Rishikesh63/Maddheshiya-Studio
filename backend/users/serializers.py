@@ -61,7 +61,7 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
         fields = ['id', 'username', 'email', 'name', 'first_name', 'last_name',
-                  'phone', 'profile_image', 'bio', 'is_creator', 'is_client', 'is_admin_user']
+                  'phone', 'profile_image', 'bio', 'is_creator', 'is_client', 'is_admin_user', 'is_superuser']
 
     def get_name(self, obj):
         full = f"{obj.first_name} {obj.last_name}".strip()
@@ -79,6 +79,7 @@ class EmailOrUsernameTokenObtainPairSerializer(TokenObtainPairSerializer):
     def get_token(cls, user):
         token = super().get_token(user)
         token['is_admin_user'] = user.is_admin_user
+        token['is_superuser'] = user.is_superuser
         return token
 
     def validate(self, attrs):

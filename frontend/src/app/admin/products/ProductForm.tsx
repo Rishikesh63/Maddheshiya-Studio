@@ -31,7 +31,7 @@ const DELIVERY_OPTIONS = [
 ];
 
 export default function ProductForm({ productId }: ProductFormProps) {
-  const { tokens } = useAuth();
+  const { getValidToken } = useAuth();
   const router = useRouter();
   const isEdit = !!productId;
 
@@ -58,42 +58,43 @@ export default function ProductForm({ productId }: ProductFormProps) {
   const [heroImage, setHeroImage] = useState<File | null>(null);
   const [existingThumbnail, setExistingThumbnail] = useState('');
 
-  const authHeaders = () => ({ Authorization: `Bearer ${tokens?.access}` });
-
   useEffect(() => {
-    if (!tokens) return;
-    fetch(apiUrl('/api/products/admin/categories/'), { headers: authHeaders() })
-      .then(r => r.json())
-      .then(data => setCategories(Array.isArray(data) ? data : data.results ?? []));
-
-    if (isEdit) {
-      fetch(apiUrl(`/api/products/admin/products/${productId}/`), { headers: authHeaders() })
+    getValidToken().then(token => {
+      if (!token) return;
+      const h = { Authorization: `Bearer ${token}` };
+      fetch(apiUrl('/api/products/admin/categories/'), { headers: h })
         .then(r => r.json())
-        .then(data => {
-          setForm({
-            name: data.name ?? '',
-            category: data.category?.id ?? '',
-            description: data.description ?? '',
-            short_description: data.short_description ?? '',
-            price: data.price ?? '',
-            discount_price: data.discount_price ?? '',
-            status: data.status ?? 'active',
-            stock: String(data.stock ?? -1),
-            delivery_timeframe: data.delivery_timeframe ?? '3-5',
-            customization_available: data.customization_available ?? false,
-            customization_options: data.customization_options ?? '',
-            featured: data.featured ?? false,
-            order: String(data.order ?? 0),
+        .then(data => setCategories(Array.isArray(data) ? data : data.results ?? []));
+      if (isEdit) {
+        fetch(apiUrl(`/api/products/admin/products/${productId}/`), { headers: h })
+          .then(r => r.json())
+          .then(data => {
+            setForm({
+              name: data.name ?? '',
+              category: data.category?.id ?? '',
+              description: data.description ?? '',
+              short_description: data.short_description ?? '',
+              price: data.price ?? '',
+              discount_price: data.discount_price ?? '',
+              status: data.status ?? 'active',
+              stock: String(data.stock ?? -1),
+              delivery_timeframe: data.delivery_timeframe ?? '3-5',
+              customization_available: data.customization_available ?? false,
+              customization_options: data.customization_options ?? '',
+              featured: data.featured ?? false,
+              order: String(data.order ?? 0),
+            });
+            setExistingThumbnail(data.thumbnail ?? '');
           });
-          setExistingThumbnail(data.thumbnail ?? '');
-        });
-    }
+      }
+    });
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [tokens, productId]);
+  }, [productId]);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    if (!tokens) return;
+    const token = await getValidToken();
+    if (!token) { setError('Session expired. Please log in again.'); return; }
     setSaving(true);
     setError('');
 
@@ -109,7 +110,7 @@ export default function ProductForm({ productId }: ProductFormProps) {
     try {
       const res = await fetch(url, {
         method: isEdit ? 'PUT' : 'POST',
-        headers: authHeaders(),
+        headers: { Authorization: `Bearer ${token}` },
         body: fd,
       });
       if (!res.ok) {

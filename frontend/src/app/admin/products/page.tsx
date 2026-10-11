@@ -19,37 +19,40 @@ interface Product {
 }
 
 export default function AdminProductsPage() {
-  const { tokens } = useAuth();
+  const { getValidToken } = useAuth();
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const headers = () => ({ Authorization: `Bearer ${tokens?.access}` });
-
-  const fetchProducts = () => {
-    if (!tokens) return;
-    fetch(apiUrl('/api/products/admin/products/'), { headers: headers() })
+  const fetchProducts = async () => {
+    const token = await getValidToken();
+    if (!token) return;
+    fetch(apiUrl('/api/products/admin/products/'), { headers: { Authorization: `Bearer ${token}` } })
       .then(r => r.json())
       .then(data => setProducts(Array.isArray(data) ? data : data.results ?? []))
       .finally(() => setLoading(false));
   };
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  useEffect(() => { fetchProducts(); }, [tokens]);
+  useEffect(() => { fetchProducts(); }, []);
 
   const deleteProduct = async (id: number) => {
     if (!confirm('Delete this product?')) return;
+    const token = await getValidToken();
+    if (!token) return;
     await fetch(apiUrl(`/api/products/admin/products/${id}/`), {
       method: 'DELETE',
-      headers: headers(),
+      headers: { Authorization: `Bearer ${token}` },
     });
     fetchProducts();
   };
 
   const toggleStatus = async (product: Product) => {
+    const token = await getValidToken();
+    if (!token) return;
     const nextStatus = product.status === 'active' ? 'inactive' : 'active';
     await fetch(apiUrl(`/api/products/admin/products/${product.id}/`), {
       method: 'PATCH',
-      headers: { ...headers(), 'Content-Type': 'application/json' },
+      headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
       body: JSON.stringify({ status: nextStatus }),
     });
     fetchProducts();

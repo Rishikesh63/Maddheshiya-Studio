@@ -15,28 +15,32 @@ interface Category {
 }
 
 export default function CategoriesPage() {
-  const { tokens } = useAuth();
+  const { getValidToken } = useAuth();
   const [cats, setCats] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const [deleting, setDeleting] = useState<number | null>(null);
 
-  const authHeaders = () => ({ Authorization: `Bearer ${tokens?.access}` });
-
   useEffect(() => {
-    if (!tokens) return;
-    fetch(apiUrl('/api/products/admin/categories/'), { headers: authHeaders() })
-      .then(r => r.json())
-      .then(data => setCats(Array.isArray(data) ? data : data.results ?? []))
-      .finally(() => setLoading(false));
+    getValidToken().then(token => {
+      if (!token) return;
+      fetch(apiUrl('/api/products/admin/categories/'), {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+        .then(r => r.json())
+        .then(data => setCats(Array.isArray(data) ? data : data.results ?? []))
+        .finally(() => setLoading(false));
+    });
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [tokens]);
+  }, []);
 
   const handleDelete = async (id: number, name: string) => {
     if (!confirm(`Delete category "${name}"? Products in this category will be unlinked.`)) return;
+    const token = await getValidToken();
+    if (!token) return;
     setDeleting(id);
     await fetch(apiUrl(`/api/products/admin/categories/${id}/`), {
       method: 'DELETE',
-      headers: authHeaders(),
+      headers: { Authorization: `Bearer ${token}` },
     });
     setCats(c => c.filter(x => x.id !== id));
     setDeleting(null);

@@ -23,6 +23,7 @@ interface User {
   name?: string;
   is_social?: boolean;
   is_admin_user?: boolean;
+  is_superuser?: boolean;
 }
 
 interface AuthContextType {
@@ -32,6 +33,7 @@ interface AuthContextType {
   logout: () => void;
   socialLogin: (provider: 'google', accessToken: string) => Promise<void>;
   loading: boolean;
+  getValidToken: () => Promise<string | null>;
 }
 
 // --- Create Context ---
@@ -48,6 +50,31 @@ const getStoredTokens = (): AuthToken | null => {
 
 const clearStoredTokens = () => sessionStorage.removeItem('authTokens');
 
+const isExpired = (token: string): boolean => {
+  try {
+    const { exp } = jwtDecode<{ exp: number }>(token);
+    return Date.now() >= exp * 1000 - 30_000; // 30s buffer
+  } catch {
+    return true;
+  }
+};
+
+const doRefresh = async (refresh: string): Promise<AuthToken | null> => {
+  try {
+    const res = await fetch(apiUrl('/api/auth/token/refresh/'), {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ refresh }),
+    });
+    if (!res.ok) return null;
+    const data = await res.json();
+    // SimpleJWT with ROTATE_REFRESH_TOKENS returns a new refresh token too
+    return { access: data.access, refresh: data.refresh ?? refresh };
+  } catch {
+    return null;
+  }
+};
+
 // --- Provider Component ---
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [tokens, setTokens] = useState<AuthToken | null>(null);
@@ -55,15 +82,26 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const parsedTokens = getStoredTokens();
-    if (parsedTokens) {
+    const init = async () => {
+      const stored = getStoredTokens();
+      if (!stored) { setLoading(false); return; }
+
+      let active = stored;
+
+      // Refresh access token if it's expired or about to expire
+      if (isExpired(stored.access)) {
+        const refreshed = await doRefresh(stored.refresh);
+        if (!refreshed) { clearStoredTokens(); setLoading(false); return; }
+        storeTokens(refreshed);
+        active = refreshed;
+      }
+
       try {
-        const decoded: User = jwtDecode(parsedTokens.access);
-        setTokens(parsedTokens);
+        const decoded: User = jwtDecode(active.access);
+        setTokens(active);
         setUser(decoded);
-        // Hydrate display name from profile
         fetch(apiUrl('/api/users/me/'), {
-          headers: { Authorization: `Bearer ${parsedTokens.access}` },
+          headers: { Authorization: `Bearer ${active.access}` },
         })
           .then((r) => r.ok ? r.json() : null)
           .then((profile) => {
@@ -72,6 +110,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
                 ...prev,
                 name: profile.name || profile.first_name || prev.username,
                 is_admin_user: profile.is_admin_user,
+                is_superuser: profile.is_superuser,
               } : prev);
             }
           })
@@ -79,8 +118,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       } catch {
         clearStoredTokens();
       }
-    }
-    setLoading(false);
+      setLoading(false);
+    };
+    init();
   }, []);
 
   const loginMutation = useMutation({
@@ -114,6 +154,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           const profile = await res.json();
           decoded.name = profile.name || profile.first_name || decoded.username;
           decoded.is_admin_user = profile.is_admin_user;
+          decoded.is_superuser = profile.is_superuser;
         }
       } catch { /* use decoded fallback */ }
       setUser(decoded);
@@ -143,8 +184,19 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     clearStoredTokens();
   };
 
+  // Returns a valid access token, refreshing it first if expired
+  const getValidToken = async (): Promise<string | null> => {
+    if (!tokens) return null;
+    if (!isExpired(tokens.access)) return tokens.access;
+    const refreshed = await doRefresh(tokens.refresh);
+    if (!refreshed) { logout(); return null; }
+    storeTokens(refreshed);
+    setTokens(refreshed);
+    return refreshed.access;
+  };
+
   return (
-    <AuthContext.Provider value={{ user, tokens, login, logout, socialLogin, loading }}>
+    <AuthContext.Provider value={{ user, tokens, login, logout, socialLogin, loading, getValidToken }}>
       {children}
     </AuthContext.Provider>
   );

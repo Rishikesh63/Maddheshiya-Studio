@@ -12,7 +12,7 @@ const TYPE_OPTIONS = [
 ];
 
 export default function NewCategoryPage() {
-  const { tokens } = useAuth();
+  const { getValidToken } = useAuth();
   const router = useRouter();
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
@@ -24,18 +24,17 @@ export default function NewCategoryPage() {
     is_active: true,
   });
 
-  const authHeaders = () => ({ Authorization: `Bearer ${tokens?.access}` });
-
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    if (!tokens) return;
+    const token = await getValidToken();
+    if (!token) { setError('Session expired. Please log in again.'); return; }
     setSaving(true);
     setError('');
 
     try {
       const res = await fetch(apiUrl('/api/products/admin/categories/'), {
         method: 'POST',
-        headers: { ...authHeaders(), 'Content-Type': 'application/json' },
+        headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
         body: JSON.stringify({
           name: form.name,
           category_type: form.category_type,

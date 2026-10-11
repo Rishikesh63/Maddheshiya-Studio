@@ -209,7 +209,7 @@ export default function Navbar() {
                 >
                   My Profile
                 </Link>
-                {user.is_admin_user && (
+                {user.is_superuser && (
                   <Link
                     href="/admin"
                     className="block px-4 py-3 text-[10px] tracking-widest uppercase text-[var(--gold)]/70 hover:text-[var(--gold)] hover:bg-[var(--gold)]/5 transition-colors border-t border-white/5"
@@ -368,7 +368,7 @@ export default function Navbar() {
             >
               Book Now
             </Link>
-            {user?.is_admin_user && (
+            {user?.is_superuser && (
               <Link
                 href="/admin"
                 className="w-full py-3 text-center text-xs tracking-widest uppercase border border-[var(--gold)]/30 text-[var(--gold)]/70 hover:border-[var(--gold)] hover:text-[var(--gold)] transition-all"

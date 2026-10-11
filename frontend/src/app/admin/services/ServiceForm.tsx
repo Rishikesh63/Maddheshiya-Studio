@@ -16,7 +16,7 @@ const MAIN_CATEGORIES = [
 ];
 
 export default function ServiceForm({ serviceId }: ServiceFormProps) {
-  const { tokens } = useAuth();
+  const { getValidToken } = useAuth();
   const router = useRouter();
   const isEdit = !!serviceId;
 
@@ -38,32 +38,36 @@ export default function ServiceForm({ serviceId }: ServiceFormProps) {
     whats_included: '',
   });
 
-  const authHeaders = () => ({ Authorization: `Bearer ${tokens?.access}` });
-
   useEffect(() => {
-    if (!tokens || !isEdit) return;
-    fetch(apiUrl(`/api/services/admin/services/${serviceId}/`), { headers: authHeaders() })
-      .then(r => r.json())
-      .then(data => {
-        setForm({
-          name: data.name ?? '',
-          main_category: data.main_category ?? 'photography',
-          subcategory: data.subcategory ?? '',
-          description: data.description ?? '',
-          short_description: data.short_description ?? '',
-          base_price: data.base_price ?? '',
-          is_active: data.is_active ?? true,
-          is_featured: data.is_featured ?? false,
-          whats_included: data.whats_included ?? '',
+    if (!isEdit) return;
+    getValidToken().then(token => {
+      if (!token) return;
+      fetch(apiUrl(`/api/services/admin/services/${serviceId}/`), {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+        .then(r => r.json())
+        .then(data => {
+          setForm({
+            name: data.name ?? '',
+            main_category: data.main_category ?? 'photography',
+            subcategory: data.subcategory ?? '',
+            description: data.description ?? '',
+            short_description: data.short_description ?? '',
+            base_price: data.base_price ?? '',
+            is_active: data.is_active ?? true,
+            is_featured: data.is_featured ?? false,
+            whats_included: data.whats_included ?? '',
+          });
+          setExistingImage(data.image ?? data.thumbnail ?? '');
         });
-        setExistingImage(data.image ?? data.thumbnail ?? '');
-      });
+    });
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [tokens, serviceId]);
+  }, [serviceId]);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    if (!tokens) return;
+    const token = await getValidToken();
+    if (!token) { setError('Session expired. Please log in again.'); return; }
     setSaving(true);
     setError('');
 
@@ -79,7 +83,7 @@ export default function ServiceForm({ serviceId }: ServiceFormProps) {
     try {
       const res = await fetch(url, {
         method: isEdit ? 'PUT' : 'POST',
-        headers: authHeaders(),
+        headers: { Authorization: `Bearer ${token}` },
         body: fd,
       });
       if (!res.ok) {

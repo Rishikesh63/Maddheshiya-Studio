@@ -28,6 +28,7 @@ export default function CategoriesPage() {
       .then(r => r.json())
       .then(data => setCats(Array.isArray(data) ? data : data.results ?? []))
       .finally(() => setLoading(false));
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tokens]);
 
   const handleDelete = async (id: number, name: string) => {
@@ -69,7 +70,7 @@ export default function CategoriesPage() {
           <Tag size={36} className="text-zinc-700 mb-3" />
           <p className="text-zinc-400 text-sm">No categories yet.</p>
           <p className="text-zinc-600 text-xs mt-1 mb-4">
-            Create a category like "Photo Framing" (slug: photo-framing) to start uploading products.
+            Create a category like &ldquo;Photo Framing&rdquo; (slug: photo-framing) to start uploading products.
           </p>
           <Link
             href="/admin/categories/new"

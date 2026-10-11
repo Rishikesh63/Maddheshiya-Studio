@@ -1,6 +1,7 @@
 'use client';
 import { useState, useEffect, FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 import { useAuth } from '@/app/context/AuthContext';
 import { apiUrl } from '@/app/lib/api';
 
@@ -174,8 +175,7 @@ export default function ServiceForm({ serviceId }: ServiceFormProps) {
         <div>
           <label className="block text-xs font-medium text-zinc-400 mb-1">Cover Image</label>
           {existingImage && (
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={existingImage} alt="current" className="w-24 h-24 object-cover rounded mb-2 bg-zinc-800" />
+            <Image src={existingImage} alt="current" width={96} height={96} className="object-cover rounded mb-2 bg-zinc-800" />
           )}
           <input
             type="file"

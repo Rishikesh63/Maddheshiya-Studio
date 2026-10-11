@@ -1,6 +1,7 @@
 'use client';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useAuth } from '@/app/context/AuthContext';
 import { apiUrl } from '@/app/lib/api';
 import { Plus, Pencil, Trash2, ToggleLeft, ToggleRight } from 'lucide-react';
@@ -94,8 +95,7 @@ export default function AdminProductsPage() {
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-3">
                       {p.thumbnail && (
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img src={p.thumbnail} alt={p.name} className="w-9 h-9 rounded object-cover bg-zinc-800" />
+                        <Image src={p.thumbnail} alt={p.name} width={36} height={36} className="rounded object-cover bg-zinc-800" />
                       )}
                       <div>
                         <p className="font-medium text-white">{p.name}</p>

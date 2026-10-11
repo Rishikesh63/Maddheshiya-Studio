@@ -66,10 +66,10 @@ function SheetTile({
       className="group relative aspect-[4/3] overflow-hidden cursor-pointer hover:ring-1 hover:ring-[var(--gold)]/50 transition-all"
       onClick={onClick}
     >
-      {currentKey && (
+      {(() => { const u = getImageUrl(currentKey); return u ? (
         <Image
           key={currentKey}
-          src={getImageUrl(currentKey)}
+          src={u}
           alt={`Sheet ${num}`}
           fill
           sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, 20vw"
@@ -77,7 +77,7 @@ function SheetTile({
           onLoad={onLoad}
           onError={handleError}
         />
-      )}
+      ) : null; })()}
 
       <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
         <ZoomIn size={20} className="text-white" />
@@ -102,7 +102,9 @@ function LightboxImage({ product, num }: { product: PsdProduct; num: number }) {
     else setAttempt(2);
   };
 
-  if (!currentKey || attempt >= 2) {
+  const lightboxUrl = getImageUrl(currentKey);
+
+  if (!currentKey || attempt >= 2 || !lightboxUrl) {
     return (
       <div className="absolute inset-0 flex items-center justify-center">
         <ImageIcon size={48} className="text-gray-600" />
@@ -113,7 +115,7 @@ function LightboxImage({ product, num }: { product: PsdProduct; num: number }) {
   return (
     <Image
       key={currentKey}
-      src={getImageUrl(currentKey)}
+      src={lightboxUrl}
       alt={`Sheet ${num}`}
       fill
       sizes="92vw"

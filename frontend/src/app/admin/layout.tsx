@@ -25,12 +25,12 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const pathname = usePathname();
 
   useEffect(() => {
-    if (!loading && (!user || !user.is_superuser)) {
+    if (!loading && (!user || !user.is_admin_user)) {
       router.replace('/');
     }
   }, [user, loading, router]);
 
-  if (loading || !user?.is_superuser) {
+  if (loading || !user?.is_admin_user) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-black text-white">
         <div className="text-center">

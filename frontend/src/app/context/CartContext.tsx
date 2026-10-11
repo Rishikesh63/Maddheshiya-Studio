@@ -1,6 +1,7 @@
 "use client";
 
-import { createContext, useContext, useState, useEffect, ReactNode, useCallback } from "react";
+import { createContext, useContext, useState, useEffect, useCallback, ReactNode, useRef } from "react";
+import { useAuth } from "./AuthContext";
 
 export interface CartItem {
   id: string;
@@ -25,18 +26,32 @@ interface CartContextType {
 const CartContext = createContext<CartContextType | null>(null);
 
 export function CartProvider({ children }: { children: ReactNode }) {
+  const { user } = useAuth();
+  const cartKey = user ? `ms_cart_${user.user_id}` : "ms_cart_guest";
   const [items, setItems] = useState<CartItem[]>([]);
+  // Prevents saving the stale (previous-user) items immediately after a key change
+  const skipNextSaveRef = useRef(false);
 
+  // Reload cart whenever user changes (login / logout)
   useEffect(() => {
+    skipNextSaveRef.current = true;
     try {
-      const saved = localStorage.getItem("ms_cart");
-      if (saved) setItems(JSON.parse(saved));
-    } catch {}
-  }, []);
+      const saved = localStorage.getItem(cartKey);
+      setItems(saved ? JSON.parse(saved) : []);
+    } catch {
+      setItems([]);
+    }
+  }, [cartKey]);
 
+  // Persist to localStorage; skip the first write after a key change to avoid
+  // overwriting the new user's saved cart with the old user's items
   useEffect(() => {
-    localStorage.setItem("ms_cart", JSON.stringify(items));
-  }, [items]);
+    if (skipNextSaveRef.current) {
+      skipNextSaveRef.current = false;
+      return;
+    }
+    localStorage.setItem(cartKey, JSON.stringify(items));
+  }, [items, cartKey]);
 
   const addItem = useCallback((item: Omit<CartItem, "quantity">) => {
     setItems((prev) => {

@@ -57,8 +57,7 @@ export const getVideoUrl = (key: string): string | null => {
  * Assumes thumbnails are stored with .jpg extension
  * @param key - The S3 object key (path to the video)
  */
-export const getVideoThumbnail = (key: string): string => {
-  // Remove extension and add .jpg
+export const getVideoThumbnail = (key: string): string | null => {
   const thumbnailKey = key.replace(/\.[^/.]+$/, '') + '-thumb.jpg';
   return getImageUrl(thumbnailKey);
 };

@@ -2,10 +2,11 @@ from rest_framework import viewsets, filters, permissions
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, BasePermission
-from .models import ProductCategory, Product
+from .models import ProductCategory, Product, ProductSample
 from .serializers import (
     ProductCategorySerializer, ProductListSerializer, ProductDetailSerializer,
     AdminProductWriteSerializer, AdminProductCategoryWriteSerializer,
+    AdminProductSampleSerializer,
 )
 
 
@@ -83,3 +84,17 @@ class AdminProductCategoryViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         return ProductCategory.objects.all().order_by('category_type', 'order')
+
+
+class AdminProductSampleViewSet(viewsets.ModelViewSet):
+    """CRUD for product gallery images — admin only."""
+    permission_classes = [IsAdminUserCustom]
+    serializer_class = AdminProductSampleSerializer
+    lookup_field = 'id'
+
+    def get_queryset(self):
+        qs = ProductSample.objects.select_related('product').order_by('order', 'created_at')
+        product_id = self.request.query_params.get('product')
+        if product_id:
+            qs = qs.filter(product_id=product_id)
+        return qs

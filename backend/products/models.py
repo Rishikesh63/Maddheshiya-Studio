@@ -172,6 +172,10 @@ class ProductSample(models.Model):
     image = models.ImageField(
         upload_to='products/samples/%Y/%m/'
     )
+    label = models.CharField(
+        max_length=100, blank=True, default='',
+        help_text='e.g. Front View, Back View, Side View'
+    )
     title = models.CharField(max_length=255, blank=True)
     description = models.TextField(blank=True)
     order = models.PositiveIntegerField(default=0)

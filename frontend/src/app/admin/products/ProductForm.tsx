@@ -2,6 +2,7 @@
 import { useState, useEffect, FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
+import { Trash2, Plus, Loader2 } from 'lucide-react';
 import { useAuth } from '@/app/context/AuthContext';
 import { apiUrl } from '@/app/lib/api';
 
@@ -9,6 +10,13 @@ interface Category {
   id: number;
   name: string;
   category_type: string;
+}
+
+interface ProductSample {
+  id: number;
+  image: string;
+  label: string;
+  order: number;
 }
 
 interface ProductFormProps {
@@ -28,6 +36,16 @@ const DELIVERY_OPTIONS = [
   { value: '1-2 weeks', label: '1-2 Weeks' },
   { value: '2-4 weeks', label: '2-4 Weeks' },
   { value: 'custom', label: 'Custom' },
+];
+
+const ANGLE_LABELS = [
+  'Front View',
+  'Back View',
+  'Side View',
+  'Top View',
+  'Close-up',
+  'Lifestyle',
+  'Packaging',
 ];
 
 export default function ProductForm({ productId }: ProductFormProps) {
@@ -58,6 +76,13 @@ export default function ProductForm({ productId }: ProductFormProps) {
   const [heroImage, setHeroImage] = useState<File | null>(null);
   const [existingThumbnail, setExistingThumbnail] = useState('');
 
+  // Multi-image samples state
+  const [samples, setSamples] = useState<ProductSample[]>([]);
+  const [newSampleFile, setNewSampleFile] = useState<File | null>(null);
+  const [newSampleLabel, setNewSampleLabel] = useState('Front View');
+  const [uploadingSample, setUploadingSample] = useState(false);
+  const [sampleError, setSampleError] = useState('');
+
   useEffect(() => {
     getValidToken().then(token => {
       if (!token) return;
@@ -86,6 +111,10 @@ export default function ProductForm({ productId }: ProductFormProps) {
             });
             setExistingThumbnail(data.thumbnail ?? '');
           });
+        // Load existing samples
+        fetch(apiUrl(`/api/products/admin/samples/?product=${productId}`), { headers: h })
+          .then(r => r.json())
+          .then(data => setSamples(Array.isArray(data) ? data : data.results ?? []));
       }
     });
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -123,6 +152,51 @@ export default function ProductForm({ productId }: ProductFormProps) {
       setError('Something went wrong.');
     } finally {
       setSaving(false);
+    }
+  };
+
+  const handleAddSample = async () => {
+    if (!newSampleFile || !productId) return;
+    const token = await getValidToken();
+    if (!token) return;
+    setUploadingSample(true);
+    setSampleError('');
+    const fd = new FormData();
+    fd.append('product', String(productId));
+    fd.append('image', newSampleFile);
+    fd.append('label', newSampleLabel);
+    fd.append('order', String(samples.length));
+    try {
+      const res = await fetch(apiUrl('/api/products/admin/samples/'), {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}` },
+        body: fd,
+      });
+      if (!res.ok) { setSampleError('Upload failed.'); return; }
+      const created: ProductSample = await res.json();
+      setSamples(prev => [...prev, created]);
+      setNewSampleFile(null);
+      // Reset file input
+      const fileInput = document.getElementById('sample-file-input') as HTMLInputElement;
+      if (fileInput) fileInput.value = '';
+    } catch {
+      setSampleError('Upload failed.');
+    } finally {
+      setUploadingSample(false);
+    }
+  };
+
+  const handleDeleteSample = async (sampleId: number) => {
+    const token = await getValidToken();
+    if (!token) return;
+    try {
+      await fetch(apiUrl(`/api/products/admin/samples/${sampleId}/`), {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setSamples(prev => prev.filter(s => s.id !== sampleId));
+    } catch {
+      setSampleError('Delete failed.');
     }
   };
 
@@ -288,6 +362,80 @@ export default function ProductForm({ productId }: ProductFormProps) {
           </button>
         </div>
       </form>
+
+      {/* ── Additional Images (only available after product is created) ─────── */}
+      {isEdit && (
+        <div className="mt-10 border-t border-zinc-800 pt-8">
+          <h2 className="text-lg font-semibold text-white mb-1">Product Images</h2>
+          <p className="text-xs text-zinc-500 mb-5">
+            Upload multiple angles — Front View, Back View, Side View, etc. These appear as a gallery on the product page.
+          </p>
+
+          {/* Existing samples */}
+          {samples.length > 0 && (
+            <div className="grid grid-cols-3 sm:grid-cols-4 gap-3 mb-6">
+              {samples.map(s => (
+                <div key={s.id} className="relative group bg-zinc-800 rounded-lg overflow-hidden">
+                  <Image
+                    src={s.image}
+                    alt={s.label || 'sample'}
+                    width={120}
+                    height={90}
+                    className="w-full aspect-[4/3] object-cover"
+                  />
+                  <div className="px-2 py-1 bg-zinc-900/80">
+                    <p className="text-[10px] text-zinc-400 truncate">{s.label || '—'}</p>
+                  </div>
+                  <button
+                    onClick={() => handleDeleteSample(s.id)}
+                    className="absolute top-1.5 right-1.5 w-6 h-6 bg-red-600 rounded flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                    title="Delete"
+                  >
+                    <Trash2 size={11} className="text-white" />
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* Add new sample */}
+          <div className="bg-zinc-800/50 border border-zinc-700 rounded-lg p-4 space-y-3">
+            <p className="text-xs font-medium text-zinc-400">Add New Image</p>
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="block text-[11px] text-zinc-500 mb-1">Angle / Label</label>
+                <select
+                  value={newSampleLabel}
+                  onChange={e => setNewSampleLabel(e.target.value)}
+                  className="w-full bg-zinc-700 border border-zinc-600 rounded px-2 py-1.5 text-sm text-white focus:outline-none"
+                >
+                  {ANGLE_LABELS.map(l => <option key={l} value={l}>{l}</option>)}
+                </select>
+              </div>
+              <div>
+                <label className="block text-[11px] text-zinc-500 mb-1">Image File</label>
+                <input
+                  id="sample-file-input"
+                  type="file"
+                  accept="image/*"
+                  onChange={e => setNewSampleFile(e.target.files?.[0] ?? null)}
+                  className="w-full text-xs text-zinc-400 file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:bg-zinc-600 file:text-zinc-300 hover:file:bg-zinc-500"
+                />
+              </div>
+            </div>
+            {sampleError && <p className="text-red-400 text-xs">{sampleError}</p>}
+            <button
+              type="button"
+              onClick={handleAddSample}
+              disabled={!newSampleFile || uploadingSample}
+              className="flex items-center gap-2 px-4 py-2 bg-zinc-700 hover:bg-zinc-600 text-white text-sm rounded-lg disabled:opacity-40 transition-colors"
+            >
+              {uploadingSample ? <Loader2 size={14} className="animate-spin" /> : <Plus size={14} />}
+              {uploadingSample ? 'Uploading...' : 'Upload Image'}
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

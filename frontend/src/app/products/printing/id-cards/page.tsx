@@ -7,7 +7,7 @@ import Navbar from "../../../components/Navbar";
 import Footer from "../../../components/Footer";
 import { useCart } from "../../../context/CartContext";
 import { apiUrl } from "@/app/lib/api";
-import { ArrowLeft, ShoppingCart, Check, ImageIcon, Truck, Zap } from "lucide-react";
+import { ArrowLeft, ShoppingCart, Check, ImageIcon, Truck, Zap, ChevronLeft, ChevronRight } from "lucide-react";
 
 // ── Pricing ────────────────────────────────────────────────────────────────────
 
@@ -21,6 +21,13 @@ const QTY_OPTIONS = [10, 25, 50, 100, 250];
 
 // ── API product shape ──────────────────────────────────────────────────────────
 
+interface CardSample {
+  id: number;
+  image: string;
+  label: string;
+  order: number;
+}
+
 interface CardProduct {
   id: number;
   name: string;
@@ -28,16 +35,91 @@ interface CardProduct {
   thumbnail: string;
   short_description: string;
   status: string;
+  samples: CardSample[];
+}
+
+// ── Image gallery ──────────────────────────────────────────────────────────────
+
+function ImageGallery({ thumbnail, samples, name }: { thumbnail: string; samples: CardSample[]; name: string }) {
+  const images: { src: string; label: string }[] = [
+    { src: thumbnail, label: "Main" },
+    ...samples.map((s) => ({ src: s.image, label: s.label || "View" })),
+  ].filter((img) => !!img.src);
+
+  const [activeIdx, setActiveIdx] = useState(0);
+  const [imgError, setImgError] = useState<Record<number, boolean>>({});
+
+  const go = (dir: 1 | -1) => setActiveIdx((i) => (i + dir + images.length) % images.length);
+  const active = images[activeIdx];
+  const hasMultiple = images.length > 1;
+
+  if (images.length === 0) {
+    return (
+      <div className="relative aspect-[4/3] bg-[#0a0a0a] flex flex-col items-center justify-center gap-2">
+        <ImageIcon size={28} className="text-white/10" />
+        <span className="text-[9px] tracking-widest uppercase text-white/20">Design Preview</span>
+      </div>
+    );
+  }
+
+  return (
+    <div className="relative aspect-[4/3] bg-[#0a0a0a] overflow-hidden group/gallery">
+      {active && !imgError[activeIdx] ? (
+        <Image
+          src={active.src}
+          alt={`${name} — ${active.label}`}
+          fill
+          sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+          className="object-cover transition-opacity duration-300"
+          onError={() => setImgError((p) => ({ ...p, [activeIdx]: true }))}
+        />
+      ) : (
+        <div className="absolute inset-0 flex flex-col items-center justify-center gap-2">
+          <ImageIcon size={28} className="text-white/10" />
+        </div>
+      )}
+      {hasMultiple && active && (
+        <div className="absolute top-2 left-2 px-2 py-0.5 bg-black/60 text-[9px] tracking-widest uppercase text-white/70">
+          {active.label}
+        </div>
+      )}
+      {hasMultiple && (
+        <>
+          <button onClick={(e) => { e.stopPropagation(); go(-1); }} className="absolute left-1.5 top-1/2 -translate-y-1/2 w-6 h-6 bg-black/60 flex items-center justify-center opacity-0 group-hover/gallery:opacity-100 transition-opacity hover:bg-black/80" aria-label="Previous">
+            <ChevronLeft size={14} className="text-white" />
+          </button>
+          <button onClick={(e) => { e.stopPropagation(); go(1); }} className="absolute right-1.5 top-1/2 -translate-y-1/2 w-6 h-6 bg-black/60 flex items-center justify-center opacity-0 group-hover/gallery:opacity-100 transition-opacity hover:bg-black/80" aria-label="Next">
+            <ChevronRight size={14} className="text-white" />
+          </button>
+        </>
+      )}
+      {hasMultiple && (
+        <div className="absolute bottom-2 left-0 right-0 flex justify-center gap-1">
+          {images.map((_, i) => (
+            <button key={i} onClick={(e) => { e.stopPropagation(); setActiveIdx(i); }} className={`w-1.5 h-1.5 rounded-full transition-all ${i === activeIdx ? "bg-[var(--gold)] w-3" : "bg-white/30 hover:bg-white/60"}`} aria-label={`Image ${i + 1}`} />
+          ))}
+        </div>
+      )}
+      {images.length >= 3 && (
+        <div className="absolute bottom-0 left-0 right-0 flex gap-0.5 p-1 bg-black/50 opacity-0 group-hover/gallery:opacity-100 transition-opacity">
+          {images.map((img, i) => (
+            <button key={i} onClick={(e) => { e.stopPropagation(); setActiveIdx(i); }} className={`relative flex-1 aspect-square overflow-hidden border transition-all ${i === activeIdx ? "border-[var(--gold)]" : "border-transparent opacity-50 hover:opacity-80"}`}>
+              {!imgError[i] ? <Image src={img.src} alt={img.label} fill className="object-cover" sizes="40px" /> : <div className="w-full h-full bg-white/10" />}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
 }
 
 // ── ID Card card ───────────────────────────────────────────────────────────────
 
 function IdCardCard({ card }: { card: CardProduct }) {
   const { addItem } = useCart();
-  const [typeId, setTypeId]     = useState(CARD_TYPES[0].id);
-  const [qty, setQty]           = useState(10);
-  const [added, setAdded]       = useState(false);
-  const [imgError, setImgError] = useState(false);
+  const [typeId, setTypeId] = useState(CARD_TYPES[0].id);
+  const [qty, setQty]       = useState(10);
+  const [added, setAdded]   = useState(false);
 
   const cardType = CARD_TYPES.find((t) => t.id === typeId)!;
   const total    = cardType.pricePerCard * qty;
@@ -55,25 +137,8 @@ function IdCardCard({ card }: { card: CardProduct }) {
   }, [addItem, card, typeId, qty, cardType, total]);
 
   return (
-    <div className="bg-[#111111] border border-[var(--gold)]/10 flex flex-col overflow-hidden group">
-      {/* Design preview */}
-      <div className="relative aspect-[4/3] bg-[#0a0a0a] overflow-hidden">
-        {card.thumbnail && !imgError ? (
-          <Image
-            src={card.thumbnail}
-            alt={card.name}
-            fill
-            sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-            className="object-cover group-hover:scale-105 transition-transform duration-500"
-            onError={() => setImgError(true)}
-          />
-        ) : (
-          <div className="absolute inset-0 flex flex-col items-center justify-center gap-2">
-            <ImageIcon size={28} className="text-white/10" />
-            <span className="text-[9px] tracking-widest uppercase text-white/20">Design Preview</span>
-          </div>
-        )}
-      </div>
+    <div className="bg-[#111111] border border-[var(--gold)]/10 flex flex-col overflow-hidden">
+      <ImageGallery thumbnail={card.thumbnail} samples={card.samples ?? []} name={card.name} />
 
       {/* Card body */}
       <div className="p-4 flex flex-col flex-1 gap-3">

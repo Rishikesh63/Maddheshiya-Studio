@@ -7,9 +7,9 @@ import Navbar from "../../../components/Navbar";
 import Footer from "../../../components/Footer";
 import { useCart } from "../../../context/CartContext";
 import { apiUrl } from "@/app/lib/api";
-import { ArrowLeft, ShoppingCart, Check, ImageIcon, Truck } from "lucide-react";
+import { ArrowLeft, ShoppingCart, Check, ImageIcon, Truck, ChevronLeft, ChevronRight } from "lucide-react";
 
-// ── Sizes & Materials (business logic — admin sets designs, these stay fixed) ──
+// ── Sizes & Materials ──────────────────────────────────────────────────────────
 
 const SIZES = [
   { id: "8x12",   label: "8×12",   inches: "8 × 12 in",   price: 499  },
@@ -29,6 +29,13 @@ const MATERIALS = [
 
 // ── API product shape ──────────────────────────────────────────────────────────
 
+interface FrameSample {
+  id: number;
+  image: string;
+  label: string;
+  order: number;
+}
+
 interface FrameProduct {
   id: number;
   name: string;
@@ -36,19 +43,131 @@ interface FrameProduct {
   thumbnail: string;
   short_description: string;
   status: string;
+  samples: FrameSample[];
+}
+
+// ── Image carousel ─────────────────────────────────────────────────────────────
+
+function ImageGallery({ thumbnail, samples, name }: { thumbnail: string; samples: FrameSample[]; name: string }) {
+  // First slot is always the thumbnail; rest are angle shots
+  const images: { src: string; label: string }[] = [
+    { src: thumbnail, label: "Main" },
+    ...samples.map((s) => ({ src: s.image, label: s.label || "View" })),
+  ].filter((img) => !!img.src);
+
+  const [activeIdx, setActiveIdx] = useState(0);
+  const [imgError, setImgError] = useState<Record<number, boolean>>({});
+
+  const go = (dir: 1 | -1) =>
+    setActiveIdx((i) => (i + dir + images.length) % images.length);
+
+  const active = images[activeIdx];
+  const hasMultiple = images.length > 1;
+
+  if (images.length === 0) {
+    return (
+      <div className="relative aspect-[4/3] bg-[#0a0a0a] flex flex-col items-center justify-center gap-2">
+        <ImageIcon size={28} className="text-white/10" />
+        <span className="text-[9px] tracking-widest uppercase text-white/20">Frame Preview</span>
+      </div>
+    );
+  }
+
+  return (
+    <div className="relative aspect-[4/3] bg-[#0a0a0a] overflow-hidden group/gallery">
+      {/* Main image */}
+      {active && !imgError[activeIdx] ? (
+        <Image
+          src={active.src}
+          alt={`${name} — ${active.label}`}
+          fill
+          sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+          className="object-cover transition-opacity duration-300"
+          onError={() => setImgError((p) => ({ ...p, [activeIdx]: true }))}
+        />
+      ) : (
+        <div className="absolute inset-0 flex flex-col items-center justify-center gap-2">
+          <ImageIcon size={28} className="text-white/10" />
+        </div>
+      )}
+
+      {/* Angle label badge */}
+      {hasMultiple && active && (
+        <div className="absolute top-2 left-2 px-2 py-0.5 bg-black/60 text-[9px] tracking-widest uppercase text-white/70">
+          {active.label}
+        </div>
+      )}
+
+      {/* Prev / Next arrows */}
+      {hasMultiple && (
+        <>
+          <button
+            onClick={(e) => { e.stopPropagation(); go(-1); }}
+            className="absolute left-1.5 top-1/2 -translate-y-1/2 w-6 h-6 bg-black/60 flex items-center justify-center opacity-0 group-hover/gallery:opacity-100 transition-opacity hover:bg-black/80"
+            aria-label="Previous image"
+          >
+            <ChevronLeft size={14} className="text-white" />
+          </button>
+          <button
+            onClick={(e) => { e.stopPropagation(); go(1); }}
+            className="absolute right-1.5 top-1/2 -translate-y-1/2 w-6 h-6 bg-black/60 flex items-center justify-center opacity-0 group-hover/gallery:opacity-100 transition-opacity hover:bg-black/80"
+            aria-label="Next image"
+          >
+            <ChevronRight size={14} className="text-white" />
+          </button>
+        </>
+      )}
+
+      {/* Dot indicators */}
+      {hasMultiple && (
+        <div className="absolute bottom-2 left-0 right-0 flex justify-center gap-1">
+          {images.map((_, i) => (
+            <button
+              key={i}
+              onClick={(e) => { e.stopPropagation(); setActiveIdx(i); }}
+              className={`w-1.5 h-1.5 rounded-full transition-all ${
+                i === activeIdx ? "bg-[var(--gold)] w-3" : "bg-white/30 hover:bg-white/60"
+              }`}
+              aria-label={`Image ${i + 1}`}
+            />
+          ))}
+        </div>
+      )}
+
+      {/* Thumbnail strip (only when ≥ 2 extras) */}
+      {images.length >= 3 && (
+        <div className="absolute bottom-0 left-0 right-0 flex gap-0.5 p-1 bg-black/50 opacity-0 group-hover/gallery:opacity-100 transition-opacity">
+          {images.map((img, i) => (
+            <button
+              key={i}
+              onClick={(e) => { e.stopPropagation(); setActiveIdx(i); }}
+              className={`relative flex-1 aspect-square overflow-hidden border transition-all ${
+                i === activeIdx ? "border-[var(--gold)]" : "border-transparent opacity-50 hover:opacity-80"
+              }`}
+            >
+              {!imgError[i] ? (
+                <Image src={img.src} alt={img.label} fill className="object-cover" sizes="40px" />
+              ) : (
+                <div className="w-full h-full bg-white/10" />
+              )}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
 }
 
 // ── Frame card ─────────────────────────────────────────────────────────────────
 
 function FrameCard({ frame }: { frame: FrameProduct }) {
   const { addItem } = useCart();
-  const [sizeId, setSizeId]     = useState(SIZES[3].id);         // default 12×18
-  const [matId, setMatId]       = useState(MATERIALS[0].id);     // default Wood
-  const [added, setAdded]       = useState(false);
-  const [imgError, setImgError] = useState(false);
+  const [sizeId, setSizeId] = useState(SIZES[3].id);
+  const [matId, setMatId]   = useState(MATERIALS[0].id);
+  const [added, setAdded]   = useState(false);
 
-  const size = SIZES.find((s) => s.id === sizeId)!;
-  const mat  = MATERIALS.find((m) => m.id === matId)!;
+  const size  = SIZES.find((s) => s.id === sizeId)!;
+  const mat   = MATERIALS.find((m) => m.id === matId)!;
   const price = size.price + mat.extra;
 
   const handleAdd = useCallback(() => {
@@ -64,25 +183,8 @@ function FrameCard({ frame }: { frame: FrameProduct }) {
   }, [addItem, frame, sizeId, matId, size, mat, price]);
 
   return (
-    <div className="bg-[#111111] border border-[var(--gold)]/10 flex flex-col overflow-hidden group">
-      {/* Frame preview image */}
-      <div className="relative aspect-[4/3] bg-[#0a0a0a] overflow-hidden">
-        {frame.thumbnail && !imgError ? (
-          <Image
-            src={frame.thumbnail}
-            alt={frame.name}
-            fill
-            sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-            className="object-cover group-hover:scale-105 transition-transform duration-500"
-            onError={() => setImgError(true)}
-          />
-        ) : (
-          <div className="absolute inset-0 flex flex-col items-center justify-center gap-2">
-            <ImageIcon size={28} className="text-white/10" />
-            <span className="text-[9px] tracking-widest uppercase text-white/20">Frame Preview</span>
-          </div>
-        )}
-      </div>
+    <div className="bg-[#111111] border border-[var(--gold)]/10 flex flex-col overflow-hidden">
+      <ImageGallery thumbnail={frame.thumbnail} samples={frame.samples ?? []} name={frame.name} />
 
       {/* Card body */}
       <div className="p-4 flex flex-col flex-1 gap-3">
@@ -134,10 +236,7 @@ function FrameCard({ frame }: { frame: FrameProduct }) {
 
         {/* Price + CTA */}
         <div className="flex items-center justify-between mt-auto pt-2 border-t border-white/5">
-          <span
-            className="text-xl font-light text-[var(--gold)]"
-            style={{ fontFamily: "var(--font-cormorant)" }}
-          >
+          <span className="text-xl font-light text-[var(--gold)]" style={{ fontFamily: "var(--font-cormorant)" }}>
             ₹{price}
           </span>
           <button
@@ -156,7 +255,7 @@ function FrameCard({ frame }: { frame: FrameProduct }) {
   );
 }
 
-// ── Skeleton loader ────────────────────────────────────────────────────────────
+// ── Skeleton ───────────────────────────────────────────────────────────────────
 
 function SkeletonCard() {
   return (
@@ -164,13 +263,8 @@ function SkeletonCard() {
       <div className="aspect-[4/3] bg-white/5" />
       <div className="p-4 space-y-3">
         <div className="h-4 bg-white/5 rounded w-3/4" />
-        <div className="h-3 bg-white/5 rounded w-1/2" />
-        <div className="flex gap-1">
-          {[...Array(4)].map((_, i) => <div key={i} className="h-6 w-12 bg-white/5 rounded" />)}
-        </div>
-        <div className="flex gap-1">
-          {[...Array(3)].map((_, i) => <div key={i} className="flex-1 h-8 bg-white/5 rounded" />)}
-        </div>
+        <div className="flex gap-1">{[...Array(4)].map((_, i) => <div key={i} className="h-6 w-12 bg-white/5 rounded" />)}</div>
+        <div className="flex gap-1">{[...Array(3)].map((_, i) => <div key={i} className="flex-1 h-8 bg-white/5 rounded" />)}</div>
         <div className="h-8 bg-white/5 rounded" />
       </div>
     </div>
@@ -226,10 +320,7 @@ export default function PhotoFramingPage() {
           <span className="text-[10px] tracking-[0.4em] uppercase text-[var(--gold)]/60 block mb-3">
             Printing Service
           </span>
-          <h1
-            className="text-4xl md:text-6xl font-light text-white mb-3"
-            style={{ fontFamily: "var(--font-cormorant)" }}
-          >
+          <h1 className="text-4xl md:text-6xl font-light text-white mb-3" style={{ fontFamily: "var(--font-cormorant)" }}>
             Photo Framing
           </h1>
           <div className="w-12 h-px bg-[var(--gold)]/40 mb-5" />
@@ -237,8 +328,6 @@ export default function PhotoFramingPage() {
             Choose a frame style, pick your size and material, then add to cart.
             Share your photo on WhatsApp after ordering — we deliver to your door.
           </p>
-
-          {/* Delivery note */}
           <div className="flex items-center gap-2 mt-5 text-xs text-white/30">
             <Truck size={13} className="text-[var(--gold)]/40" />
             Delivery in 3–7 working days · Free delivery above ₹999
@@ -256,18 +345,12 @@ export default function PhotoFramingPage() {
           ) : frames.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-28 text-center">
               <ImageIcon size={40} className="text-white/10 mb-4" />
-              <p className="text-white/30 text-sm tracking-widest uppercase">
-                Frame examples coming soon
-              </p>
-              <p className="text-white/20 text-xs mt-2">
-                The admin is uploading frame designs. Check back shortly.
-              </p>
+              <p className="text-white/30 text-sm tracking-widest uppercase">Frame examples coming soon</p>
+              <p className="text-white/20 text-xs mt-2">The admin is uploading frame designs. Check back shortly.</p>
             </div>
           ) : (
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-              {frames.map((f) => (
-                <FrameCard key={f.id} frame={f} />
-              ))}
+              {frames.map((f) => <FrameCard key={f.id} frame={f} />)}
             </div>
           )}
         </div>
@@ -276,23 +359,18 @@ export default function PhotoFramingPage() {
       {/* How it works */}
       <section className="px-6 pb-20 border-t border-[var(--gold)]/10">
         <div className="max-w-4xl mx-auto pt-14">
-          <h2
-            className="text-2xl font-light text-white text-center mb-10"
-            style={{ fontFamily: "var(--font-cormorant)" }}
-          >
+          <h2 className="text-2xl font-light text-white text-center mb-10" style={{ fontFamily: "var(--font-cormorant)" }}>
             How It Works
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-4 gap-6 text-center">
             {[
-              { step: "1", title: "Choose Frame",    desc: "Pick a frame design from our catalog above." },
-              { step: "2", title: "Select Size",     desc: "Choose your preferred print size and material." },
-              { step: "3", title: "Add to Cart",     desc: "Add items to cart and complete checkout." },
-              { step: "4", title: "Share Your Photo",desc: "Send your photo on WhatsApp after order — we print & deliver." },
+              { step: "1", title: "Choose Frame",     desc: "Pick a frame design from our catalog above." },
+              { step: "2", title: "Select Size",      desc: "Choose your preferred print size and material." },
+              { step: "3", title: "Add to Cart",      desc: "Add items to cart and complete checkout." },
+              { step: "4", title: "Share Your Photo", desc: "Send your photo on WhatsApp after order — we print & deliver." },
             ].map(({ step, title, desc }) => (
               <div key={step} className="flex flex-col items-center gap-3">
-                <div className="w-9 h-9 bg-[var(--gold)] text-black text-sm font-bold flex items-center justify-center">
-                  {step}
-                </div>
+                <div className="w-9 h-9 bg-[var(--gold)] text-black text-sm font-bold flex items-center justify-center">{step}</div>
                 <p className="text-sm font-medium text-white">{title}</p>
                 <p className="text-[11px] text-white/30 leading-relaxed">{desc}</p>
               </div>

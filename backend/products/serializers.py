@@ -11,7 +11,14 @@ class ProductCategorySerializer(serializers.ModelSerializer):
 class ProductSampleSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProductSample
-        fields = ['id', 'image', 'title', 'description', 'order']
+        fields = ['id', 'image', 'label', 'title', 'description', 'order']
+
+
+class AdminProductSampleSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ProductSample
+        fields = ['id', 'product', 'image', 'label', 'order']
+        read_only_fields = ['id']
 
 
 class ProductFeatureSerializer(serializers.ModelSerializer):
@@ -22,6 +29,7 @@ class ProductFeatureSerializer(serializers.ModelSerializer):
 
 class ProductListSerializer(serializers.ModelSerializer):
     category = ProductCategorySerializer(read_only=True)
+    samples = ProductSampleSerializer(many=True, read_only=True)
     current_price = serializers.DecimalField(max_digits=10, decimal_places=2, read_only=True)
     has_discount = serializers.BooleanField(read_only=True)
     discount_percentage = serializers.IntegerField(read_only=True)
@@ -31,7 +39,7 @@ class ProductListSerializer(serializers.ModelSerializer):
         fields = [
             'id', 'name', 'slug', 'category', 'short_description',
             'thumbnail', 'price', 'discount_price', 'current_price',
-            'has_discount', 'discount_percentage', 'status', 'featured',
+            'has_discount', 'discount_percentage', 'status', 'featured', 'samples',
         ]
 
 

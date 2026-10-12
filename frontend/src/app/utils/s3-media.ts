@@ -19,6 +19,8 @@ export const getImageUrl = (
   key: string | null | undefined
 ): string | null => {
   if (!key) return null;
+  // Pass through URLs that are already fully qualified (e.g. from the products API)
+  if (key.startsWith('https://') || key.startsWith('http://')) return key;
   // If CloudFront URL is configured, use it (recommended for production)
   if (CLOUDFRONT_URL) {
     return `${CLOUDFRONT_URL}/${key}`;

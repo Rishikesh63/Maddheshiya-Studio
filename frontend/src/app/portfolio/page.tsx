@@ -4,7 +4,7 @@ import Image from "next/image";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import BookingCTA from "../components/BookingCTA";
-import { staticPortfolioItems } from "./staticData";
+import { staticPortfolioItems, StaticPortfolioItem } from "./staticData";
 import { getImageUrl } from "../utils/s3-media";
 
 export const metadata: Metadata = {
@@ -14,14 +14,56 @@ export const metadata: Metadata = {
 };
 
 const categories = [
-  { slug: "all", label: "All" },
-  { slug: "photography", label: "Photography" },
-  { slug: "videography", label: "Videography" },
+  { slug: "all",              label: "All" },
+  { slug: "photography",     label: "Photography" },
+  { slug: "videography",     label: "Videography" },
   { slug: "invitation-video", label: "Invitation" },
-  { slug: "album-design", label: "Albums" },
-  { slug: "printing", label: "Printing" },
-  { slug: "framing", label: "Framing" },
+  { slug: "album-design",    label: "Albums" },
+  { slug: "printing",        label: "Printing" },
+  { slug: "framing",         label: "Framing" },
 ];
+
+// ── Fetch live products from the products API for dynamic categories ───────────
+
+interface ApiProduct {
+  id: number;
+  name: string;
+  thumbnail: string;
+  status: string;
+}
+
+async function fetchProductItems(
+  apiCategory: string,
+  portfolioCategory: string,
+  portfolioCategoryLabel: string,
+  href: string,
+): Promise<StaticPortfolioItem[]> {
+  try {
+    const base = process.env.NEXT_PUBLIC_API_URL ?? "https://maddheshiya-studio.onrender.com";
+    const res = await fetch(
+      `${base}/api/products/products/?category=${apiCategory}`,
+      { next: { revalidate: 300 } },
+    );
+    if (!res.ok) return [];
+    const data = await res.json();
+    const products: ApiProduct[] = Array.isArray(data) ? data : (data.results ?? []);
+    return products
+      .filter((p) => p.thumbnail && p.status === "active")
+      .map((p) => ({
+        id: `api-${portfolioCategory}-${p.id}`,
+        title: p.name,
+        category: portfolioCategory,
+        categoryLabel: portfolioCategoryLabel,
+        // thumbnail is already a full CloudFront URL — getImageUrl will pass it through
+        image: p.thumbnail,
+        href,
+      }));
+  } catch {
+    return [];
+  }
+}
+
+// ── Page ───────────────────────────────────────────────────────────────────────
 
 export default async function PortfolioPage({
   searchParams,
@@ -31,9 +73,24 @@ export default async function PortfolioPage({
   const { category } = await searchParams;
   const activeCategory = category && category !== "all" ? category : undefined;
 
+  // Fetch dynamic items for framing and printing categories in parallel
+  const needsFraming  = !activeCategory || activeCategory === "framing";
+  const needsPrinting = !activeCategory || activeCategory === "printing";
+
+  const [framingItems, printingItems] = await Promise.all([
+    needsFraming
+      ? fetchProductItems("photo-framing", "framing", "Photo Framing", "/products/printing/photo-framing")
+      : Promise.resolve([] as StaticPortfolioItem[]),
+    needsPrinting
+      ? fetchProductItems("id-cards", "printing", "Printing", "/products/printing/id-cards")
+      : Promise.resolve([] as StaticPortfolioItem[]),
+  ]);
+
+  const allItems = [...staticPortfolioItems, ...framingItems, ...printingItems];
+
   const filtered = activeCategory
-    ? staticPortfolioItems.filter((i) => i.category === activeCategory)
-    : staticPortfolioItems;
+    ? allItems.filter((i) => i.category === activeCategory)
+    : allItems;
 
   return (
     <div className="bg-[var(--black)]">
@@ -81,45 +138,56 @@ export default async function PortfolioPage({
       {/* Grid */}
       <section className="pb-24 px-6">
         <div className="max-w-7xl mx-auto">
-          <div className="columns-1 sm:columns-2 lg:columns-3 gap-4 space-y-4">
-            {filtered.map((item) => {
-              const src = item.youtubeId
-                ? `https://img.youtube.com/vi/${item.youtubeId}/maxresdefault.jpg`
-                : item.image
-                ? getImageUrl(item.image)
-                : null;
+          {filtered.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-28 text-center">
+              <p className="text-white/30 text-sm tracking-widest uppercase">
+                Coming soon
+              </p>
+              <p className="text-white/20 text-xs mt-2">
+                We&apos;re adding work to this section. Check back shortly.
+              </p>
+            </div>
+          ) : (
+            <div className="columns-1 sm:columns-2 lg:columns-3 gap-4 space-y-4">
+              {filtered.map((item) => {
+                const src = item.youtubeId
+                  ? `https://img.youtube.com/vi/${item.youtubeId}/maxresdefault.jpg`
+                  : item.image
+                  ? getImageUrl(item.image)
+                  : null;
 
-              if (!src) return null;
+                if (!src) return null;
 
-              return (
-                <Link
-                  key={item.id}
-                  href={item.href}
-                  className="group block break-inside-avoid"
-                >
-                  <div className="relative overflow-hidden bg-[var(--black-card)]">
-                    <Image
-                      src={src}
-                      alt={item.title}
-                      width={600}
-                      height={400}
-                      unoptimized={!!item.youtubeId}
-                      className="w-full object-cover transition-transform duration-700 group-hover:scale-105"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-400" />
-                    <div className="absolute bottom-0 left-0 right-0 p-5 translate-y-4 group-hover:translate-y-0 opacity-0 group-hover:opacity-100 transition-all duration-400">
-                      <span className="text-[9px] tracking-[0.3em] uppercase text-[var(--gold)]/70 block mb-1">
-                        {item.categoryLabel}
-                      </span>
-                      <h3 className="text-lg font-light text-white" style={{ fontFamily: "var(--font-cormorant)" }}>
-                        {item.title}
-                      </h3>
+                return (
+                  <Link
+                    key={item.id}
+                    href={item.href}
+                    className="group block break-inside-avoid"
+                  >
+                    <div className="relative overflow-hidden bg-[var(--black-card)]">
+                      <Image
+                        src={src}
+                        alt={item.title}
+                        width={600}
+                        height={400}
+                        unoptimized={!!item.youtubeId}
+                        className="w-full object-cover transition-transform duration-700 group-hover:scale-105"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-400" />
+                      <div className="absolute bottom-0 left-0 right-0 p-5 translate-y-4 group-hover:translate-y-0 opacity-0 group-hover:opacity-100 transition-all duration-400">
+                        <span className="text-[9px] tracking-[0.3em] uppercase text-[var(--gold)]/70 block mb-1">
+                          {item.categoryLabel}
+                        </span>
+                        <h3 className="text-lg font-light text-white" style={{ fontFamily: "var(--font-cormorant)" }}>
+                          {item.title}
+                        </h3>
+                      </div>
                     </div>
-                  </div>
-                </Link>
-              );
-            })}
-          </div>
+                  </Link>
+                );
+              })}
+            </div>
+          )}
         </div>
       </section>
 

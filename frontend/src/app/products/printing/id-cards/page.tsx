@@ -55,7 +55,7 @@ function ImageGallery({ thumbnail, samples, name }: { thumbnail: string; samples
 
   if (images.length === 0) {
     return (
-      <div className="relative aspect-[4/3] bg-[#0a0a0a] flex flex-col items-center justify-center gap-2">
+      <div className="relative aspect-square bg-[#0a0a0a] flex flex-col items-center justify-center gap-2">
         <ImageIcon size={28} className="text-white/10" />
         <span className="text-[9px] tracking-widest uppercase text-white/20">Design Preview</span>
       </div>
@@ -63,14 +63,14 @@ function ImageGallery({ thumbnail, samples, name }: { thumbnail: string; samples
   }
 
   return (
-    <div className="relative aspect-[4/3] bg-[#0a0a0a] overflow-hidden group/gallery">
+    <div className="relative aspect-square bg-[#0a0a0a] overflow-hidden group/gallery">
       {active && !imgError[activeIdx] ? (
         <Image
           src={active.src}
           alt={`${name} — ${active.label}`}
           fill
           sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-          className="object-cover transition-opacity duration-300"
+          className="object-contain transition-opacity duration-300"
           onError={() => setImgError((p) => ({ ...p, [activeIdx]: true }))}
         />
       ) : (
@@ -218,7 +218,7 @@ function IdCardCard({ card }: { card: CardProduct }) {
 function SkeletonCard() {
   return (
     <div className="bg-[#111111] border border-[var(--gold)]/10 overflow-hidden animate-pulse">
-      <div className="aspect-[4/3] bg-white/5" />
+      <div className="aspect-square bg-white/5" />
       <div className="p-4 space-y-3">
         <div className="h-4 bg-white/5 rounded w-3/4" />
         <div className="h-3 bg-white/5 rounded w-1/2" />

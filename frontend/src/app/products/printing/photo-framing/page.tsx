@@ -12,13 +12,19 @@ import { ArrowLeft, ShoppingCart, Check, ImageIcon, Truck, ChevronLeft, ChevronR
 // ── Sizes & Materials ──────────────────────────────────────────────────────────
 
 const SIZES = [
-  { id: "8x12",   label: "8×12",   inches: "8 × 12 in",   price: 499  },
-  { id: "10x12",  label: "10×12",  inches: "10 × 12 in",  price: 599  },
-  { id: "12x15",  label: "12×15",  inches: "12 × 15 in",  price: 699  },
-  { id: "12x18",  label: "12×18",  inches: "12 × 18 in",  price: 799, popular: true },
-  { id: "16x30",  label: "16×30",  inches: "16 × 30 in",  price: 999  },
-  { id: "20x24",  label: "20×24",  inches: "20 × 24 in",  price: 1199 },
-  { id: "24x36",  label: "24×36",  inches: "24 × 36 in",  price: 1499 },
+  { id: "6x8",    label: "6×8",    w: 6,  h: 8,  price: 399              },
+  { id: "8x10",   label: "8×10",   w: 8,  h: 10, price: 449              },
+  { id: "8x12",   label: "8×12",   w: 8,  h: 12, price: 499              },
+  { id: "10x12",  label: "10×12",  w: 10, h: 12, price: 599              },
+  { id: "10x15",  label: "10×15",  w: 10, h: 15, price: 649              },
+  { id: "12x15",  label: "12×15",  w: 12, h: 15, price: 699              },
+  { id: "12x18",  label: "12×18",  w: 12, h: 18, price: 799, popular: true },
+  { id: "16x20",  label: "16×20",  w: 16, h: 20, price: 999              },
+  { id: "16x24",  label: "16×24",  w: 16, h: 24, price: 1099             },
+  { id: "18x24",  label: "18×24",  w: 18, h: 24, price: 1149             },
+  { id: "20x24",  label: "20×24",  w: 20, h: 24, price: 1199             },
+  { id: "20x30",  label: "20×30",  w: 20, h: 30, price: 1399             },
+  { id: "24x36",  label: "24×36",  w: 24, h: 36, price: 1499             },
 ];
 
 const MATERIALS = [
@@ -46,10 +52,21 @@ interface FrameProduct {
   samples: FrameSample[];
 }
 
-// ── Image carousel ─────────────────────────────────────────────────────────────
+// ── Image gallery with real-time size preview ──────────────────────────────────
 
-function ImageGallery({ thumbnail, samples, name }: { thumbnail: string; samples: FrameSample[]; name: string }) {
-  // First slot is always the thumbnail; rest are angle shots
+function ImageGallery({
+  thumbnail,
+  samples,
+  name,
+  aspectW,
+  aspectH,
+}: {
+  thumbnail: string;
+  samples: FrameSample[];
+  name: string;
+  aspectW: number;
+  aspectH: number;
+}) {
   const images: { src: string; label: string }[] = [
     { src: thumbnail, label: "Main" },
     ...samples.map((s) => ({ src: s.image, label: s.label || "View" })),
@@ -64,79 +81,109 @@ function ImageGallery({ thumbnail, samples, name }: { thumbnail: string; samples
   const active = images[activeIdx];
   const hasMultiple = images.length > 1;
 
+  // Compute frame proportions inside the square container.
+  // Container = 1:1. Frame fills 88% of the dominant axis.
+  const MAX = 88; // % utilization of the container
+  const ratio = aspectH / aspectW; // e.g. 12/8 = 1.5 for 8×12
+  const frameW = ratio >= 1 ? (MAX / ratio)      : MAX;
+  const frameH = ratio >= 1 ? MAX                : (MAX * ratio);
+
   if (images.length === 0) {
     return (
-      <div className="relative aspect-[4/3] bg-[#0a0a0a] flex flex-col items-center justify-center gap-2">
-        <ImageIcon size={28} className="text-white/10" />
-        <span className="text-[9px] tracking-widest uppercase text-white/20">Frame Preview</span>
+      <div className="relative aspect-square bg-[#0a0a0a] flex flex-col items-center justify-center gap-2">
+        <div
+          className="flex items-center justify-center border border-white/10"
+          style={{
+            width: `${frameW}%`,
+            height: `${frameH}%`,
+            transition: "width 0.45s cubic-bezier(.4,0,.2,1), height 0.45s cubic-bezier(.4,0,.2,1)",
+          }}
+        >
+          <ImageIcon size={22} className="text-white/10" />
+        </div>
+        <span className="text-[9px] tracking-widest uppercase text-white/20 mt-2">Frame Preview</span>
       </div>
     );
   }
 
   return (
-    <div className="relative aspect-[4/3] bg-[#0a0a0a] overflow-hidden group/gallery">
-      {/* Main image */}
-      {active && !imgError[activeIdx] ? (
-        <Image
-          src={active.src}
-          alt={`${name} — ${active.label}`}
-          fill
-          sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-          className="object-cover transition-opacity duration-300"
-          onError={() => setImgError((p) => ({ ...p, [activeIdx]: true }))}
-        />
-      ) : (
-        <div className="absolute inset-0 flex flex-col items-center justify-center gap-2">
-          <ImageIcon size={28} className="text-white/10" />
-        </div>
-      )}
+    // Outer container is always 1:1 — no layout shift
+    <div className="relative aspect-square bg-[#0a0a0a] overflow-hidden group/gallery flex items-center justify-center">
 
-      {/* Angle label badge */}
-      {hasMultiple && active && (
-        <div className="absolute top-2 left-2 px-2 py-0.5 bg-black/60 text-[9px] tracking-widest uppercase text-white/70">
-          {active.label}
-        </div>
-      )}
+      {/* ── Animated frame ─────────────────────────────────────────────────── */}
+      <div
+        className="relative overflow-hidden group/frame"
+        style={{
+          width:  `${frameW}%`,
+          height: `${frameH}%`,
+          transition: "width 0.45s cubic-bezier(.4,0,.2,1), height 0.45s cubic-bezier(.4,0,.2,1)",
+          // Simulate a picture frame: inner image + outer shadow
+          boxShadow: "0 0 0 2px rgba(200,163,82,0.35), 0 0 0 6px #1a1500, 0 12px 40px rgba(0,0,0,0.85)",
+        }}
+      >
+        {/* Image */}
+        {active && !imgError[activeIdx] ? (
+          <Image
+            src={active.src}
+            alt={`${name} — ${active.label}`}
+            fill
+            sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+            className="object-cover"
+            onError={() => setImgError((p) => ({ ...p, [activeIdx]: true }))}
+          />
+        ) : (
+          <div className="absolute inset-0 flex items-center justify-center bg-[#111]">
+            <ImageIcon size={20} className="text-white/10" />
+          </div>
+        )}
 
-      {/* Prev / Next arrows */}
-      {hasMultiple && (
-        <>
-          <button
-            onClick={(e) => { e.stopPropagation(); go(-1); }}
-            className="absolute left-1.5 top-1/2 -translate-y-1/2 w-6 h-6 bg-black/60 flex items-center justify-center opacity-0 group-hover/gallery:opacity-100 transition-opacity hover:bg-black/80"
-            aria-label="Previous image"
-          >
-            <ChevronLeft size={14} className="text-white" />
-          </button>
-          <button
-            onClick={(e) => { e.stopPropagation(); go(1); }}
-            className="absolute right-1.5 top-1/2 -translate-y-1/2 w-6 h-6 bg-black/60 flex items-center justify-center opacity-0 group-hover/gallery:opacity-100 transition-opacity hover:bg-black/80"
-            aria-label="Next image"
-          >
-            <ChevronRight size={14} className="text-white" />
-          </button>
-        </>
-      )}
+        {/* Angle label badge */}
+        {hasMultiple && active && (
+          <div className="absolute top-1.5 left-1.5 px-1.5 py-0.5 bg-black/70 text-[8px] tracking-widest uppercase text-white/70">
+            {active.label}
+          </div>
+        )}
 
-      {/* Dot indicators */}
-      {hasMultiple && (
-        <div className="absolute bottom-2 left-0 right-0 flex justify-center gap-1">
-          {images.map((_, i) => (
+        {/* Prev / Next arrows */}
+        {hasMultiple && (
+          <>
             <button
-              key={i}
-              onClick={(e) => { e.stopPropagation(); setActiveIdx(i); }}
-              className={`w-1.5 h-1.5 rounded-full transition-all ${
-                i === activeIdx ? "bg-[var(--gold)] w-3" : "bg-white/30 hover:bg-white/60"
-              }`}
-              aria-label={`Image ${i + 1}`}
-            />
-          ))}
-        </div>
-      )}
+              onClick={(e) => { e.stopPropagation(); go(-1); }}
+              className="absolute left-1 top-1/2 -translate-y-1/2 w-5 h-5 bg-black/70 flex items-center justify-center opacity-0 group-hover/frame:opacity-100 transition-opacity"
+              aria-label="Previous image"
+            >
+              <ChevronLeft size={12} className="text-white" />
+            </button>
+            <button
+              onClick={(e) => { e.stopPropagation(); go(1); }}
+              className="absolute right-1 top-1/2 -translate-y-1/2 w-5 h-5 bg-black/70 flex items-center justify-center opacity-0 group-hover/frame:opacity-100 transition-opacity"
+              aria-label="Next image"
+            >
+              <ChevronRight size={12} className="text-white" />
+            </button>
+          </>
+        )}
 
-      {/* Thumbnail strip (only when ≥ 2 extras) */}
-      {images.length >= 3 && (
-        <div className="absolute bottom-0 left-0 right-0 flex gap-0.5 p-1 bg-black/50 opacity-0 group-hover/gallery:opacity-100 transition-opacity">
+        {/* Dot indicators */}
+        {hasMultiple && (
+          <div className="absolute bottom-1.5 left-0 right-0 flex justify-center gap-1">
+            {images.map((_, i) => (
+              <button
+                key={i}
+                onClick={(e) => { e.stopPropagation(); setActiveIdx(i); }}
+                className={`h-1 rounded-full transition-all duration-300 ${
+                  i === activeIdx ? "bg-[var(--gold)] w-3" : "bg-white/40 w-1.5 hover:bg-white/70"
+                }`}
+                aria-label={`Image ${i + 1}`}
+              />
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Thumbnail strip — bottom of the outer container on hover */}
+      {images.length >= 2 && (
+        <div className="absolute bottom-0 left-0 right-0 flex gap-0.5 p-1 bg-black/60 translate-y-full group-hover/gallery:translate-y-0 transition-transform duration-300">
           {images.map((img, i) => (
             <button
               key={i}
@@ -154,6 +201,14 @@ function ImageGallery({ thumbnail, samples, name }: { thumbnail: string; samples
           ))}
         </div>
       )}
+
+      {/* Size label overlay — bottom right of outer container */}
+      <div
+        className="absolute bottom-2 right-2 px-2 py-0.5 bg-black/70 text-[8px] tracking-widest uppercase text-[var(--gold)]/70"
+        style={{ transition: "opacity 0.2s" }}
+      >
+        {aspectW}×{aspectH} in
+      </div>
     </div>
   );
 }
@@ -184,7 +239,13 @@ function FrameCard({ frame }: { frame: FrameProduct }) {
 
   return (
     <div className="bg-[#111111] border border-[var(--gold)]/10 flex flex-col overflow-hidden">
-      <ImageGallery thumbnail={frame.thumbnail} samples={frame.samples ?? []} name={frame.name} />
+      <ImageGallery
+        thumbnail={frame.thumbnail}
+        samples={frame.samples ?? []}
+        name={frame.name}
+        aspectW={size.w}
+        aspectH={size.h}
+      />
 
       {/* Card body */}
       <div className="p-4 flex flex-col flex-1 gap-3">
@@ -260,7 +321,7 @@ function FrameCard({ frame }: { frame: FrameProduct }) {
 function SkeletonCard() {
   return (
     <div className="bg-[#111111] border border-[var(--gold)]/10 overflow-hidden animate-pulse">
-      <div className="aspect-[4/3] bg-white/5" />
+      <div className="aspect-square bg-white/5" />
       <div className="p-4 space-y-3">
         <div className="h-4 bg-white/5 rounded w-3/4" />
         <div className="flex gap-1">{[...Array(4)].map((_, i) => <div key={i} className="h-6 w-12 bg-white/5 rounded" />)}</div>
@@ -365,7 +426,7 @@ export default function PhotoFramingPage() {
           <div className="grid grid-cols-1 sm:grid-cols-4 gap-6 text-center">
             {[
               { step: "1", title: "Choose Frame",     desc: "Pick a frame design from our catalog above." },
-              { step: "2", title: "Select Size",      desc: "Choose your preferred print size and material." },
+              { step: "2", title: "Select Size",      desc: "Choose your preferred print size — the preview updates live." },
               { step: "3", title: "Add to Cart",      desc: "Add items to cart and complete checkout." },
               { step: "4", title: "Share Your Photo", desc: "Send your photo on WhatsApp after order — we print & deliver." },
             ].map(({ step, title, desc }) => (

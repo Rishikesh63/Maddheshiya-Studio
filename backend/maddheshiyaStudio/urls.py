@@ -27,7 +27,7 @@ from rest_framework import permissions
 
 # Public Home view
 from services.views import home
-from users.views import EmailOrUsernameTokenObtainPairView
+from users.views import EmailOrUsernameTokenObtainPairView, GoogleAuthView
 
 schema_view = get_schema_view(
     openapi.Info(
@@ -57,6 +57,7 @@ urlpatterns = [
     # Auth & JWT
     path('api/auth/token/', EmailOrUsernameTokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/auth/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    path('api/auth/google/', GoogleAuthView.as_view(), name='google_auth'),
     path('api/auth/', include('dj_rest_auth.urls')),
     path('api/auth/registration/', include('dj_rest_auth.registration.urls')),
 

@@ -1,3 +1,5 @@
+import json
+import urllib.request
 from rest_framework import generics, permissions, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -105,6 +107,61 @@ class ResendOTPView(APIView):
         _send_otp_email(user.email, otp_obj.otp, user.first_name)
 
         return Response({'message': 'A new verification code has been sent to your email.'})
+
+
+class GoogleAuthView(APIView):
+    permission_classes = [permissions.AllowAny]
+
+    def post(self, request):
+        access_token = request.data.get('access_token', '').strip()
+        if not access_token:
+            return Response({'error': 'Google access token is required.'}, status=400)
+
+        # Verify token and get user info from Google
+        try:
+            req = urllib.request.Request(
+                'https://www.googleapis.com/oauth2/v3/userinfo',
+                headers={'Authorization': f'Bearer {access_token}'},
+            )
+            with urllib.request.urlopen(req, timeout=5) as resp:
+                payload = json.loads(resp.read())
+        except Exception:
+            return Response({'error': 'Invalid Google token. Please try again.'}, status=400)
+
+        email = payload.get('email', '').strip().lower()
+        if not email or not payload.get('email_verified'):
+            return Response({'error': 'Could not verify your Google account email.'}, status=400)
+
+        user = CustomUser.objects.filter(email__iexact=email).first()
+        if user:
+            # Activate if previously unverified via email registration
+            if not user.is_active:
+                user.is_active = True
+                user.save(update_fields=['is_active'])
+        else:
+            base = email.split('@')[0]
+            username = base
+            counter = 1
+            while CustomUser.objects.filter(username=username).exists():
+                username = f'{base}{counter}'
+                counter += 1
+            user = CustomUser.objects.create_user(
+                username=username,
+                email=email,
+                password=None,
+                first_name=payload.get('given_name', ''),
+                last_name=payload.get('family_name', ''),
+                is_active=True,
+            )
+
+        refresh = RefreshToken.for_user(user)
+        refresh['is_admin_user'] = user.is_admin_user
+        refresh['is_superuser'] = user.is_superuser
+
+        return Response({
+            'access': str(refresh.access_token),
+            'refresh': str(refresh),
+        })
 
 
 class UserDetailView(APIView):

@@ -18,7 +18,6 @@ const RegisterPage = () => {
   const [showConfirm, setShowConfirm] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const [success, setSuccess] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -27,7 +26,6 @@ const RegisterPage = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
-    setSuccess(false);
 
     const { name, email, password, confirmPassword } = formData;
 
@@ -51,11 +49,17 @@ const RegisterPage = () => {
       });
       const data = await res.json();
       if (res.ok) {
-        setSuccess(true);
-        setTimeout(() => router.push('/login'), 2000);
+        router.push(`/verify-email?email=${encodeURIComponent(email)}`);
+        return;
       } else {
         // Flatten DRF error format: { email: ["msg"], password: ["msg"] }
         if (data && typeof data === 'object') {
+          // Unverified account — resend OTP and go to verify page
+          const emailErrors: string[] = Array.isArray(data.email) ? data.email : [];
+          if (emailErrors.includes('awaiting_verification')) {
+            router.push(`/verify-email?email=${encodeURIComponent(email)}`);
+            return;
+          }
           const messages: string[] = [];
           for (const [field, val] of Object.entries(data)) {
             const msgs = Array.isArray(val) ? val : [String(val)];
@@ -117,11 +121,6 @@ const RegisterPage = () => {
 
           {error && (
             <p className="text-red-400 text-xs tracking-wide mb-4">{error}</p>
-          )}
-          {success && (
-            <p className="text-green-400 text-xs tracking-wide mb-4">
-              Account created! Redirecting to login...
-            </p>
           )}
 
           <form onSubmit={handleSubmit} className="space-y-4">

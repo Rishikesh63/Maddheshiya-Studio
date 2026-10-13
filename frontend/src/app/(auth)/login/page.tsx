@@ -29,7 +29,10 @@ export default function LoginPage() {
       router.push('/');
     } catch (err) {
       const msg = err instanceof Error ? err.message : '';
-      if (msg.toLowerCase().includes('failed to fetch') || msg.toLowerCase().includes('networkerror')) {
+      if (msg === 'email_not_verified') {
+        router.push(`/verify-email?email=${encodeURIComponent(formData.email)}`);
+        return;
+      } else if (msg.toLowerCase().includes('failed to fetch') || msg.toLowerCase().includes('networkerror')) {
         setError('Cannot connect to server. Please try again in a moment.');
       } else {
         setError(msg || 'Invalid email or password');

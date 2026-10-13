@@ -288,22 +288,22 @@ AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
 ]
 
-POSTMARK_SERVER_TOKEN = env('POSTMARK_SERVER_TOKEN', default='')
-SMTP_FROM = env('SMTP_FROM', default='no-reply@maddheshiyastudio.com')
 SMTP_FROM_NAME = env('SMTP_FROM_NAME', default='Maddheshiya Studio')
+GMAIL_USER     = env('GMAIL_USER', default='')
+GMAIL_PASSWORD = env('GMAIL_PASSWORD', default='')  # Gmail App Password
 
-if POSTMARK_SERVER_TOKEN:
-    EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-    EMAIL_HOST = 'smtp.postmarkapp.com'
-    EMAIL_PORT = 587
-    EMAIL_HOST_USER = POSTMARK_SERVER_TOKEN
-    EMAIL_HOST_PASSWORD = POSTMARK_SERVER_TOKEN
-    EMAIL_USE_TLS = True
-    DEFAULT_FROM_EMAIL = f'{SMTP_FROM_NAME} <{SMTP_FROM}>'
+if GMAIL_USER and GMAIL_PASSWORD:
+    EMAIL_BACKEND   = 'django.core.mail.backends.smtp.EmailBackend'
+    EMAIL_HOST      = 'smtp.gmail.com'
+    EMAIL_PORT      = 587
+    EMAIL_USE_TLS   = True
+    EMAIL_HOST_USER     = GMAIL_USER
+    EMAIL_HOST_PASSWORD = GMAIL_PASSWORD
+    DEFAULT_FROM_EMAIL  = f'{SMTP_FROM_NAME} <{GMAIL_USER}>'
 else:
-    # For local development: prints emails to the console.
-    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-    DEFAULT_FROM_EMAIL = f'{SMTP_FROM_NAME} <{SMTP_FROM}>'
+    # Local dev: prints emails to console (OTP will appear in Render logs)
+    EMAIL_BACKEND      = 'django.core.mail.backends.console.EmailBackend'
+    DEFAULT_FROM_EMAIL = f'{SMTP_FROM_NAME} <noreply@maddheshiyastudio.com>'
 
 
 # Allauth config for email verification

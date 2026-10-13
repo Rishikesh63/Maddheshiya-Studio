@@ -30,6 +30,7 @@ interface AuthContextType {
   user: User | null;
   tokens: AuthToken | null;
   login: (username: string, password: string) => Promise<void>;
+  loginWithTokens: (access: string, refresh: string) => Promise<void>;
   logout: () => void;
   socialLogin: (provider: 'google', accessToken: string) => Promise<void>;
   loading: boolean;
@@ -165,6 +166,25 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     await loginMutation.mutateAsync({ username, password });
   };
 
+  const loginWithTokens = async (access: string, refresh: string) => {
+    const data: AuthToken = { access, refresh };
+    storeTokens(data);
+    setTokens(data);
+    const decoded: User = jwtDecode(access);
+    try {
+      const res = await fetch(apiUrl('/api/users/me/'), {
+        headers: { Authorization: `Bearer ${access}` },
+      });
+      if (res.ok) {
+        const profile = await res.json();
+        decoded.name = profile.name || profile.first_name || decoded.username;
+        decoded.is_admin_user = profile.is_admin_user;
+        decoded.is_superuser = profile.is_superuser;
+      }
+    } catch { /* use decoded fallback */ }
+    setUser(decoded);
+  };
+
   const socialLogin = async (provider: 'google', accessToken: string) => {
     const res = await fetch(apiUrl(`/api/auth/${provider}/`), {
       method: 'POST',
@@ -196,7 +216,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, tokens, login, logout, socialLogin, loading, getValidToken }}>
+    <AuthContext.Provider value={{ user, tokens, login, loginWithTokens, logout, socialLogin, loading, getValidToken }}>
       {children}
     </AuthContext.Provider>
   );

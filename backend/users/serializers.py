@@ -36,11 +36,38 @@ def _send_otp_email(to_email: str, otp: str, first_name: str = '') -> None:
 """
     resend_api_key = getattr(settings, 'RESEND_API_KEY', '')
 
-    if resend_api_key:
-        # Use Resend HTTP API — works on Render free tier (HTTPS, no blocked ports)
-        from_email = getattr(settings, 'RESEND_FROM_EMAIL', f'Maddheshiya Studio <noreply@{getattr(settings, "RESEND_DOMAIN", "madhesiyastudio.com")}>')
+    aws_key    = getattr(settings, 'AWS_ACCESS_KEY_ID', '')
+    aws_secret = getattr(settings, 'AWS_SECRET_ACCESS_KEY', '')
+    aws_region = getattr(settings, 'AWS_SES_REGION', getattr(settings, 'AWS_S3_REGION_NAME', 'ap-south-1'))
+    from_address = getattr(settings, 'SES_FROM_EMAIL', 'Maddheshiya Studio <noreply@madhesiyastudio.com>')
+
+    if aws_key and aws_secret:
+        # Use AWS SES via boto3 — same credentials as S3, works on Render free tier
+        try:
+            import boto3
+            ses = boto3.client(
+                'ses',
+                region_name=aws_region,
+                aws_access_key_id=aws_key,
+                aws_secret_access_key=aws_secret,
+            )
+            ses.send_email(
+                Source=from_address,
+                Destination={'ToAddresses': [to_email]},
+                Message={
+                    'Subject': {'Data': subject, 'Charset': 'UTF-8'},
+                    'Body': {
+                        'Text': {'Data': text_body, 'Charset': 'UTF-8'},
+                        'Html': {'Data': html_body,  'Charset': 'UTF-8'},
+                    },
+                },
+            )
+            logger.info("OTP email sent via SES to %s", to_email)
+        except Exception as e:
+            logger.error("SES failed for %s: %s", to_email, e)
+    elif resend_api_key:
         payload = json.dumps({
-            "from": from_email,
+            "from": getattr(settings, 'RESEND_FROM_EMAIL', 'Maddheshiya Studio <noreply@madhesiyastudio.com>'),
             "to": [to_email],
             "subject": subject,
             "html": html_body,

@@ -124,7 +124,13 @@ class RegisterSerializer(serializers.ModelSerializer):
         existing = CustomUser.objects.filter(email__iexact=value).first()
         if existing:
             if not existing.is_active:
-                # Resend OTP so they can complete verification
+                # Update name if a new one was provided in this attempt
+                name = self.initial_data.get('name', '').strip()
+                if name:
+                    parts = name.split(' ', 1)
+                    existing.first_name = parts[0]
+                    existing.last_name = parts[1] if len(parts) > 1 else ''
+                    existing.save(update_fields=['first_name', 'last_name'])
                 otp_obj = EmailVerificationOTP.generate_for(existing)
                 _send_otp_email(existing.email, otp_obj.otp, existing.first_name)
                 raise serializers.ValidationError("awaiting_verification")

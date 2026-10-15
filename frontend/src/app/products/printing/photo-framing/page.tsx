@@ -1,13 +1,14 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import Navbar from "../../../components/Navbar";
 import Footer from "../../../components/Footer";
 import { useCart } from "../../../context/CartContext";
 import { apiUrl } from "@/app/lib/api";
-import { ArrowLeft, ShoppingCart, Check, ImageIcon, Truck, ChevronLeft, ChevronRight } from "lucide-react";
+import { ArrowLeft, ShoppingCart, Check, ImageIcon, Truck, ChevronLeft, ChevronRight, Zap } from "lucide-react";
 
 // ── Sizes & Materials ──────────────────────────────────────────────────────────
 
@@ -217,6 +218,7 @@ function ImageGallery({
 
 function FrameCard({ frame }: { frame: FrameProduct }) {
   const { addItem } = useCart();
+  const router = useRouter();
   const [sizeId, setSizeId] = useState(SIZES[3].id);
   const [matId, setMatId]   = useState(MATERIALS[0].id);
   const [added, setAdded]   = useState(false);
@@ -225,17 +227,24 @@ function FrameCard({ frame }: { frame: FrameProduct }) {
   const mat   = MATERIALS.find((m) => m.id === matId)!;
   const price = size.price + mat.extra;
 
+  const cartItem = useCallback(() => ({
+    id: `frame-${frame.id}-${sizeId}-${matId}`,
+    title: `${frame.name} — ${size.label} ${mat.label}`,
+    category: "Photo Framing",
+    price,
+    image: frame.thumbnail || null,
+  }), [frame, sizeId, matId, size, mat, price]);
+
   const handleAdd = useCallback(() => {
-    addItem({
-      id: `frame-${frame.id}-${sizeId}-${matId}`,
-      title: `${frame.name} — ${size.label} ${mat.label}`,
-      category: "Photo Framing",
-      price,
-      image: frame.thumbnail || null,
-    });
+    addItem(cartItem());
     setAdded(true);
     setTimeout(() => setAdded(false), 1800);
-  }, [addItem, frame, sizeId, matId, size, mat, price]);
+  }, [addItem, cartItem]);
+
+  const handleBuyNow = useCallback(() => {
+    addItem(cartItem());
+    router.push('/cart');
+  }, [addItem, cartItem, router]);
 
   return (
     <div className="bg-[#111111] border border-[var(--gold)]/10 flex flex-col overflow-hidden">
@@ -296,20 +305,28 @@ function FrameCard({ frame }: { frame: FrameProduct }) {
         </div>
 
         {/* Price + CTA */}
-        <div className="flex items-center justify-between mt-auto pt-2 border-t border-white/5">
-          <span className="text-xl font-light text-[var(--gold)]" style={{ fontFamily: "var(--font-cormorant)" }}>
+        <div className="mt-auto pt-2 border-t border-white/5">
+          <span className="text-xl font-light text-[var(--gold)] block mb-2" style={{ fontFamily: "var(--font-cormorant)" }}>
             ₹{price}
           </span>
-          <button
-            onClick={handleAdd}
-            className={`flex items-center gap-1.5 px-4 py-2 text-[10px] tracking-widest uppercase font-medium transition-all ${
-              added
-                ? "bg-green-600 text-white"
-                : "border border-[var(--gold)] text-[var(--gold)] hover:bg-[var(--gold)] hover:text-black"
-            }`}
-          >
-            {added ? <><Check size={11} /> Added</> : <><ShoppingCart size={11} /> Add to Cart</>}
-          </button>
+          <div className="flex gap-2">
+            <button
+              onClick={handleBuyNow}
+              className="flex-1 flex items-center justify-center gap-1.5 py-2 text-[10px] tracking-widest uppercase font-medium bg-[var(--gold)] text-black hover:bg-[#b8933e] transition-all"
+            >
+              <Zap size={11} /> Buy Now
+            </button>
+            <button
+              onClick={handleAdd}
+              className={`flex-1 flex items-center justify-center gap-1.5 py-2 text-[10px] tracking-widest uppercase font-medium transition-all ${
+                added
+                  ? "bg-green-600 text-white"
+                  : "border border-[var(--gold)] text-[var(--gold)] hover:bg-[var(--gold)] hover:text-black"
+              }`}
+            >
+              {added ? <><Check size={11} /> Added</> : <><ShoppingCart size={11} /> Cart</>}
+            </button>
+          </div>
         </div>
       </div>
     </div>

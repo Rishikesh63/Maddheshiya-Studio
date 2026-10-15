@@ -1,9 +1,12 @@
+import logging
 from rest_framework import serializers
 from .models import CustomUser, EmailVerificationOTP
 from django.contrib.auth.password_validation import validate_password
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from django.core.mail import EmailMultiAlternatives
 from django.conf import settings
+
+logger = logging.getLogger(__name__)
 
 
 def _send_otp_email(to_email: str, otp: str, first_name: str = '') -> None:
@@ -38,8 +41,9 @@ def _send_otp_email(to_email: str, otp: str, first_name: str = '') -> None:
     msg.attach_alternative(html_body, "text/html")
     try:
         msg.send()
-    except Exception:
-        pass  # fail_silently — OTP is still saved in DB
+        logger.info("OTP email sent to %s", to_email)
+    except Exception as e:
+        logger.error("Failed to send OTP email to %s: %s", to_email, e)
 
 
 class RegisterSerializer(serializers.ModelSerializer):

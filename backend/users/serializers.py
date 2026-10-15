@@ -1,5 +1,6 @@
 import json
 import logging
+import urllib.error
 import urllib.request
 from rest_framework import serializers
 from .models import CustomUser, EmailVerificationOTP
@@ -58,6 +59,9 @@ def _send_otp_email(to_email: str, otp: str, first_name: str = '') -> None:
             with urllib.request.urlopen(req, timeout=10) as resp:
                 resp.read()
             logger.info("OTP email sent via Resend to %s", to_email)
+        except urllib.error.HTTPError as e:
+            body = e.read().decode('utf-8', errors='replace')
+            logger.error("Resend HTTP %s for %s: %s", e.code, to_email, body)
         except Exception as e:
             logger.error("Resend failed for %s: %s", to_email, e)
     else:

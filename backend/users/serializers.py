@@ -1,9 +1,10 @@
+import json
 import logging
+import urllib.request
 from rest_framework import serializers
 from .models import CustomUser, EmailVerificationOTP
 from django.contrib.auth.password_validation import validate_password
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
-from django.core.mail import EmailMultiAlternatives
 from django.conf import settings
 
 logger = logging.getLogger(__name__)
@@ -22,7 +23,7 @@ def _send_otp_email(to_email: str, otp: str, first_name: str = '') -> None:
     )
     html_body = f"""
 <div style="font-family:Georgia,serif;max-width:480px;margin:0 auto;background:#0a0a0a;color:#e8e0d0;padding:40px 32px;border:1px solid #c8a352;">
-  <h1 style="font-size:22px;font-weight:300;letter-spacing:0.2em;color:#c8a352;margin:0 0 4px"">MADDHESHIYA</h1>
+  <h1 style="font-size:22px;font-weight:300;letter-spacing:0.2em;color:#c8a352;margin:0 0 4px">MADDHESHIYA</h1>
   <p style="font-size:10px;letter-spacing:0.5em;color:#888;margin:0 0 32px">STUDIO</p>
   <p style="font-size:14px;margin:0 0 8px">{greeting}</p>
   <p style="font-size:13px;color:#aaa;margin:0 0 24px">Use the code below to verify your email address.</p>
@@ -32,18 +33,48 @@ def _send_otp_email(to_email: str, otp: str, first_name: str = '') -> None:
   <p style="font-size:11px;color:#666;margin:0">This code expires in <strong style="color:#aaa">15 minutes</strong>. If you did not create an account, please ignore this email.</p>
 </div>
 """
-    msg = EmailMultiAlternatives(
-        subject=subject,
-        body=text_body,
-        from_email=settings.DEFAULT_FROM_EMAIL,
-        to=[to_email],
-    )
-    msg.attach_alternative(html_body, "text/html")
-    try:
-        msg.send()
-        logger.info("OTP email sent to %s", to_email)
-    except Exception as e:
-        logger.error("Failed to send OTP email to %s: %s", to_email, e)
+    resend_api_key = getattr(settings, 'RESEND_API_KEY', '')
+
+    if resend_api_key:
+        # Use Resend HTTP API — works on Render free tier (HTTPS, no blocked ports)
+        from_email = getattr(settings, 'RESEND_FROM_EMAIL', f'Maddheshiya Studio <noreply@{getattr(settings, "RESEND_DOMAIN", "madhesiyastudio.com")}>')
+        payload = json.dumps({
+            "from": from_email,
+            "to": [to_email],
+            "subject": subject,
+            "html": html_body,
+            "text": text_body,
+        }).encode()
+        req = urllib.request.Request(
+            "https://api.resend.com/emails",
+            data=payload,
+            headers={
+                "Authorization": f"Bearer {resend_api_key}",
+                "Content-Type": "application/json",
+            },
+            method="POST",
+        )
+        try:
+            with urllib.request.urlopen(req, timeout=10) as resp:
+                resp.read()
+            logger.info("OTP email sent via Resend to %s", to_email)
+        except Exception as e:
+            logger.error("Resend failed for %s: %s", to_email, e)
+    else:
+        # Local dev fallback — prints OTP to console/logs
+        from django.core.mail import EmailMultiAlternatives
+        msg = EmailMultiAlternatives(
+            subject=subject,
+            body=text_body,
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            to=[to_email],
+        )
+        msg.attach_alternative(html_body, "text/html")
+        try:
+            msg.send()
+            logger.info("OTP email sent to %s", to_email)
+        except Exception as e:
+            logger.error("Failed to send OTP email to %s: %s", to_email, e)
 
 
 class RegisterSerializer(serializers.ModelSerializer):

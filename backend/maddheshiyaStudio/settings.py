@@ -288,9 +288,12 @@ AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
 ]
 
-SMTP_FROM_NAME = env('SMTP_FROM_NAME', default='Maddheshiya Studio')
-GMAIL_USER     = env('GMAIL_USER', default='')
-GMAIL_PASSWORD = env('GMAIL_PASSWORD', default='')  # Gmail App Password
+SMTP_FROM_NAME   = env('SMTP_FROM_NAME', default='Maddheshiya Studio')
+GMAIL_USER       = env('GMAIL_USER', default='')
+GMAIL_PASSWORD   = env('GMAIL_PASSWORD', default='')
+RESEND_API_KEY   = env('RESEND_API_KEY', default='')
+RESEND_DOMAIN    = env('RESEND_DOMAIN', default='madhesiyastudio.com')
+RESEND_FROM_EMAIL = env('RESEND_FROM_EMAIL', default='Maddheshiya Studio <noreply@madhesiyastudio.com>')
 
 if GMAIL_USER and GMAIL_PASSWORD:
     EMAIL_BACKEND   = 'django.core.mail.backends.smtp.EmailBackend'

@@ -183,6 +183,17 @@ export default function ProductForm({ productId }: ProductFormProps) {
         setError(JSON.stringify(data));
         return;
       }
+      // For new products: save staged dimensions now that we have a product id
+      if (!isEdit && dimensions.length > 0) {
+        const created = await res.json();
+        await Promise.all(dimensions.map((d, i) =>
+          fetch(apiUrl('/api/products/admin/dimensions/'), {
+            method: 'POST',
+            headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+            body: JSON.stringify({ product: created.id, size_id: d.size_id, price: d.price, order: i }),
+          })
+        ));
+      }
       router.push('/admin/products');
     } catch {
       setError('Something went wrong.');
@@ -237,50 +248,62 @@ export default function ProductForm({ productId }: ProductFormProps) {
   };
 
   const handleAddDimension = async () => {
-    if (!newDimPrice || !productId) return;
-    const token = await getValidToken();
-    if (!token) return;
-    // Prevent duplicate size
+    if (!newDimPrice) return;
     if (dimensions.some(d => d.size_id === newDimSizeId)) {
-      setDimError(`${newDimSizeId} is already added. Delete it first to change the price.`);
+      setDimError('This size is already added. Remove it first to change the price.');
       return;
     }
-    setSavingDim(true);
     setDimError('');
-    try {
-      const res = await fetch(apiUrl('/api/products/admin/dimensions/'), {
-        method: 'POST',
-        headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          product: productId,
-          size_id: newDimSizeId,
-          price: newDimPrice,
-          order: dimensions.length,
-        }),
-      });
-      if (!res.ok) { setDimError('Failed to add dimension.'); return; }
-      const created: ProductDimension = await res.json();
-      setDimensions(prev => [...prev, created]);
-      setNewDimPrice('');
-    } catch {
-      setDimError('Failed to add dimension.');
-    } finally {
-      setSavingDim(false);
+    const sizeLabel = STANDARD_SIZES.find(s => s.id === newDimSizeId)?.label ?? newDimSizeId;
+
+    if (isEdit && productId) {
+      // Edit mode: save to DB immediately
+      const token = await getValidToken();
+      if (!token) return;
+      setSavingDim(true);
+      try {
+        const res = await fetch(apiUrl('/api/products/admin/dimensions/'), {
+          method: 'POST',
+          headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ product: productId, size_id: newDimSizeId, price: newDimPrice, order: dimensions.length }),
+        });
+        if (!res.ok) { setDimError('Failed to add dimension.'); return; }
+        const created: ProductDimension = await res.json();
+        setDimensions(prev => [...prev, created]);
+      } catch {
+        setDimError('Failed to add dimension.');
+      } finally {
+        setSavingDim(false);
+      }
+    } else {
+      // New product mode: stage locally, will be saved after product creation
+      setDimensions(prev => [...prev, {
+        id: Date.now(), // temporary local-only id
+        size_id: newDimSizeId,
+        label: sizeLabel,
+        price: newDimPrice,
+        is_active: true,
+        order: prev.length,
+      }]);
     }
+    setNewDimPrice('');
   };
 
   const handleDeleteDimension = async (dimId: number) => {
-    const token = await getValidToken();
-    if (!token) return;
-    try {
-      await fetch(apiUrl(`/api/products/admin/dimensions/${dimId}/`), {
-        method: 'DELETE',
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      setDimensions(prev => prev.filter(d => d.id !== dimId));
-    } catch {
-      setDimError('Delete failed.');
+    if (isEdit) {
+      const token = await getValidToken();
+      if (!token) return;
+      try {
+        await fetch(apiUrl(`/api/products/admin/dimensions/${dimId}/`), {
+          method: 'DELETE',
+          headers: { Authorization: `Bearer ${token}` },
+        });
+      } catch {
+        setDimError('Delete failed.');
+        return;
+      }
     }
+    setDimensions(prev => prev.filter(d => d.id !== dimId));
   };
 
   const field = (label: string, key: keyof typeof form, type = 'text', required = false) => (
@@ -428,35 +451,16 @@ export default function ProductForm({ productId }: ProductFormProps) {
           </label>
         </div>
 
-        <div className="flex items-center gap-3 pt-2">
-          <button
-            type="submit"
-            disabled={saving}
-            className="px-5 py-2 bg-white text-black rounded-lg text-sm font-medium hover:bg-zinc-200 disabled:opacity-50 transition-colors"
-          >
-            {saving ? 'Saving...' : isEdit ? 'Save Changes' : 'Create Product'}
-          </button>
-          <button
-            type="button"
-            onClick={() => router.push('/admin/products')}
-            className="px-5 py-2 bg-zinc-800 text-zinc-300 rounded-lg text-sm font-medium hover:bg-zinc-700 transition-colors"
-          >
-            Cancel
-          </button>
-        </div>
-      </form>
-
-      {/* ── Dimensions / Sizes (only available after product is created) ──── */}
-      {isEdit && (
-        <div className="mt-10 border-t border-zinc-800 pt-8">
-          <h2 className="text-lg font-semibold text-white mb-1">Dimensions & Pricing</h2>
-          <p className="text-xs text-zinc-500 mb-5">
-            Add the sizes you offer for this frame and set a custom price for each. Only these sizes will appear on the website.
+        {/* ── Dimensions & Pricing ────────────────────────────────────────── */}
+        <div className="border-t border-zinc-800 pt-5">
+          <h2 className="text-sm font-semibold text-white mb-1">Dimensions & Pricing</h2>
+          <p className="text-xs text-zinc-500 mb-4">
+            Add the sizes you offer for this frame. Only configured sizes will appear on the website.
+            {!isEdit && <span className="text-yellow-500 ml-1">These will be saved when you create the product.</span>}
           </p>
 
-          {/* Existing dimensions table */}
           {dimensions.length > 0 && (
-            <div className="mb-6 border border-zinc-700 rounded-lg overflow-hidden">
+            <div className="mb-4 border border-zinc-700 rounded-lg overflow-hidden">
               <table className="w-full text-sm">
                 <thead>
                   <tr className="bg-zinc-800 text-zinc-400 text-xs uppercase tracking-wider">
@@ -472,9 +476,10 @@ export default function ProductForm({ productId }: ProductFormProps) {
                       <td className="px-4 py-2.5 text-right text-emerald-400 font-mono">₹{d.price}</td>
                       <td className="px-3 py-2.5 text-right">
                         <button
+                          type="button"
                           onClick={() => handleDeleteDimension(d.id)}
                           className="w-6 h-6 bg-red-600 rounded flex items-center justify-center ml-auto hover:bg-red-500 transition-colors"
-                          title="Remove size"
+                          title="Remove"
                         >
                           <Trash2 size={11} className="text-white" />
                         </button>
@@ -486,9 +491,7 @@ export default function ProductForm({ productId }: ProductFormProps) {
             </div>
           )}
 
-          {/* Add new dimension */}
           <div className="bg-zinc-800/50 border border-zinc-700 rounded-lg p-4 space-y-3">
-            <p className="text-xs font-medium text-zinc-400">Add Size</p>
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <label className="block text-[11px] text-zinc-500 mb-1">Dimension</label>
@@ -526,7 +529,24 @@ export default function ProductForm({ productId }: ProductFormProps) {
             </button>
           </div>
         </div>
-      )}
+
+        <div className="flex items-center gap-3 pt-2">
+          <button
+            type="submit"
+            disabled={saving}
+            className="px-5 py-2 bg-white text-black rounded-lg text-sm font-medium hover:bg-zinc-200 disabled:opacity-50 transition-colors"
+          >
+            {saving ? 'Saving...' : isEdit ? 'Save Changes' : 'Create Product'}
+          </button>
+          <button
+            type="button"
+            onClick={() => router.push('/admin/products')}
+            className="px-5 py-2 bg-zinc-800 text-zinc-300 rounded-lg text-sm font-medium hover:bg-zinc-700 transition-colors"
+          >
+            Cancel
+          </button>
+        </div>
+      </form>
 
       {/* ── Additional Images (only available after product is created) ─────── */}
       {isEdit && (

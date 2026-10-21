@@ -161,6 +161,10 @@ class Product(models.Model):
     def is_in_stock(self):
         return self.stock == -1 or self.stock > 0
 
+    @property
+    def active_dimensions(self):
+        return self.dimensions.filter(is_active=True).order_by('order', 'size_id')
+
 
 class ProductSample(models.Model):
     """Product samples/gallery images"""
@@ -226,6 +230,56 @@ class ProductReview(models.Model):
 
     def __str__(self):
         return f"{self.product.name} - {self.customer_name}"
+
+
+class ProductDimension(models.Model):
+    """Per-product size/dimension with admin-set price."""
+    STANDARD_SIZES = [
+        ('6x8',   '6×8'),
+        ('8x10',  '8×10'),
+        ('8x12',  '8×12'),
+        ('10x12', '10×12'),
+        ('10x15', '10×15'),
+        ('12x15', '12×15'),
+        ('12x18', '12×18'),
+        ('16x20', '16×20'),
+        ('16x24', '16×24'),
+        ('18x24', '18×24'),
+        ('20x24', '20×24'),
+        ('20x30', '20×30'),
+        ('24x36', '24×36'),
+    ]
+
+    product = models.ForeignKey(
+        Product,
+        on_delete=models.CASCADE,
+        related_name='dimensions',
+    )
+    size_id = models.CharField(max_length=20, choices=STANDARD_SIZES)
+    price = models.DecimalField(max_digits=10, decimal_places=2, validators=[MinValueValidator(0)])
+    is_active = models.BooleanField(default=True)
+    order = models.PositiveIntegerField(default=0)
+
+    class Meta:
+        ordering = ['order', 'size_id']
+        unique_together = ('product', 'size_id')
+
+    def __str__(self):
+        return f"{self.product.name} — {self.size_id} @ ₹{self.price}"
+
+    @property
+    def label(self):
+        return dict(self.STANDARD_SIZES).get(self.size_id, self.size_id)
+
+    @property
+    def width(self):
+        parts = self.size_id.split('x')
+        return int(parts[0]) if len(parts) == 2 else 0
+
+    @property
+    def height(self):
+        parts = self.size_id.split('x')
+        return int(parts[1]) if len(parts) == 2 else 0
 
 
 class ProductOrder(models.Model):

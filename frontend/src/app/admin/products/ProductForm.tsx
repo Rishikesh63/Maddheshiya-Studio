@@ -19,6 +19,31 @@ interface ProductSample {
   order: number;
 }
 
+interface ProductDimension {
+  id: number;
+  size_id: string;
+  label: string;
+  price: string;
+  is_active: boolean;
+  order: number;
+}
+
+const STANDARD_SIZES = [
+  { id: '6x8',   label: '6×8 in'   },
+  { id: '8x10',  label: '8×10 in'  },
+  { id: '8x12',  label: '8×12 in'  },
+  { id: '10x12', label: '10×12 in' },
+  { id: '10x15', label: '10×15 in' },
+  { id: '12x15', label: '12×15 in' },
+  { id: '12x18', label: '12×18 in' },
+  { id: '16x20', label: '16×20 in' },
+  { id: '16x24', label: '16×24 in' },
+  { id: '18x24', label: '18×24 in' },
+  { id: '20x24', label: '20×24 in' },
+  { id: '20x30', label: '20×30 in' },
+  { id: '24x36', label: '24×36 in' },
+];
+
 interface ProductFormProps {
   productId?: number;
 }
@@ -83,6 +108,13 @@ export default function ProductForm({ productId }: ProductFormProps) {
   const [uploadingSample, setUploadingSample] = useState(false);
   const [sampleError, setSampleError] = useState('');
 
+  // Dimensions state
+  const [dimensions, setDimensions] = useState<ProductDimension[]>([]);
+  const [newDimSizeId, setNewDimSizeId] = useState(STANDARD_SIZES[0].id);
+  const [newDimPrice, setNewDimPrice] = useState('');
+  const [savingDim, setSavingDim] = useState(false);
+  const [dimError, setDimError] = useState('');
+
   useEffect(() => {
     getValidToken().then(token => {
       if (!token) return;
@@ -115,6 +147,10 @@ export default function ProductForm({ productId }: ProductFormProps) {
         fetch(apiUrl(`/api/products/admin/samples/?product=${productId}`), { headers: h })
           .then(r => r.json())
           .then(data => setSamples(Array.isArray(data) ? data : data.results ?? []));
+        // Load existing dimensions
+        fetch(apiUrl(`/api/products/admin/dimensions/?product=${productId}`), { headers: h })
+          .then(r => r.json())
+          .then(data => setDimensions(Array.isArray(data) ? data : data.results ?? []));
       }
     });
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -197,6 +233,53 @@ export default function ProductForm({ productId }: ProductFormProps) {
       setSamples(prev => prev.filter(s => s.id !== sampleId));
     } catch {
       setSampleError('Delete failed.');
+    }
+  };
+
+  const handleAddDimension = async () => {
+    if (!newDimPrice || !productId) return;
+    const token = await getValidToken();
+    if (!token) return;
+    // Prevent duplicate size
+    if (dimensions.some(d => d.size_id === newDimSizeId)) {
+      setDimError(`${newDimSizeId} is already added. Delete it first to change the price.`);
+      return;
+    }
+    setSavingDim(true);
+    setDimError('');
+    try {
+      const res = await fetch(apiUrl('/api/products/admin/dimensions/'), {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          product: productId,
+          size_id: newDimSizeId,
+          price: newDimPrice,
+          order: dimensions.length,
+        }),
+      });
+      if (!res.ok) { setDimError('Failed to add dimension.'); return; }
+      const created: ProductDimension = await res.json();
+      setDimensions(prev => [...prev, created]);
+      setNewDimPrice('');
+    } catch {
+      setDimError('Failed to add dimension.');
+    } finally {
+      setSavingDim(false);
+    }
+  };
+
+  const handleDeleteDimension = async (dimId: number) => {
+    const token = await getValidToken();
+    if (!token) return;
+    try {
+      await fetch(apiUrl(`/api/products/admin/dimensions/${dimId}/`), {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setDimensions(prev => prev.filter(d => d.id !== dimId));
+    } catch {
+      setDimError('Delete failed.');
     }
   };
 
@@ -362,6 +445,88 @@ export default function ProductForm({ productId }: ProductFormProps) {
           </button>
         </div>
       </form>
+
+      {/* ── Dimensions / Sizes (only available after product is created) ──── */}
+      {isEdit && (
+        <div className="mt-10 border-t border-zinc-800 pt-8">
+          <h2 className="text-lg font-semibold text-white mb-1">Dimensions & Pricing</h2>
+          <p className="text-xs text-zinc-500 mb-5">
+            Add the sizes you offer for this frame and set a custom price for each. Only these sizes will appear on the website.
+          </p>
+
+          {/* Existing dimensions table */}
+          {dimensions.length > 0 && (
+            <div className="mb-6 border border-zinc-700 rounded-lg overflow-hidden">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="bg-zinc-800 text-zinc-400 text-xs uppercase tracking-wider">
+                    <th className="text-left px-4 py-2">Size</th>
+                    <th className="text-right px-4 py-2">Price (₹)</th>
+                    <th className="px-3 py-2" />
+                  </tr>
+                </thead>
+                <tbody>
+                  {dimensions.map(d => (
+                    <tr key={d.id} className="border-t border-zinc-800 hover:bg-zinc-800/40 transition-colors">
+                      <td className="px-4 py-2.5 text-white font-medium">{d.label}</td>
+                      <td className="px-4 py-2.5 text-right text-emerald-400 font-mono">₹{d.price}</td>
+                      <td className="px-3 py-2.5 text-right">
+                        <button
+                          onClick={() => handleDeleteDimension(d.id)}
+                          className="w-6 h-6 bg-red-600 rounded flex items-center justify-center ml-auto hover:bg-red-500 transition-colors"
+                          title="Remove size"
+                        >
+                          <Trash2 size={11} className="text-white" />
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+
+          {/* Add new dimension */}
+          <div className="bg-zinc-800/50 border border-zinc-700 rounded-lg p-4 space-y-3">
+            <p className="text-xs font-medium text-zinc-400">Add Size</p>
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="block text-[11px] text-zinc-500 mb-1">Dimension</label>
+                <select
+                  value={newDimSizeId}
+                  onChange={e => setNewDimSizeId(e.target.value)}
+                  className="w-full bg-zinc-700 border border-zinc-600 rounded px-2 py-1.5 text-sm text-white focus:outline-none"
+                >
+                  {STANDARD_SIZES.map(s => (
+                    <option key={s.id} value={s.id}>{s.label}</option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label className="block text-[11px] text-zinc-500 mb-1">Price (₹)</label>
+                <input
+                  type="number"
+                  min="0"
+                  value={newDimPrice}
+                  onChange={e => setNewDimPrice(e.target.value)}
+                  placeholder="e.g. 499"
+                  className="w-full bg-zinc-700 border border-zinc-600 rounded px-2 py-1.5 text-sm text-white placeholder-zinc-500 focus:outline-none"
+                />
+              </div>
+            </div>
+            {dimError && <p className="text-red-400 text-xs">{dimError}</p>}
+            <button
+              type="button"
+              onClick={handleAddDimension}
+              disabled={!newDimPrice || savingDim}
+              className="flex items-center gap-2 px-4 py-2 bg-zinc-700 hover:bg-zinc-600 text-white text-sm rounded-lg disabled:opacity-40 transition-colors"
+            >
+              {savingDim ? <Loader2 size={14} className="animate-spin" /> : <Plus size={14} />}
+              {savingDim ? 'Adding...' : 'Add Size'}
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* ── Additional Images (only available after product is created) ─────── */}
       {isEdit && (

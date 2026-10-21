@@ -2,11 +2,11 @@ from rest_framework import viewsets, filters, permissions
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, BasePermission
-from .models import ProductCategory, Product, ProductSample
+from .models import ProductCategory, Product, ProductSample, ProductDimension
 from .serializers import (
     ProductCategorySerializer, ProductListSerializer, ProductDetailSerializer,
     AdminProductWriteSerializer, AdminProductCategoryWriteSerializer,
-    AdminProductSampleSerializer,
+    AdminProductSampleSerializer, AdminProductDimensionSerializer,
 )
 
 
@@ -94,6 +94,20 @@ class AdminProductSampleViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         qs = ProductSample.objects.select_related('product').order_by('order', 'created_at')
+        product_id = self.request.query_params.get('product')
+        if product_id:
+            qs = qs.filter(product_id=product_id)
+        return qs
+
+
+class AdminProductDimensionViewSet(viewsets.ModelViewSet):
+    """CRUD for product dimensions/sizes with prices — admin only."""
+    permission_classes = [IsAdminUserCustom]
+    serializer_class = AdminProductDimensionSerializer
+    lookup_field = 'id'
+
+    def get_queryset(self):
+        qs = ProductDimension.objects.select_related('product').order_by('order', 'size_id')
         product_id = self.request.query_params.get('product')
         if product_id:
             qs = qs.filter(product_id=product_id)

@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import ProductCategory, Product, ProductSample, ProductFeature, ProductReview
+from .models import ProductCategory, Product, ProductSample, ProductFeature, ProductReview, ProductDimension
 
 
 class ProductCategorySerializer(serializers.ModelSerializer):
@@ -27,9 +27,29 @@ class ProductFeatureSerializer(serializers.ModelSerializer):
         fields = ['id', 'feature_name', 'feature_value', 'order']
 
 
+class ProductDimensionSerializer(serializers.ModelSerializer):
+    label = serializers.CharField(read_only=True)
+    width = serializers.IntegerField(read_only=True)
+    height = serializers.IntegerField(read_only=True)
+
+    class Meta:
+        model = ProductDimension
+        fields = ['id', 'size_id', 'label', 'width', 'height', 'price', 'is_active', 'order']
+
+
+class AdminProductDimensionSerializer(serializers.ModelSerializer):
+    label = serializers.CharField(read_only=True)
+
+    class Meta:
+        model = ProductDimension
+        fields = ['id', 'product', 'size_id', 'label', 'price', 'is_active', 'order']
+        read_only_fields = ['id']
+
+
 class ProductListSerializer(serializers.ModelSerializer):
     category = ProductCategorySerializer(read_only=True)
     samples = ProductSampleSerializer(many=True, read_only=True)
+    dimensions = ProductDimensionSerializer(many=True, read_only=True, source='active_dimensions')
     current_price = serializers.DecimalField(max_digits=10, decimal_places=2, read_only=True)
     has_discount = serializers.BooleanField(read_only=True)
     discount_percentage = serializers.IntegerField(read_only=True)
@@ -39,7 +59,7 @@ class ProductListSerializer(serializers.ModelSerializer):
         fields = [
             'id', 'name', 'slug', 'category', 'short_description',
             'thumbnail', 'price', 'discount_price', 'current_price',
-            'has_discount', 'discount_percentage', 'status', 'featured', 'samples',
+            'has_discount', 'discount_percentage', 'status', 'featured', 'samples', 'dimensions',
         ]
 
 
@@ -47,6 +67,7 @@ class ProductDetailSerializer(serializers.ModelSerializer):
     category = ProductCategorySerializer(read_only=True)
     samples = ProductSampleSerializer(many=True, read_only=True)
     features = ProductFeatureSerializer(many=True, read_only=True)
+    dimensions = ProductDimensionSerializer(many=True, read_only=True, source='active_dimensions')
     current_price = serializers.DecimalField(max_digits=10, decimal_places=2, read_only=True)
     has_discount = serializers.BooleanField(read_only=True)
     discount_percentage = serializers.IntegerField(read_only=True)
@@ -60,7 +81,7 @@ class ProductDetailSerializer(serializers.ModelSerializer):
             'thumbnail', 'hero_image', 'price', 'discount_price', 'current_price',
             'has_discount', 'discount_percentage', 'status', 'stock', 'is_in_stock',
             'delivery_timeframe', 'customization_available', 'customization_options',
-            'customization_options_list', 'featured', 'samples', 'features',
+            'customization_options_list', 'featured', 'samples', 'features', 'dimensions',
         ]
 
     def get_customization_options_list(self, obj):

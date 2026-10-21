@@ -87,8 +87,6 @@ export default function ProductForm({ productId }: ProductFormProps) {
     category: '',
     description: '',
     short_description: '',
-    price: '',
-    discount_price: '',
     status: 'active',
     stock: '-1',
     delivery_timeframe: '3-5',
@@ -131,8 +129,6 @@ export default function ProductForm({ productId }: ProductFormProps) {
               category: data.category?.id ?? '',
               description: data.description ?? '',
               short_description: data.short_description ?? '',
-              price: data.price ?? '',
-              discount_price: data.discount_price ?? '',
               status: data.status ?? 'active',
               stock: String(data.stock ?? -1),
               delivery_timeframe: data.delivery_timeframe ?? '3-5',
@@ -165,6 +161,11 @@ export default function ProductForm({ productId }: ProductFormProps) {
 
     const fd = new FormData();
     Object.entries(form).forEach(([k, v]) => fd.append(k, String(v)));
+    // Derive price from lowest dimension; fallback to 0 (dimensions set the real prices)
+    const minPrice = dimensions.length > 0
+      ? Math.min(...dimensions.map(d => Number(d.price)))
+      : 0;
+    fd.append('price', String(minPrice));
     if (thumbnail) fd.append('thumbnail', thumbnail);
     if (heroImage) fd.append('hero_image', heroImage);
 
@@ -360,11 +361,6 @@ export default function ProductForm({ productId }: ProductFormProps) {
             rows={4}
             className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2 text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-zinc-500 resize-none"
           />
-        </div>
-
-        <div className="grid grid-cols-2 gap-4">
-          {field('Price (₹)', 'price', 'number', true)}
-          {field('Discount Price (₹)', 'discount_price', 'number')}
         </div>
 
         <div className="grid grid-cols-2 gap-4">

@@ -9,18 +9,24 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        # Step 1: Convert empty phone strings to NULL so unique constraint works
+        # Step 1: Make phone nullable first (drop NOT NULL constraint)
+        migrations.AlterField(
+            model_name='customuser',
+            name='phone',
+            field=models.CharField(blank=True, null=True, max_length=15, default=None),
+        ),
+        # Step 2: Convert empty strings to NULL (now safe since column allows NULL)
         migrations.RunSQL(
             sql="UPDATE users_customuser SET phone = NULL WHERE phone = '' OR phone IS NULL",
             reverse_sql=migrations.RunSQL.noop,
         ),
-        # Step 2: Alter phone field to be unique + nullable
+        # Step 3: Add unique constraint (NULL values are excluded from uniqueness in PostgreSQL)
         migrations.AlterField(
             model_name='customuser',
             name='phone',
             field=models.CharField(blank=True, default=None, max_length=15, null=True, unique=True),
         ),
-        # Step 3: Add PhoneOTP model
+        # Step 4: Add PhoneOTP model
         migrations.CreateModel(
             name='PhoneOTP',
             fields=[

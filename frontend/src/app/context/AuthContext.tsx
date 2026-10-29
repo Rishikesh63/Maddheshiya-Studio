@@ -142,23 +142,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       }
       return (await response.json()) as AuthToken;
     },
-    onSuccess: async (data) => {
+    onSuccess: (data) => {
       storeTokens(data);
       setTokens(data);
-      const decoded: User = jwtDecode(data.access);
-      // Fetch full profile to get display name
-      try {
-        const res = await fetch(apiUrl('/api/users/me/'), {
-          headers: { Authorization: `Bearer ${data.access}` },
-        });
-        if (res.ok) {
-          const profile = await res.json();
-          decoded.name = profile.name || profile.first_name || decoded.username;
-          decoded.is_admin_user = profile.is_admin_user;
-          decoded.is_superuser = profile.is_superuser;
-        }
-      } catch { /* use decoded fallback */ }
-      setUser(decoded);
+      setUser(jwtDecode(data.access));
     },
   });
 
@@ -170,19 +157,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const data: AuthToken = { access, refresh };
     storeTokens(data);
     setTokens(data);
-    const decoded: User = jwtDecode(access);
-    try {
-      const res = await fetch(apiUrl('/api/users/me/'), {
-        headers: { Authorization: `Bearer ${access}` },
-      });
-      if (res.ok) {
-        const profile = await res.json();
-        decoded.name = profile.name || profile.first_name || decoded.username;
-        decoded.is_admin_user = profile.is_admin_user;
-        decoded.is_superuser = profile.is_superuser;
-      }
-    } catch { /* use decoded fallback */ }
-    setUser(decoded);
+    setUser(jwtDecode(access));
   };
 
   const socialLogin = async (provider: 'google', accessToken: string) => {

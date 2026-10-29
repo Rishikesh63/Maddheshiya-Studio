@@ -15,6 +15,17 @@ from .serializers import (
 from .models import CustomUser, EmailVerificationOTP, PhoneOTP
 
 
+def _issue_tokens(user):
+    """Create JWT refresh+access tokens with full user claims embedded."""
+    refresh = RefreshToken.for_user(user)
+    refresh['is_admin_user'] = user.is_admin_user
+    refresh['is_superuser']  = user.is_superuser
+    refresh['name']          = f"{user.first_name} {user.last_name}".strip() or user.username
+    refresh['email']         = user.email or ''
+    refresh['username']      = user.username or ''
+    return {'access': str(refresh.access_token), 'refresh': str(refresh)}
+
+
 class EmailOrUsernameTokenObtainPairView(TokenObtainPairView):
     serializer_class = EmailOrUsernameTokenObtainPairSerializer
 
@@ -76,15 +87,7 @@ class VerifyEmailView(APIView):
         user.is_active = True
         user.save(update_fields=['is_active'])
 
-        # Issue JWT tokens so user is immediately logged in after verification
-        refresh = RefreshToken.for_user(user)
-        refresh['is_admin_user'] = user.is_admin_user
-        refresh['is_superuser'] = user.is_superuser
-
-        return Response({
-            'refresh': str(refresh),
-            'access':  str(refresh.access_token),
-        })
+        return Response(_issue_tokens(user))
 
 
 class ResendOTPView(APIView):
@@ -155,14 +158,7 @@ class GoogleAuthView(APIView):
                 is_active=True,
             )
 
-        refresh = RefreshToken.for_user(user)
-        refresh['is_admin_user'] = user.is_admin_user
-        refresh['is_superuser'] = user.is_superuser
-
-        return Response({
-            'access': str(refresh.access_token),
-            'refresh': str(refresh),
-        })
+        return Response(_issue_tokens(user))
 
 
 class SendPhoneOTPView(APIView):
@@ -276,14 +272,7 @@ class VerifyPhoneOTPView(APIView):
             user.is_active = True
             user.save(update_fields=['is_active'])
 
-        refresh = RefreshToken.for_user(user)
-        refresh['is_admin_user'] = user.is_admin_user
-        refresh['is_superuser']  = user.is_superuser
-
-        return Response({
-            'access':  str(refresh.access_token),
-            'refresh': str(refresh),
-        })
+        return Response(_issue_tokens(user))
 
 
 class UserDetailView(APIView):

@@ -240,7 +240,10 @@ class EmailOrUsernameTokenObtainPairSerializer(TokenObtainPairSerializer):
     def get_token(cls, user):
         token = super().get_token(user)
         token['is_admin_user'] = user.is_admin_user
-        token['is_superuser'] = user.is_superuser
+        token['is_superuser']  = user.is_superuser
+        token['name']          = f"{user.first_name} {user.last_name}".strip() or user.username
+        token['email']         = user.email or ''
+        token['username']      = user.username or ''
         return token
 
     def validate(self, attrs):

@@ -71,10 +71,12 @@ function ImageGallery({
   thumbnail,
   samples,
   name,
+  priority = false,
 }: {
   thumbnail: string;
   samples: FrameSample[];
   name: string;
+  priority?: boolean;
 }) {
   const images: { src: string; label: string }[] = [
     { src: thumbnail, label: "Main" },
@@ -109,6 +111,7 @@ function ImageGallery({
           fill
           sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
           className="object-contain"
+          priority={priority && activeIdx === 0}
           onError={() => setImgError((p) => ({ ...p, [activeIdx]: true }))}
         />
       ) : (
@@ -186,7 +189,7 @@ function ImageGallery({
 
 // ── Frame card ─────────────────────────────────────────────────────────────────
 
-function FrameCard({ frame }: { frame: FrameProduct }) {
+function FrameCard({ frame, priority = false }: { frame: FrameProduct; priority?: boolean }) {
   const { addItem } = useCart();
   const router = useRouter();
 
@@ -229,6 +232,7 @@ function FrameCard({ frame }: { frame: FrameProduct }) {
         thumbnail={frame.thumbnail}
         samples={frame.samples ?? []}
         name={frame.name}
+        priority={priority}
       />
 
       {/* Card body */}
@@ -403,7 +407,7 @@ export default function PhotoFramingPage() {
             </div>
           ) : (
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-              {frames.map((f) => <FrameCard key={f.id} frame={f} />)}
+              {frames.map((f, i) => <FrameCard key={f.id} frame={f} priority={i < 4} />)}
             </div>
           )}
         </div>

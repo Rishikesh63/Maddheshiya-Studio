@@ -10,8 +10,9 @@ from .serializers import (
     RegisterSerializer,
     UserSerializer,
     _send_otp_email,
+    _send_phone_otp,
 )
-from .models import CustomUser, EmailVerificationOTP
+from .models import CustomUser, EmailVerificationOTP, PhoneOTP
 
 
 class EmailOrUsernameTokenObtainPairView(TokenObtainPairView):
@@ -160,6 +161,127 @@ class GoogleAuthView(APIView):
 
         return Response({
             'access': str(refresh.access_token),
+            'refresh': str(refresh),
+        })
+
+
+class SendPhoneOTPView(APIView):
+    """
+    Send a login/signup OTP to the given phone number.
+    If the phone is new, creates an inactive user (name required for new users).
+    POST { phone, name }
+    """
+    permission_classes = [permissions.AllowAny]
+
+    def post(self, request):
+        phone = request.data.get('phone', '').strip()
+        name  = request.data.get('name', '').strip()
+
+        if not phone or len(phone) < 10:
+            return Response({'error': 'Enter a valid 10-digit mobile number.'}, status=400)
+
+        # Normalise: strip leading +91 / 0 so we store only 10 digits
+        if phone.startswith('+91'):
+            phone = phone[3:]
+        elif phone.startswith('91') and len(phone) == 12:
+            phone = phone[2:]
+        phone = phone.lstrip('0')
+
+        if len(phone) != 10 or not phone.isdigit():
+            return Response({'error': 'Enter a valid 10-digit Indian mobile number.'}, status=400)
+
+        user = CustomUser.objects.filter(phone=phone).first()
+
+        if not user:
+            # New user — name is required
+            if not name:
+                return Response({'error': 'Please enter your name to create an account.', 'is_new': True}, status=400)
+            parts = name.split(' ', 1)
+            base = f'user{phone[-4:]}'
+            username = base
+            counter = 1
+            while CustomUser.objects.filter(username=username).exists():
+                username = f'{base}{counter}'
+                counter += 1
+            user = CustomUser.objects.create_user(
+                username=username,
+                email=None,
+                password=None,
+                first_name=parts[0],
+                last_name=parts[1] if len(parts) > 1 else '',
+                phone=phone,
+                is_active=False,
+            )
+        else:
+            # Existing user — update name if provided and different
+            if name:
+                parts = name.split(' ', 1)
+                changed = False
+                if not user.first_name:
+                    user.first_name = parts[0]; changed = True
+                if len(parts) > 1 and not user.last_name:
+                    user.last_name = parts[1]; changed = True
+                if changed:
+                    user.save(update_fields=['first_name', 'last_name'])
+
+        otp_obj = PhoneOTP.generate_for(user)
+        _send_phone_otp(phone, otp_obj.otp)
+
+        return Response({'message': 'OTP sent to your mobile number.', 'is_new': not user.is_active})
+
+
+class VerifyPhoneOTPView(APIView):
+    """
+    Verify phone OTP. Activates new users and returns JWT tokens.
+    POST { phone, otp }
+    """
+    permission_classes = [permissions.AllowAny]
+
+    def post(self, request):
+        phone = request.data.get('phone', '').strip()
+        otp   = request.data.get('otp', '').strip()
+
+        if not phone or not otp:
+            return Response({'error': 'Phone and OTP are required.'}, status=400)
+
+        # Normalise
+        if phone.startswith('+91'):
+            phone = phone[3:]
+        elif phone.startswith('91') and len(phone) == 12:
+            phone = phone[2:]
+        phone = phone.lstrip('0')
+
+        try:
+            user = CustomUser.objects.get(phone=phone)
+        except CustomUser.DoesNotExist:
+            return Response({'error': 'Invalid OTP. Please try again.'}, status=400)
+
+        otp_obj = (
+            PhoneOTP.objects
+            .filter(user=user, otp=otp, is_used=False)
+            .order_by('-created_at')
+            .first()
+        )
+
+        if not otp_obj:
+            return Response({'error': 'Invalid OTP. Please check and try again.'}, status=400)
+
+        if otp_obj.is_expired():
+            return Response({'error': 'This OTP has expired. Please request a new one.'}, status=400)
+
+        otp_obj.is_used = True
+        otp_obj.save()
+
+        if not user.is_active:
+            user.is_active = True
+            user.save(update_fields=['is_active'])
+
+        refresh = RefreshToken.for_user(user)
+        refresh['is_admin_user'] = user.is_admin_user
+        refresh['is_superuser']  = user.is_superuser
+
+        return Response({
+            'access':  str(refresh.access_token),
             'refresh': str(refresh),
         })
 

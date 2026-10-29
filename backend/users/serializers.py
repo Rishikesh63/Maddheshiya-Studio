@@ -3,12 +3,53 @@ import logging
 import urllib.error
 import urllib.request
 from rest_framework import serializers
-from .models import CustomUser, EmailVerificationOTP
+from .models import CustomUser, EmailVerificationOTP, PhoneOTP
 from django.contrib.auth.password_validation import validate_password
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from django.conf import settings
 
 logger = logging.getLogger(__name__)
+
+
+def _send_phone_otp(phone: str, otp: str) -> None:
+    """Send OTP via AWS SNS SMS. Phone should be a 10-digit Indian number."""
+    aws_key    = getattr(settings, 'AWS_ACCESS_KEY_ID', '')
+    aws_secret = getattr(settings, 'AWS_SECRET_ACCESS_KEY', '')
+    aws_region = getattr(settings, 'AWS_SNS_REGION', getattr(settings, 'AWS_S3_REGION_NAME', 'ap-south-1'))
+
+    e164 = phone.strip()
+    if not e164.startswith('+'):
+        e164 = f'+91{e164}'
+
+    message = (
+        f"Your Maddheshiya Studio OTP is: {otp}\n"
+        f"Valid for 10 minutes. Do not share this code."
+    )
+
+    if aws_key and aws_secret:
+        try:
+            import boto3
+            sns = boto3.client(
+                'sns',
+                region_name=aws_region,
+                aws_access_key_id=aws_key,
+                aws_secret_access_key=aws_secret,
+            )
+            sns.publish(
+                PhoneNumber=e164,
+                Message=message,
+                MessageAttributes={
+                    'AWS.SNS.SMS.SMSType': {
+                        'DataType': 'String',
+                        'StringValue': 'Transactional',
+                    },
+                },
+            )
+            logger.info("Phone OTP sent via SNS to %s", phone)
+        except Exception as e:
+            logger.error("SNS SMS failed for %s: %s", phone, e)
+    else:
+        logger.warning("AWS not configured — Phone OTP for %s: %s", phone, otp)
 
 
 def _send_otp_email(to_email: str, otp: str, first_name: str = '') -> None:

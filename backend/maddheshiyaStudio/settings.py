@@ -321,6 +321,27 @@ ACCOUNT_USER_MODEL_USERNAME_FIELD = 'username'
 
 # Redirect URLs after login/logout - can customize
 LOGIN_REDIRECT_URL = "/"
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'root': {
+        'handlers': ['console'],
+        'level': 'INFO',
+    },
+    'loggers': {
+        'users': {
+            'handlers': ['console'],
+            'level': 'DEBUG',
+            'propagate': False,
+        },
+    },
+}
 LOGOUT_REDIRECT_URL = "/"
 
 _CSRF_TRUSTED_ORIGINS = env.list(

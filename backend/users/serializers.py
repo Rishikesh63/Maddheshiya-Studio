@@ -26,6 +26,8 @@ def _send_phone_otp(phone: str, otp: str) -> None:
         f"Valid for 10 minutes. Do not share this code."
     )
 
+    print(f"[OTP DEBUG] Phone: {phone} | OTP: {otp}")
+
     if aws_key and aws_secret:
         try:
             import boto3
@@ -46,10 +48,13 @@ def _send_phone_otp(phone: str, otp: str) -> None:
                 },
             )
             logger.info("Phone OTP sent via SNS to %s", phone)
+            print(f"[OTP] SMS sent via SNS to {phone}")
         except Exception as e:
             logger.error("SNS SMS failed for %s: %s", phone, e)
+            print(f"[OTP ERROR] SNS failed for {phone}: {e}")
     else:
         logger.warning("AWS not configured — Phone OTP for %s: %s", phone, otp)
+        print(f"[OTP] AWS not configured. OTP for {phone}: {otp}")
 
 
 def _send_otp_email(to_email: str, otp: str, first_name: str = '') -> None:
